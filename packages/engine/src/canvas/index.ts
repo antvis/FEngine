@@ -6,7 +6,7 @@ import equal from '../component/equal';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
-import render from '../render';
+import createRenderTree from './createRenderTree';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -19,6 +19,7 @@ interface CanvasProps {
   theme?: any;
   style?: any;
   container?: any;
+  renderer?: any;
 }
 
 // function measureText(canvas, px2hd) {
@@ -77,7 +78,7 @@ class Canvas extends Component<CanvasProps> {
       return;
     }
     renderComponent(components);
-    this.draw();
+    this._render();
   }
 
   update(nextProps: CanvasProps) {
@@ -94,15 +95,17 @@ class Canvas extends Component<CanvasProps> {
     const { children: nextChildren } = props;
 
     renderChildren(this, nextChildren, lastChildren);
-    this.draw();
+    this._render();
     return null;
   }
 
-  destroy() {}
-
-  draw() {
+  _render() {
     const { children, props } = this;
+    const renderTree = createRenderTree(children);
+    props.renderer.render(renderTree);
   }
+
+  destroy() {}
 
   on(type: string, listener) {
     this._ee.on(type, listener);
