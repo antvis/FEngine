@@ -1,6 +1,8 @@
 import { jsx, Canvas, Component } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
+import GRender from '../../src/g-render';
+import JSONRender from '../../src/json-render';
 
 class View extends Component {
   render() {
@@ -14,26 +16,12 @@ class View extends Component {
             height: '80px',
             fill: 'red',
           }}
-          animation={{
-            appear: {
-              easing: 'linear',
-              duration: 300,
-              delay: 0,
-              property: ['fillOpacity'],
-              start: {
-                fillOpacity: 0,
-              },
-              end: {
-                fillOpacity: 1,
-              },
-            },
-          }}
         />
         <circle
           attrs={{
             x: '150px',
             y: '50px',
-            r: '50px',
+            r: '40px',
             fill: 'red',
           }}
         />
@@ -46,24 +34,77 @@ function View1() {
   return <group></group>;
 }
 
-function View2() {
-  return <View />;
+function View2(props) {
+  return props.children;
 }
 
 describe('Canvas', () => {
-  it('图形绘制', async () => {
+  it('g render', async () => {
+    const renderer = new GRender();
     const { props } = (
-      <Canvas context={context}>
+      <Canvas renderer={renderer} context={context}>
         <View />
         <View1 />
-        <View2 />
+        <View2>
+          <View />
+          <View1 />
+        </View2>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+  });
+
+  it('json render', async () => {
+    const renderer = new JSONRender();
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <View />
+        <View1 />
+        <View2>
+          <View />
+          <View1 />
+        </View2>
       </Canvas>
     );
 
     const canvas = new Canvas(props);
     canvas.render();
 
-    // await delay(100);
-    // expect(context).toMatchImageSnapshot();
+    const json = renderer.root;
+    expect(json).toEqual({
+      type: 'canvas',
+      props: {
+        children: [
+          {
+            type: 'group',
+            props: {
+              children: [
+                {
+                  type: 'rect',
+                  props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
+                },
+                { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
+              ],
+            },
+          },
+          { type: 'group', props: {} },
+          {
+            type: 'group',
+            props: {
+              children: [
+                {
+                  type: 'rect',
+                  props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
+                },
+                { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
+              ],
+            },
+          },
+          { type: 'group', props: {} },
+        ],
+      },
+    });
   });
 });
