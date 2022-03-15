@@ -25,13 +25,93 @@ class View extends Component {
             fill: 'red',
           }}
         />
+        <path
+          attrs={{
+            path: [
+              ['M', 100, 100],
+              ['L', 200, 200],
+            ],
+            stroke: '#F04864',
+          }}
+        />
+        <ellipse
+          attrs={{
+            x: '250px',
+            y: '50px',
+            rx: '40px',
+            ry: '20px',
+            fill: 'red',
+          }}
+        />
+        <image
+          attrs={{
+            x: '300px',
+            y: '10px',
+            width: '100px',
+            height: '100px',
+            img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+          }}
+        />
       </group>
     );
   }
 }
 
 function View1() {
-  return <group></group>;
+  return (
+    <group>
+      <line
+        attrs={{
+          x1: '400px',
+          y1: '50px',
+          x2: '500px',
+          y2: '50px',
+          stroke: '#1890FF',
+          lineWidth: 2,
+          lineDash: [10, 10],
+        }}
+      />
+      <polyline
+        attrs={{
+          points: [
+            [50, 50],
+            [100, 50],
+            [100, 100],
+            [150, 100],
+            [150, 150],
+            [200, 150],
+            [200, 200],
+          ],
+          stroke: '#1890FF',
+          lineWidth: 2,
+        }}
+      />
+      <polygon
+        attrs={{
+          points: [
+            [0, 100],
+            [100, 100],
+            [100, 200],
+            [0, 200],
+          ],
+          stroke: '#1890FF',
+          lineWidth: 2,
+        }}
+      />
+      <text
+        attrs={{
+          x: 100,
+          y: 100,
+          fontFamily: 'PingFang SC',
+          text: '这是测试文本This is text',
+          fontSize: 15,
+          fill: '#1890FF',
+          stroke: '#F04864',
+          lineWidth: 5,
+        }}
+      />
+    </group>
+  );
 }
 
 function View2(props) {
@@ -86,10 +166,114 @@ describe('Canvas', () => {
                   props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
                 },
                 { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
+                {
+                  type: 'path',
+                  props: {
+                    attrs: {
+                      path: [
+                        ['M', 100, 100],
+                        ['L', 200, 200],
+                      ],
+                      stroke: '#F04864',
+                    },
+                  },
+                },
+                {
+                  type: 'ellipse',
+                  props: {
+                    attrs: {
+                      x: 125,
+                      y: 25,
+                      rx: 20,
+                      ry: 10,
+                      fill: 'red',
+                    },
+                  },
+                },
+                {
+                  type: 'image',
+                  props: {
+                    attrs: {
+                      x: 150,
+                      y: 5,
+                      width: 50,
+                      height: 50,
+                      img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+                    },
+                  },
+                },
               ],
             },
           },
-          { type: 'group', props: {} },
+          {
+            type: 'group',
+            props: {
+              children: [
+                {
+                  type: 'line',
+                  props: {
+                    attrs: {
+                      x1: 200,
+                      y1: 25,
+                      x2: 250,
+                      y2: 25,
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                      lineDash: [10, 10],
+                    },
+                  },
+                },
+                {
+                  type: 'polyline',
+                  props: {
+                    attrs: {
+                      points: [
+                        [50, 50],
+                        [100, 50],
+                        [100, 100],
+                        [150, 100],
+                        [150, 150],
+                        [200, 150],
+                        [200, 200],
+                      ],
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                    },
+                  },
+                },
+                {
+                  type: 'polygon',
+                  props: {
+                    attrs: {
+                      points: [
+                        [0, 100],
+                        [100, 100],
+                        [100, 200],
+                        [0, 200],
+                      ],
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                    },
+                  },
+                },
+                {
+                  type: 'text',
+                  props: {
+                    attrs: {
+                      x: 100,
+                      y: 100,
+                      fontFamily: 'PingFang SC',
+                      text: '这是测试文本This is text',
+                      fontSize: 15,
+                      fill: '#1890FF',
+                      stroke: '#F04864',
+                      lineWidth: 5,
+                    },
+                  },
+                },
+              ],
+            },
+          },
           {
             type: 'group',
             props: {
@@ -99,10 +283,114 @@ describe('Canvas', () => {
                   props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
                 },
                 { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
+                {
+                  type: 'path',
+                  props: {
+                    attrs: {
+                      path: [
+                        ['M', 100, 100],
+                        ['L', 200, 200],
+                      ],
+                      stroke: '#F04864',
+                    },
+                  },
+                },
+                {
+                  type: 'ellipse',
+                  props: {
+                    attrs: {
+                      x: 125,
+                      y: 25,
+                      rx: 20,
+                      ry: 10,
+                      fill: 'red',
+                    },
+                  },
+                },
+                {
+                  type: 'image',
+                  props: {
+                    attrs: {
+                      x: 150,
+                      y: 5,
+                      width: 50,
+                      height: 50,
+                      img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+                    },
+                  },
+                },
               ],
             },
           },
-          { type: 'group', props: {} },
+          {
+            type: 'group',
+            props: {
+              children: [
+                {
+                  type: 'line',
+                  props: {
+                    attrs: {
+                      x1: 200,
+                      y1: 25,
+                      x2: 250,
+                      y2: 25,
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                      lineDash: [10, 10],
+                    },
+                  },
+                },
+                {
+                  type: 'polyline',
+                  props: {
+                    attrs: {
+                      points: [
+                        [50, 50],
+                        [100, 50],
+                        [100, 100],
+                        [150, 100],
+                        [150, 150],
+                        [200, 150],
+                        [200, 200],
+                      ],
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                    },
+                  },
+                },
+                {
+                  type: 'polygon',
+                  props: {
+                    attrs: {
+                      points: [
+                        [0, 100],
+                        [100, 100],
+                        [100, 200],
+                        [0, 200],
+                      ],
+                      stroke: '#1890FF',
+                      lineWidth: 2,
+                    },
+                  },
+                },
+                {
+                  type: 'text',
+                  props: {
+                    attrs: {
+                      x: 100,
+                      y: 100,
+                      fontFamily: 'PingFang SC',
+                      text: '这是测试文本This is text',
+                      fontSize: 15,
+                      fill: '#1890FF',
+                      stroke: '#F04864',
+                      lineWidth: 5,
+                    },
+                  },
+                },
+              ],
+            },
+          },
         ],
       },
     });

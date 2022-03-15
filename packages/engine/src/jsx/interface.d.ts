@@ -20,6 +20,9 @@ declare global {
       group: any;
       rect: any;
       circle: any;
+      path: any;
+      ellipse: any;
+      image: any;
       line: any;
       polygon: any;
       polyline: any;
@@ -28,7 +31,6 @@ declare global {
       text: any;
       custom: any;
       marker: any;
-      image: any;
 
       // group: RectProps;
       // rect: RectProps;

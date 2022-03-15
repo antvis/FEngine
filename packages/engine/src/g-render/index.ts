@@ -1,4 +1,16 @@
-import { Canvas, Group, Circle, Rect, Path, Image, Line, Polyline } from '@antv/g';
+import {
+  Canvas,
+  Group,
+  Text,
+  Circle,
+  Ellipse,
+  Rect,
+  Path,
+  Image,
+  Line,
+  Polyline,
+  Polygon,
+} from '@antv/g';
 import { Renderer as CanvasRenderer } from '@antv/g-canvas';
 // import { Renderer as WebGLRenderer } from '@antv/g-webgl';
 // import { Renderer as SVGRenderer } from '@antv/g-svg';
@@ -11,8 +23,15 @@ const canvasRenderer = new CanvasRenderer();
 
 const classMap = {
   group: Group,
+  text: Text,
   circle: Circle,
+  path: Path,
+  ellipse: Ellipse,
   rect: Rect,
+  image: Image,
+  line: Line,
+  polyline: Polyline,
+  polygon: Polygon,
 };
 
 function renderChildren(elements, container) {
