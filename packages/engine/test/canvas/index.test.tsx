@@ -16,6 +16,18 @@ class View extends Component {
             height: '80px',
             fill: 'red',
           }}
+          onClick={() => {
+            console.log('click rect');
+          }}
+          onPanStart={() => {
+            console.log('drag start');
+          }}
+          onPan={() => {
+            console.log('drag');
+          }}
+          onPanEnd={() => {
+            console.log('drag end');
+          }}
         />
         <circle
           attrs={{
@@ -23,6 +35,15 @@ class View extends Component {
             y: '50px',
             r: '40px',
             fill: 'red',
+          }}
+          touchStart={() => {
+            console.log('touchStart');
+          }}
+          touchMove={() => {
+            console.log('touchMove');
+          }}
+          touchEnd={() => {
+            console.log('touchEnd');
           }}
         />
         <path
@@ -49,7 +70,8 @@ class View extends Component {
             y: '10px',
             width: '100px',
             height: '100px',
-            img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+            img:
+              'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
           }}
         />
       </group>
@@ -109,6 +131,9 @@ function View1() {
           stroke: '#F04864',
           lineWidth: 5,
         }}
+        onClick={() => {
+          console.log('click text');
+        }}
       />
     </group>
   );
@@ -120,7 +145,9 @@ function View2(props) {
 
 describe('Canvas', () => {
   it('g render', async () => {
-    const renderer = new GRender();
+    const renderer = new GRender({
+      context,
+    });
     const { props } = (
       <Canvas renderer={renderer} context={context}>
         <View />
@@ -163,7 +190,21 @@ describe('Canvas', () => {
               children: [
                 {
                   type: 'rect',
-                  props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
+                  props: {
+                    attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' },
+                    // onClick: () => {
+                    //   console.log('click rect');
+                    // },
+                    // onPanStart: () => {
+                    //   console.log('drag start');
+                    // },
+                    // onPan: () => {
+                    //   console.log('drag');
+                    // },
+                    // onPanEnd: () => {
+                    //   console.log('drag end');
+                    // },
+                  },
                 },
                 { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
                 {
@@ -198,7 +239,8 @@ describe('Canvas', () => {
                       y: 5,
                       width: 50,
                       height: 50,
-                      img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+                      img:
+                        'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
                     },
                   },
                 },
@@ -280,7 +322,21 @@ describe('Canvas', () => {
               children: [
                 {
                   type: 'rect',
-                  props: { attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' } },
+                  props: {
+                    attrs: { x: 5, y: 5, width: 40, height: 40, fill: 'red' },
+                    // onClick: () => {
+                    //   console.log('click rect');
+                    // },
+                    // onPanStart: () => {
+                    //   console.log('drag start');
+                    // },
+                    // onPan: () => {
+                    //   console.log('drag');
+                    // },
+                    // onPanEnd: () => {
+                    //   console.log('drag end');
+                    // },
+                  },
                 },
                 { type: 'circle', props: { attrs: { x: 75, y: 25, r: 20, fill: 'red' } } },
                 {
@@ -315,7 +371,8 @@ describe('Canvas', () => {
                       y: 5,
                       width: 50,
                       height: 50,
-                      img: 'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
+                      img:
+                        'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
                     },
                   },
                 },

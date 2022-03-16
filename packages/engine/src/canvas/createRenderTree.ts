@@ -35,6 +35,18 @@ function createNodeTree(element) {
   const style = px2hd(props.style);
   const attrs = px2hd(props.attrs);
 
+  // 事件
+  const {
+    onClick,
+    onPanStart,
+    touchStart,
+    touchMove,
+    touchEnd,
+    onPan,
+    onPanEnd,
+    press,
+    swipe,
+  } = props;
   // 文本要自动计算文本的宽高, TODO, 后面再优化
   // if (type === 'text') {
   //   const shape = container.addShape(type, {
@@ -63,7 +75,16 @@ function createNodeTree(element) {
     children,
     status,
     animation,
-
+    // 事件
+    onClick,
+    onPanStart,
+    touchStart,
+    touchMove,
+    touchEnd,
+    onPan,
+    onPanEnd,
+    press,
+    swipe,
     // 处理px2hd之后的配置
     style,
     attrs,
