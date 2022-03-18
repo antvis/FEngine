@@ -1,5 +1,6 @@
 import {
   Canvas,
+  Renderer,
   Group,
   Text,
   Circle,
@@ -10,14 +11,14 @@ import {
   Line,
   Polyline,
   Polygon,
-} from '@antv/g';
-import { Renderer as CanvasRenderer } from '@antv/g-canvas';
+} from '@antv/g-mobile';
+import EventController from './event';
 // import { Renderer as WebGLRenderer } from '@antv/g-webgl';
 // import { Renderer as SVGRenderer } from '@antv/g-svg';
 import Children from '../children';
 
 // create a renderer
-const canvasRenderer = new CanvasRenderer();
+const render = new Renderer();
 // const webglRenderer = new WebGLRenderer();
 // const svgRenderer = new SVGRenderer();
 
@@ -44,6 +45,8 @@ function renderChildren(elements, container) {
     });
     container.appendChild(shape);
 
+    const eventController = new EventController({ shape, callback: { ...element } });
+
     // 如果元素被删除了，就不会有renderChildren， 直接拿node.children渲染
     const children = element.renderChildren ? element.renderChildren : nodeChildren;
     if (children && children.length) {
@@ -55,18 +58,21 @@ function renderChildren(elements, container) {
 }
 
 class Render {
-  canvas: any;
-  constructor() {
+  canvas: Canvas;
+
+  constructor(props) {
+    const { context, onClick } = props;
     this.canvas = new Canvas({
-      container: 'container',
-      width: 600,
+      context,
+      width: 500,
       height: 500,
-      renderer: canvasRenderer,
+      devicePixelRatio: 2,
+      renderer: render,
     });
   }
+
   render(renderTree) {
     renderChildren(renderTree, this.canvas);
-
     return this.canvas;
   }
 }
