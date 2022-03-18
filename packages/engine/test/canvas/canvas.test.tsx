@@ -1,6 +1,6 @@
 import { createContext, delay } from '../util';
 const context = createContext();
-import Hammer from 'hammerjs';
+import Hammer from 'hammer';
 
 import { Canvas, Renderer, Circle } from '@antv/g-mobile';
 
@@ -28,7 +28,9 @@ describe('canvas', () => {
         shadowBlur: 20,
       },
     });
+    // @ts-ignore
     const hammer = new Hammer(circle);
+    // @ts-ignore
     hammer.on('panleft panright tap press', onPanStart);
     canvas.appendChild(circle);
   });
