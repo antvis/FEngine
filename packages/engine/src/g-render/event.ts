@@ -1,10 +1,9 @@
-import Hammer from 'hammerjs';
+import Hammer from 'hammer';
 
 export default class EventController {
   private shape;
   private callback;
   private hammer;
-  private dragging: boolean = false;
 
   constructor(props) {
     const { shape, callback } = props;
