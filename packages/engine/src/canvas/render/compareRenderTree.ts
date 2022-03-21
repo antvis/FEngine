@@ -1,7 +1,7 @@
 // 比较2颗shape树，并返回新的渲染树
-import Children from '../children';
+import Children from '../../children';
 import { isArray, isNil, mix } from '@antv/util';
-import { ELEMENT_APPEAR, ELEMENT_DELETE, ELEMENT_UPDATE } from './elementStatus';
+import { ELEMENT_APPEAR, ELEMENT_DELETE, ELEMENT_UPDATE } from '../../component/elementStatus';
 
 // 处理删除的元素
 function deleteElement(element) {

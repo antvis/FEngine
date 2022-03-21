@@ -7,7 +7,7 @@
   "dependencies": {
     "@antv/event-emitter": "~0.1.3",
     "@antv/g": "~5.0.14",
-    "@antv/g-canvas": "~1.0.12",
+    "@antv/g-mobile": "*",
     "@antv/util": "~2.0.6",
     "@babel/runtime": "^7.12.5",
     "reflect-metadata": "^0.1.13"
