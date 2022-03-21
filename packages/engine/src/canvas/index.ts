@@ -6,7 +6,8 @@ import equal from '../component/equal';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
-import createRenderTree from './createRenderTree';
+import { Canvas as GCanvas } from '@antv/g-mobile';
+import { render } from './render';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -48,11 +49,12 @@ interface CanvasProps {
 
 // 顶层Canvas标签
 class Canvas extends Component<CanvasProps> {
+  private canvas: GCanvas;
   private _ee: EE;
 
   constructor(props: CanvasProps) {
     super(props);
-    const { context, width, height, animate = true, px2hd } = props;
+    const { context, renderer, width, height, animate = true, px2hd } = props;
 
     // 组件更新器
     const updater = createUpdater(this);
@@ -64,8 +66,11 @@ class Canvas extends Component<CanvasProps> {
       // measureText: measureText(canvas, px2hd),
     };
 
-    // 动画模块
-    // const animation = new Animation(canvas);
+    this.canvas = new GCanvas({
+      context,
+      devicePixelRatio: 1,
+      renderer,
+    });
 
     this._ee = new EE();
     this.context = componentContext;
@@ -100,9 +105,9 @@ class Canvas extends Component<CanvasProps> {
   }
 
   _render() {
-    const { children, props } = this;
-    const renderTree = createRenderTree(children);
-    props.renderer.render(renderTree);
+    const { children, canvas } = this;
+    // @ts-ignore
+    render(children, canvas);
   }
 
   destroy() {}

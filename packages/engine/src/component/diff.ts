@@ -2,8 +2,6 @@ import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';
 import Children from '../children';
-import renderJSXElement from './renderJSXElement';
-import compareRenderTree from './compareRenderTree';
 
 interface Element extends JSX.Element {
   component: Component;
@@ -16,31 +14,6 @@ function pickElement(element) {
     // 只需要这几个元素就可以了
     return pick(item, ['key', 'ref', 'type', 'props']);
   });
-}
-
-function renderShape(component: Component, children: Element, animate?: boolean) {
-  const {
-    context,
-    updater,
-    // @ts-ignore
-    __lastElement,
-    // @ts-ignore
-    transformFrom,
-    animate: componentAnimate,
-  } = component;
-
-  animate = isBoolean(animate) ? animate : componentAnimate;
-  const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
-
-  // children 是 shape 的 jsx 结构, component.render() 返回的结构
-  const shapeElement = renderJSXElement(children, context, updater);
-  // @ts-ignore
-  component.__lastElement = shapeElement;
-  const renderElement =
-    animate !== false ? compareRenderTree(shapeElement, lastElement) : shapeElement;
-  // @ts-ignore
-  component.renderElement = renderElement;
-  return renderElement;
 }
 
 function setComponentAnimate(child: Component, parent: Component) {
@@ -273,13 +246,18 @@ function isContainer(children: Element | Element[]) {
 function renderChildren(parent: Component, nextChildren, lastChildren) {
   // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
   nextChildren = pickElement(nextChildren);
+
+  // 设置 children 的引用
   parent.children = nextChildren;
 
   if (!isContainer(nextChildren)) {
-    return renderShape(parent, nextChildren);
+    // TODO
+    // @ts-ignore
+    parent.isShapeComponent = true;
+    return;
   }
 
   return diff(parent, nextChildren, lastChildren);
 }
 
-export { renderChildren, diff, renderComponent };
+export { renderChildren, renderComponent };

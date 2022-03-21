@@ -28,6 +28,7 @@ class Component<P = any, S = any> {
   }
   willMount() {}
   didMount() {}
+  shouldUpdate() {}
   willReceiveProps(_props: P) {}
   willUpdate() {}
   didUpdate() {}

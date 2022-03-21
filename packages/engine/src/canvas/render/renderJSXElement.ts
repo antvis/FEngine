@@ -1,5 +1,5 @@
-import JSX from '../jsx/interface';
-import Children from '../children';
+import JSX from '../../jsx/interface';
+import Children from '../../children';
 
 // 主要是把function节点，全部转换成string标签节点
 function renderJSXElement(element: JSX.Element, context, updater): JSX.Element {
