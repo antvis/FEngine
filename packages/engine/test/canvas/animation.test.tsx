@@ -94,14 +94,29 @@ class View extends Component {
           onClick={() => {
             console.log('click rect');
           }}
+          onDbClick={() => {
+            console.log('dbclick');
+          }}
+          // onTouchStart={() => {
+          //   console.log('touch start');
+          // }}
+          // onTouchMove={() => {
+          //   console.log('touch');
+          // }}
+          // onTouchEnd={() => {
+          //   console.log('touch end');
+          // }}
+          // onTouchEndOutside={() => {
+          //   console.log('touch end outside');
+          // }}
           onPanStart={() => {
-            console.log('drag start');
+            console.log('pan start');
           }}
           onPan={() => {
-            console.log('drag');
+            console.log('pan');
           }}
           onPanEnd={() => {
-            console.log('drag end');
+            console.log('pan end');
           }}
         />
       </group>

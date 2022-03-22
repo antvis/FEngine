@@ -1,4 +1,4 @@
-import { Group, convertToPath } from '@antv/g-mobile';
+import { Group, convertToPath } from '@antv/g';
 import { isBoolean, isNil, mix } from '@antv/util';
 import Children from '../../children';
 import Component from '../../component';

@@ -1,5 +1,6 @@
 import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
-import Hammer from 'hammer';
+// import Hammer from 'hammer';
+import Hammer from '../event/index';
 
 const classMap = {
   group: Group,
@@ -21,9 +22,11 @@ function createShape(type: string, props) {
   //  支持的事件列表
   const {
     onClick,
+    onDbClick,
     onTouchStart,
     onTouchMove,
     onTouchEnd,
+    onTouchEndOutside,
     onPanStart,
     onPan,
     onPanEnd,
@@ -32,25 +35,21 @@ function createShape(type: string, props) {
   } = props;
   const shape = new ShapeClass({ style });
 
-  if (onClick) {
-    shape.addEventListener('click', onClick);
-  }
-  if (onTouchStart) {
-    shape.addEventListener('touchstart', onTouchStart);
-  }
-  if (onTouchMove) {
-    shape.addEventListener('touchmove', onTouchMove);
-  }
-  if (onTouchEnd) {
-    shape.addEventListener('touchend', onTouchEnd);
-  }
-
   const hammer = new Hammer(shape);
-  hammer.on('panstart', onPanStart);
-  hammer.on('panmove', onPan);
-  hammer.on('panend', onPanEnd);
-  hammer.on('press', onPress);
-  hammer.on('swipe', onSwipe);
+
+  onClick && hammer.on('click', onClick);
+  onDbClick && hammer.on('dbclick', onDbClick);
+
+  onTouchStart && hammer.on('touchstart', onTouchStart);
+  onTouchMove && hammer.on('touchmove', onTouchMove);
+  onTouchEnd && hammer.on('touchend', onTouchEnd);
+  onTouchEndOutside && hammer.on('touchendoutside', onTouchEndOutside);
+
+  onPanStart && hammer.on('panstart', onPanStart);
+  onPan && hammer.on('pan', onPan);
+  onPanEnd && hammer.on('panend', onPanEnd);
+  onPress && hammer.on('press', onPress);
+  onSwipe && hammer.on('swipe', onSwipe);
 
   return shape;
 }
