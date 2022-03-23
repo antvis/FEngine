@@ -16,6 +16,7 @@
     "url": "https://github.com/antvis/FEngine/issues"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-static-block": "^7.17.6",
     "@types/jest": "^26.0.20",
     "@types/jest-image-snapshot": "^4.3.1",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
@@ -63,5 +64,11 @@
     "react-monaco-editor": "0.34.0",
     "monaco-editor": "0.20.0",
     "monaco-editor-webpack-plugin": "1.9.1"
+  },
+  "dependencies": {
+    "@antv/f2-graphic": "^0.0.2-alpha.1",
+    "@antv/g-webgl": "^1.0.20",
+    "d3-interpolate": "^3.0.1",
+    "reflect-metadata": "^0.1.13"
   }
 }
