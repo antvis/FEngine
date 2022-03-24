@@ -1,17 +1,5 @@
-import {
-  Canvas,
-  Renderer,
-  Group,
-  Text,
-  Circle,
-  Ellipse,
-  Rect,
-  Path,
-  Image,
-  Line,
-  Polyline,
-  Polygon,
-} from '@antv/g-mobile';
+import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
+import { Canvas, Renderer } from '@antv/g-mobile';
 import EventController from './event';
 // import { Renderer as WebGLRenderer } from '@antv/g-webgl';
 // import { Renderer as SVGRenderer } from '@antv/g-svg';
