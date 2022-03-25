@@ -89,6 +89,8 @@ class View extends Component {
               end: {
                 fill: 'red',
               },
+              // onFrame(),
+              // onEnd()()
             },
           }}
           onClick={() => {

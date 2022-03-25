@@ -8,6 +8,7 @@ import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import { render } from './render';
+import AnimateController from './animation/animateController';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -51,6 +52,7 @@ interface CanvasProps {
 class Canvas extends Component<CanvasProps> {
   private canvas: GCanvas;
   private _ee: EE;
+  private animateControllers: AnimateController[];
 
   constructor(props: CanvasProps) {
     super(props);
@@ -76,6 +78,8 @@ class Canvas extends Component<CanvasProps> {
     this.context = componentContext;
     this.updater = updater;
     this.animate = animate;
+    // 单帧动画
+    this.animateControllers = [];
   }
 
   renderComponents(components: Component[]) {
@@ -91,6 +95,7 @@ class Canvas extends Component<CanvasProps> {
     if (equal(nextProps, props)) {
       return;
     }
+
     this.props = nextProps;
     this.render();
   }
@@ -105,9 +110,23 @@ class Canvas extends Component<CanvasProps> {
   }
 
   _render() {
-    const { children, canvas } = this;
-    // @ts-ignore
-    render(children, canvas);
+    const { children, canvas, animateControllers } = this;
+    const animateController = new AnimateController();
+
+    render(children, {
+      // @ts-ignore
+      container: canvas,
+      animateController,
+    });
+
+    // 获取当帧动画时长
+    const endTime = animateController.getMaxEndTime();
+
+    animateController.animationEnd(this._animationEnd);
+  }
+
+  _animationEnd() {
+    console.log('当帧动画结束');
   }
 
   destroy() {}
