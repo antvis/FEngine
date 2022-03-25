@@ -1,14 +1,15 @@
-import { Group, convertToPath } from '@antv/g';
-import { flatten, isBoolean, isNil, mix } from '@antv/util';
+import { convertToPath } from '@antv/g';
+import { isBoolean, isNil, mix } from '@antv/util';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import Children from '../../children';
 import Component from '../../component';
+import AnimateController from '../animation/animateController';
 import renderJSXElement from './renderJSXElement';
 import createShape from './createShape';
 
 interface Options {
-  container: Group;
-  animateController: any;
+  container: GCanvas;
+  animateController: AnimateController;
 }
 
 function doAnimate(shape, animate) {
