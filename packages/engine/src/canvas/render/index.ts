@@ -6,6 +6,9 @@ import Component from '../../component';
 import AnimateController from '../animation/animateController';
 import renderJSXElement from './renderJSXElement';
 import createShape from './createShape';
+import { createNodeTree, mergeLayout } from './renderLayout';
+import computeLayout from '../css-layout';
+import getShapeAttrs from '../shape';
 
 interface Options {
   container: GCanvas;
@@ -28,13 +31,22 @@ function doAnimate(shape, animate) {
 }
 
 // 创建元素
-function createElement(element, options) {
+function createElement(element, options, parentLayout) {
   const { container, animateController } = options;
+
   return Children.map(element, (item) => {
     if (!item) return item;
-    const { ref, type, props } = item;
-    const { children, animation } = props;
-    const shape = createShape(type, props);
+    const { ref, type, props, layout: originLayout, children } = item;
+
+    const { style, animation } = props;
+    const layout = mergeLayout(parentLayout, originLayout);
+
+    const elementAttrs = {
+      ...getShapeAttrs(type, layout),
+      ...style,
+    };
+
+    const shape = createShape(type, props, elementAttrs);
 
     item.shape = shape;
     container.appendChild(shape);
@@ -49,7 +61,7 @@ function createElement(element, options) {
     }
 
     // 继续创建自元素
-    createElement(children, { ...options, container: shape });
+    createElement(children, { ...options, container: shape }, layout);
   });
 }
 
@@ -58,8 +70,8 @@ function deleteElement(element, options) {
   const { container, animateController } = options;
   Children.map(element, (item) => {
     if (!item) return item;
-    const { props, shape } = item;
-    const { children, animation } = props;
+    const { props, shape, children } = item;
+    const { animation } = props;
     const animate = animation && animation.leave;
 
     deleteElement(children, shape);
@@ -78,15 +90,13 @@ function deleteElement(element, options) {
 
 // 更新元素
 function updateElement(nextElement, lastElement, options) {
-  const { props: nextProps } = nextElement;
-  const { props: lastProps, shape } = lastElement;
+  const { props: nextProps, children: nextChildren } = nextElement;
+  const { shape, children: lastChildren } = lastElement;
+  const { style: nextStyle, animation: nextAnimation } = nextProps;
   const { animateController } = options;
 
   // 保留图形引用
   nextElement.shape = shape;
-
-  const { children: nextChildren, style: nextStyle, animation: nextAnimation } = nextProps;
-  const { children: lastChildren } = lastProps;
 
   // 覆盖样式
   mix(shape.style, nextStyle);
@@ -109,12 +119,15 @@ function morphElement(nextElement, lastElement, options) {
   const lastPath = convertToPath(lastShape);
   const nextPath = convertToPath(nextShape);
 
-  const pathShape = createShape('path', {
-    style: {
-      ...nextStyle,
+  const pathShape = createShape(
+    'path',
+    {
       path: lastPath,
     },
-  });
+    {
+      ...nextStyle,
+    }
+  );
   container.replaceChild(pathShape, lastShape);
 
   const animate = nextAnimation && nextAnimation.update;
@@ -248,10 +261,10 @@ function morphElement(nextElement, lastElement, options) {
 // }
 
 function changeElementType(nextElement, lastElement, options) {
-  const { type: nextType, props: nextProps } = nextElement;
+  const { type: nextType, props: nextProps, style } = nextElement;
   const { type: lastType } = lastElement;
-
-  nextElement.shape = createShape(nextType, nextProps);
+  // const { style } = nextProps;
+  nextElement.shape = createShape(nextType, nextProps, style);
 
   // if (nextType === 'group') {
   //   return changeTypeToGroup(nextElement, lastElement);
@@ -275,7 +288,7 @@ function renderShape(nextElements, lastElements, options) {
     }
     // 新增
     if (!lastElement) {
-      createElement(nextElement, options);
+      createElement(nextElement, options, null);
       return;
     }
     // 删除
@@ -291,7 +304,7 @@ function renderShape(nextElements, lastElements, options) {
     // key 值不相等
     if (!isNil(nextKey) && nextKey !== lastKey) {
       deleteElement(lastElement, options);
-      createElement(nextElement, options);
+      createElement(nextElement, options, null);
       return;
     }
 
@@ -316,15 +329,20 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
     animate: componentAnimate,
     children,
   } = component;
+  const { container } = options;
   animate = isBoolean(animate) ? animate : componentAnimate;
   const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const shapeElement = renderJSXElement(children, context, updater);
-  // @ts-ignore
-  component.__lastElement = shapeElement;
 
-  // TODO 布局计算
-  renderShape(shapeElement, lastElement, options);
+  // 布局计算
+  const nodeTree = createNodeTree(shapeElement, container);
+  computeLayout(nodeTree);
+
+  // @ts-ignore
+  component.__lastElement = nodeTree;
+
+  renderShape(nodeTree, lastElement, options);
 
   // const renderElement =
   //   animate !== false ? compareRenderTree(shapeElement, lastElement) : shapeElement;
@@ -348,7 +366,6 @@ function renderComponent(component, options) {
     // 挂载画布渲染结束事件 onend
     // const updateChild = getMaxTime(children.props?.children, onend);
     // component.children.props.children = updateChild;
-
     renderShapeComponent(component, options, false);
     return;
   }

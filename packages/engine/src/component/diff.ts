@@ -246,10 +246,9 @@ function isContainer(children: Element | Element[]) {
 function renderChildren(parent: Component, nextChildren, lastChildren) {
   // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
   nextChildren = pickElement(nextChildren);
-
+  console.log(parent);
   // 设置 children 的引用
   parent.children = nextChildren;
-
   if (!isContainer(nextChildren)) {
     // TODO
     // @ts-ignore

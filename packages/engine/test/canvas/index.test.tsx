@@ -37,13 +37,13 @@ class View extends Component {
             r: 40,
             fill: 'red',
           }}
-          touchStart={() => {
+          onTouchStart={() => {
             console.log('touchStart');
           }}
-          touchMove={() => {
+          onTouchMove={() => {
             console.log('touchMove');
           }}
-          touchEnd={() => {
+          onTouchEnd={() => {
             console.log('touchEnd');
           }}
         />
