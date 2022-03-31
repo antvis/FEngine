@@ -30,7 +30,7 @@ function doAnimate(shape, animate) {
 }
 
 // 创建元素
-function createElement(element, options, parentLayout) {
+function createElement(element, options) {
   const { container, animateController } = options;
 
   return Children.map(element, (item) => {
@@ -53,7 +53,7 @@ function createElement(element, options, parentLayout) {
     }
 
     // 继续创建自元素
-    createElement(children, { ...options, container: shape }, layout);
+    createElement(children, { ...options, container: shape });
   });
 }
 
@@ -253,7 +253,7 @@ function morphElement(nextElement, lastElement, options) {
 // }
 
 function changeElementType(nextElement, lastElement, options) {
-  const { type: nextType, props: nextProps, style } = nextElement;
+  const { type: nextType, props: nextProps } = nextElement;
   const { type: lastType } = lastElement;
   const { style } = nextProps;
   nextElement.shape = createShape(nextType, nextProps, style);
@@ -278,7 +278,7 @@ function renderShape(nextElements, lastElements, options) {
     }
     // 新增
     if (!lastElement) {
-      createElement(nextElement, options, null);
+      createElement(nextElement, options);
       return;
     }
     // 删除
@@ -294,7 +294,7 @@ function renderShape(nextElements, lastElements, options) {
     // key 值不相等
     if (!isNil(nextKey) && nextKey !== lastKey) {
       deleteElement(lastElement, options);
-      createElement(nextElement, options, null);
+      createElement(nextElement, options);
       return;
     }
 
@@ -331,7 +331,7 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
   updateNodeTree(shapeElement, nodeTree);
 
   // @ts-ignore
-  component.__lastElement = nodeTree;
+  component.__lastElement = shapeElement;
 
   renderShape(shapeElement, lastElement, options);
 
