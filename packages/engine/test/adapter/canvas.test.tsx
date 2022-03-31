@@ -1,13 +1,7 @@
-import { createContext, delay, dispatchEvent } from '../util';
-import { CanvasAdapter, CanvasRender } from '../../src';
+import { dispatchEvent } from '../util';
 import { createCanvasAdapterInstance } from './util';
 import { AdapterEvent } from '../../src/adapter/event';
 
-function simulateTouchEvent(dom, type, cfg) {
-  // esingnore
-  const event = new TouchEvent(type, cfg);
-  dom.dispatchEvent(event);
-}
 function getClientPoint(canvas, x, y) {
   const point = canvas.getClientByPoint(x, y);
   return {

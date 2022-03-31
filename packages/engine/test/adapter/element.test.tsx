@@ -1,5 +1,3 @@
-import { createContext, delay } from '../util';
-import { CanvasAdapter, CanvasRender } from '../../src';
 import { createCanvasAdapterInstance } from './util';
 
 describe('element test', () => {
