@@ -60,7 +60,7 @@ class CanvasAdapter extends Element {
    */
   setCursor(cursor) {
     this.set('cursor', cursor);
-    this.adapteredEle.setCursor(cursor);
+    this.canvasEle.setCursor(cursor);
   }
 
   getPointByClient(clientX: number, clientY: number) {

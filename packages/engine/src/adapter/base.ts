@@ -1,6 +1,7 @@
+import { DisplayObject } from '@antv/g';
 import { mix } from '@antv/util';
 abstract class Base {
-  adapteredEle: any;
+  adapteredEle: DisplayObject;
   /**
    * 内部属性，用于 get,set，但是可以用于优化性能使用
    * @type {object}
@@ -49,8 +50,8 @@ abstract class Base {
     const result = this.adapteredEle[type]?.(...rest);
     return result;
   }
-  on(evt: string, callback: Function, once?: boolean) {}
-  off(evt?: string, callback?: Function) {}
+  abstract on(evt: string, callback: Function, once?: boolean);
+  abstract off(evt?: string, callback?: Function);
 }
 
 export default Base;

@@ -75,6 +75,7 @@ class Element extends Base {
     if (args.length === 1 && typeof args[0] === 'object') {
       args[0] = filterEmptyAttributes(args[0]);
     }
+    // @ts-ignore
     const res = this.adapteredEle.attr(...args);
     return res;
   }
@@ -376,15 +377,17 @@ class Element extends Base {
 
     animation.onframe = (e) => {
       const animation = e.target;
-      const computedTiming = animation.effect.getComputedTiming();
+      const computedTiming = (animation as Animation).effect.getComputedTiming();
       onFrame && onFrame(computedTiming.progress);
     };
 
-    animation.onfinish = (e) => {
+    animation.onfinish = () => {
       callback && callback();
     };
 
+    // @ts-ignore
     animation._onAdapterPause = pauseCallback;
+    // @ts-ignore
     animation._onResumePause = resumeCallback;
 
     animations.push(animation);
@@ -455,7 +458,7 @@ class Element extends Base {
   move(targetX: number, targetY: number) {
     const x = this.attr('x') || 0;
     const y = this.attr('y') || 0;
-    this.translate(targetX - x, targetY - y);
+    this.translate(targetX - (x as number), targetY - (y as number));
     return this;
   }
 
@@ -500,7 +503,7 @@ class Element extends Base {
    * @return {Element} 元素
    */
   rotateAtStart(rotate: number): Element {
-    const { x, y } = this.attr();
+    const { x, y } = this.attrs;
     const matrix = this.getMatrix();
     const newMatrix = transform(matrix, [
       ['t', -x, -y],
@@ -677,10 +680,12 @@ class Element extends Base {
   }
 
   getPoint(ratio) {
+    // @ts-ignore
     return this.adapteredEle.getPoint(ratio);
   }
 
   getTotalLength(ratio) {
+    // @ts-ignore
     return this.adapteredEle.getTotalLength(ratio);
   }
 

@@ -1,4 +1,4 @@
-import { Path, CustomElement, Line, Polyline } from '@antv/g';
+import { Path, CustomElement, Line, Polyline, BaseStyleProps, PathStyleProps } from '@antv/g';
 import { Arrow } from './arrow';
 
 function getDefaultArrow(pathStyle) {
@@ -12,7 +12,12 @@ function getDefaultArrow(pathStyle) {
     },
   });
 }
-class ArrowAdpater extends CustomElement<any> {
+
+interface ArrowAdpaterProps extends BaseStyleProps {
+  startArrow: PathStyleProps;
+  endArrow: PathStyleProps;
+}
+class ArrowAdpater extends CustomElement<ArrowAdpaterProps> {
   arrow = null;
   static tag = 'ArrowAdpater';
   constructor(config) {

@@ -47,7 +47,7 @@ export class Arrow extends CustomElement<ArrowStyleProps> {
       type: Arrow.tag,
     });
 
-    const { body, startHead, endHead, ...rest } = this.attributes;
+    const { body, startHead, endHead } = this.attributes;
 
     if (!body) {
       throw new Error("Arrow's body is required");
@@ -56,7 +56,7 @@ export class Arrow extends CustomElement<ArrowStyleProps> {
     // append arrow body
     this.body = body;
     // @ts-ignore
-    this.appendChild(this.body!);
+    this.appendChild(this.body);
 
     if (startHead) {
       this.appendArrowHead(this.getArrowHeadType(startHead), true);
@@ -89,19 +89,17 @@ export class Arrow extends CustomElement<ArrowStyleProps> {
       this.destroyArrowHead(isStart);
 
       if (newValue) {
-        const { body, startHead, endHead, x, y, ...rest } = this.attributes;
         // append new arrow head
         // @ts-ignore
         this.appendArrowHead(this.getArrowHeadType(newValue), isStart);
       }
     } else if (name === 'body') {
-      const { body, startHead, endHead, x, y, ...rest } = this.attributes;
       // @ts-ignore
-      this.removeChild(this.body!, true);
+      this.removeChild(this.body, true);
       // @ts-ignore
       this.body = newValue;
       // @ts-ignore
-      this.appendChild(this.body!);
+      this.appendChild(this.body);
     }
   }
 
