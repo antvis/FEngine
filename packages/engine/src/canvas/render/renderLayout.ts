@@ -1,36 +1,15 @@
 import { extendMap, px2hd } from '../util';
+import Children from '../../children';
+import getShapeAttrs from '../shape';
 
 // 转换成布局所需要的布局树
-function createNodeTree(element, container) {
+function createNodeTree(element) {
   const { key, ref, _cache, type, props, status, animation } = element;
   const children = extendMap(props.children, (child) => {
-    return createNodeTree(child, container);
+    return createNodeTree(child);
   });
-  // Children.map(props.children, (child) => {
-  //     return createNodeTree(child, container);
-  //   });
-  // const { style, attrs } = props;
   const style = px2hd(props.style);
   const attrs = px2hd(props.attrs);
-
-  // 文本要自动计算文本的宽高, TODO, 后面再优化
-  // if (type === 'text') {
-  //   const shape = container.addShape(type, {
-  //     attrs: {
-  //       x: 0,
-  //       y: 0,
-  //       ...attrs,
-  //     },
-  //   });
-  //   const { width, height } = shape.getBBox();
-  //   style = {
-  //     width,
-  //     height,
-  //     ...style,
-  //   };
-  //   // 无用，销毁掉
-  //   shape.remove(true);
-  // }
 
   return {
     key,
@@ -59,4 +38,36 @@ function mergeLayout(parent, layout) {
   };
 }
 
-export { createNodeTree, mergeLayout };
+function getLayoutChild(children, layoutStack, parentLayout) {
+  return Children.map(children, (child) => {
+    const { type } = child;
+
+    const item = layoutStack.splice(0, 1)[0];
+
+    const layout = mergeLayout(parentLayout, item.layout);
+
+    const elementAttrs = {
+      ...getShapeAttrs(type, layout),
+      ...item.style,
+    };
+
+    child = {
+      ...child,
+      style: elementAttrs,
+      // layout: layout.layout,
+      // lastLayout: layout.lastLayout,
+    };
+
+    return child;
+  });
+}
+
+function updateNodeTree(jsxTree, layoutTree) {
+  const { children } = jsxTree.props;
+  jsxTree.style = layoutTree.style;
+  const { children: layoutStack } = layoutTree;
+
+  jsxTree.props.children = getLayoutChild(children, layoutStack, null);
+}
+
+export { createNodeTree, mergeLayout, updateNodeTree };

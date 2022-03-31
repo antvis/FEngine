@@ -10,12 +10,11 @@ class View extends Component {
         style={{
           x: 50,
           y: 50,
-          width: 100,
+          width: 250,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: ['6px', '6px', '6px', 0],
+          justifyContent: 'space-around',
         }}
       >
         <rect
@@ -25,12 +24,15 @@ class View extends Component {
             fill: 'red',
           }}
         />
-        <circle
-          style={{
-            r: 40,
-            fill: '#000',
-          }}
-        />
+        {[1, 2].map((d) => (
+          <rect
+            style={{
+              width: 40,
+              height: 40,
+              fill: 'red',
+            }}
+          />
+        ))}
       </group>
     );
   }
