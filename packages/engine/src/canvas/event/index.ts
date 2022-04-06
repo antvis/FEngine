@@ -161,7 +161,8 @@ class Hammer extends EE {
 
     this.reset();
 
-    const touches = [ev.canvas];
+    //TODO: 修改为 ev.touches
+    const touches = [];
     // 当多指只释放了1指时也会触发end, 这时重新触发一次start
     if (touches && touches.length > 0) {
       this._start(ev);

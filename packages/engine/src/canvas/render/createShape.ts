@@ -15,10 +15,10 @@ const classMap = {
   polygon: Polygon,
 };
 
-function createShape(type: string, props) {
+function createShape(type: string, props, style) {
   if (!type) return null;
   const ShapeClass = classMap[type];
-  const { style } = props;
+  // const { style } = props;
   //  支持的事件列表
   const {
     onClick,

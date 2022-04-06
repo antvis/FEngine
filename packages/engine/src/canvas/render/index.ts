@@ -1,14 +1,17 @@
-import { Group, convertToPath } from '@antv/g';
-import { flatten, isBoolean, isNil, mix } from '@antv/util';
+import { convertToPath } from '@antv/g';
+import { isBoolean, isNil, mix, omit } from '@antv/util';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import Children from '../../children';
 import Component from '../../component';
+import AnimateController from '../animation/animateController';
 import renderJSXElement from './renderJSXElement';
 import createShape from './createShape';
+import { createNodeTree, updateNodeTree } from './renderLayout';
+import computeLayout from '../css-layout';
 
 interface Options {
-  container: Group;
-  animateController: any;
+  container: GCanvas;
+  animateController: AnimateController;
 }
 
 function doAnimate(shape, animate) {
@@ -29,11 +32,13 @@ function doAnimate(shape, animate) {
 // 创建元素
 function createElement(element, options) {
   const { container, animateController } = options;
+
   return Children.map(element, (item) => {
     if (!item) return item;
-    const { ref, type, props } = item;
-    const { children, animation } = props;
-    const shape = createShape(type, props);
+    const { ref, type, props, style } = item;
+    const { animation, children } = props;
+
+    const shape = createShape(type, props, style);
 
     item.shape = shape;
     container.appendChild(shape);
@@ -57,8 +62,8 @@ function deleteElement(element, options) {
   const { container, animateController } = options;
   Children.map(element, (item) => {
     if (!item) return item;
-    const { props, shape } = item;
-    const { children, animation } = props;
+    const { props, shape, children } = item;
+    const { animation } = props;
     const animate = animation && animation.leave;
 
     deleteElement(children, shape);
@@ -77,18 +82,16 @@ function deleteElement(element, options) {
 
 // 更新元素
 function updateElement(nextElement, lastElement, options) {
-  const { props: nextProps } = nextElement;
+  const { props: nextProps, style: nextStyle } = nextElement;
   const { props: lastProps, shape } = lastElement;
+  const { animation: nextAnimation, children: nextChildren } = nextProps;
+  const { children: lastChildren } = lastProps;
   const { animateController } = options;
 
   // 保留图形引用
   nextElement.shape = shape;
 
-  const { children: nextChildren, style: nextStyle, animation: nextAnimation } = nextProps;
-  const { children: lastChildren } = lastProps;
-
-  // 覆盖样式
-  mix(shape.style, nextStyle);
+  mix(shape.style, omit(nextStyle, nextAnimation?.update?.property || []));
 
   // 继续比较子元素
   renderShape(nextChildren, lastChildren, { ...options, container: shape });
@@ -108,12 +111,15 @@ function morphElement(nextElement, lastElement, options) {
   const lastPath = convertToPath(lastShape);
   const nextPath = convertToPath(nextShape);
 
-  const pathShape = createShape('path', {
-    style: {
-      ...nextStyle,
+  const pathShape = createShape(
+    'path',
+    {
       path: lastPath,
     },
-  });
+    {
+      ...nextStyle,
+    }
+  );
   container.replaceChild(pathShape, lastShape);
 
   const animate = nextAnimation && nextAnimation.update;
@@ -249,8 +255,8 @@ function morphElement(nextElement, lastElement, options) {
 function changeElementType(nextElement, lastElement, options) {
   const { type: nextType, props: nextProps } = nextElement;
   const { type: lastType } = lastElement;
-
-  nextElement.shape = createShape(nextType, nextProps);
+  const { style } = nextProps;
+  nextElement.shape = createShape(nextType, nextProps, style);
 
   // if (nextType === 'group') {
   //   return changeTypeToGroup(nextElement, lastElement);
@@ -265,8 +271,6 @@ function changeElementType(nextElement, lastElement, options) {
 }
 
 function renderShape(nextElements, lastElements, options) {
-  // const { container } = options;
-
   Children.compare(nextElements, lastElements, (nextElement, lastElement) => {
     // 都为空
     if (!nextElement && !lastElement) {
@@ -315,14 +319,20 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
     animate: componentAnimate,
     children,
   } = component;
+  const { container } = options;
   animate = isBoolean(animate) ? animate : componentAnimate;
   const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const shapeElement = renderJSXElement(children, context, updater);
+
+  // 布局计算
+  const nodeTree = createNodeTree(shapeElement);
+  computeLayout(nodeTree);
+  updateNodeTree(shapeElement, nodeTree);
+
   // @ts-ignore
   component.__lastElement = shapeElement;
 
-  // TODO 布局计算
   renderShape(shapeElement, lastElement, options);
 
   // const renderElement =
@@ -344,10 +354,6 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
 function renderComponent(component, options) {
   const { isShapeComponent, children } = component;
   if (isShapeComponent) {
-    // 挂载画布渲染结束事件 onend
-    // const updateChild = getMaxTime(children.props?.children, onend);
-    // component.children.props.children = updateChild;
-
     renderShapeComponent(component, options, false);
     return;
   }

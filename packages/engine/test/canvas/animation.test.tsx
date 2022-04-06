@@ -8,12 +8,20 @@ class View extends Component {
     const { id } = this.props;
     if (id === 1) {
       return (
-        <group>
+        <group
+          style={{
+            x: 50,
+            y: 50,
+            width: 250,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <circle
             style={{
-              x: 50,
-              y: 50,
-              r: 40,
+              r: 20,
               fill: '#000',
             }}
             animation={{
@@ -26,15 +34,13 @@ class View extends Component {
                   r: 0,
                 },
                 end: {
-                  r: 50,
+                  r: 20,
                 },
               },
             }}
           />
           <rect
             style={{
-              x: 100,
-              y: 100,
               width: 40,
               height: 40,
               fill: 'red',
@@ -68,59 +74,70 @@ class View extends Component {
     }
 
     return (
-      <group>
-        <rect
+      <group
+        style={{
+          x: 50,
+          y: 70,
+          width: 250,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+        }}
+      >
+        <circle
           style={{
-            x: 100,
-            y: 50,
-            width: 40,
-            height: 40,
-            fill: 'red',
+            r: 20,
+            fill: '#000',
           }}
           animation={{
             update: {
-              // easing: 'linear',
               duration: 1000,
-              // delay: 0,
-              // property: ['fillOpacity'],
-              start: {
-                fill: '#000',
-              },
-              end: {
-                fill: 'red',
-              },
-              // onFrame(),
-              // onEnd()()
             },
           }}
-          onClick={() => {
-            console.log('click rect');
-          }}
-          onDbClick={() => {
-            console.log('dbclick');
-          }}
-          // onTouchStart={() => {
-          //   console.log('touch start');
-          // }}
-          // onTouchMove={() => {
-          //   console.log('touch');
-          // }}
-          // onTouchEnd={() => {
-          //   console.log('touch end');
-          // }}
-          // onTouchEndOutside={() => {
-          //   console.log('touch end outside');
-          // }}
-          onPanStart={() => {
-            console.log('pan start');
-          }}
-          onPan={() => {
-            console.log('pan');
-          }}
-          onPanEnd={() => {
-            console.log('pan end');
-          }}
         />
+        {[1, 2, 3].map((d, i) => (
+          <rect
+            style={{
+              // x: 10 * i + 50,
+              // y: 10,
+              width: 40,
+              height: 40,
+              fill: 'red',
+            }}
+            animation={{
+              update: {
+                // easing: 'linear',
+                duration: 1000,
+                // delay: 0,
+                property: ['fillOpacity', 'fill'],
+                start: {
+                  fill: '#000',
+                },
+                end: {
+                  fill: 'red',
+                },
+                // onFrame(),
+                // onEnd()()
+              },
+            }}
+            onClick={() => {
+              console.log('click rect');
+            }}
+            onDbClick={() => {
+              console.log('dbclick');
+            }}
+            onPanStart={() => {
+              console.log('pan start');
+            }}
+            onPan={() => {
+              console.log('pan');
+            }}
+            onPanEnd={() => {
+              console.log('pan end');
+            }}
+          />
+        ))}
       </group>
     );
   }

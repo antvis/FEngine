@@ -126,7 +126,7 @@ class Canvas extends Component<CanvasProps> {
   }
 
   _animationEnd() {
-    console.log('当帧动画结束');
+    // console.log('当帧动画结束');
   }
 
   destroy() {}
