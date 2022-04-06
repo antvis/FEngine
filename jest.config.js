@@ -8,4 +8,11 @@ module.exports = {
   testPathIgnorePatterns: [],
   testRegex: '/test/.*\\.test\\.tsx?$',
   setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
+  globals: {
+    'ts-jest': {
+      tsConfig: {
+        target: 'ES2019',
+      },
+    },
+  },
 };

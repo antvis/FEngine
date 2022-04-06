@@ -8,4 +8,5 @@ export default {
   runtimeHelpers: true,
   lessInBabelMode: true,
   cssModules: true,
+  extraBabelPlugins: ['@babel/plugin-proposal-class-static-block'],
 };
