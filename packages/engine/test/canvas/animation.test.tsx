@@ -96,11 +96,9 @@ class View extends Component {
             },
           }}
         />
-        {[1, 2, 3].map((d, i) => (
+        {[1, 2, 3].map((d) => (
           <rect
             style={{
-              // x: 10 * i + 50,
-              // y: 10,
               width: 40,
               height: 40,
               fill: 'red',
@@ -117,8 +115,6 @@ class View extends Component {
                 end: {
                   fill: 'red',
                 },
-                // onFrame(),
-                // onEnd()()
               },
             }}
             onClick={() => {

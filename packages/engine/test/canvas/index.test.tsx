@@ -191,18 +191,6 @@ describe('Canvas', () => {
                   type: 'rect',
                   props: {
                     style: { x: 5, y: 5, width: 40, height: 40, fill: 'red' },
-                    // onClick: () => {
-                    //   console.log('click rect');
-                    // },
-                    // onPanStart: () => {
-                    //   console.log('drag start');
-                    // },
-                    // onPan: () => {
-                    //   console.log('drag');
-                    // },
-                    // onPanEnd: () => {
-                    //   console.log('drag end');
-                    // },
                   },
                 },
                 { type: 'circle', props: { style: { x: 75, y: 25, r: 20, fill: 'red' } } },
@@ -323,18 +311,6 @@ describe('Canvas', () => {
                   type: 'rect',
                   props: {
                     style: { x: 5, y: 5, width: 40, height: 40, fill: 'red' },
-                    // onClick: () => {
-                    //   console.log('click rect');
-                    // },
-                    // onPanStart: () => {
-                    //   console.log('drag start');
-                    // },
-                    // onPan: () => {
-                    //   console.log('drag');
-                    // },
-                    // onPanEnd: () => {
-                    //   console.log('drag end');
-                    // },
                   },
                 },
                 { type: 'circle', props: { style: { x: 75, y: 25, r: 20, fill: 'red' } } },

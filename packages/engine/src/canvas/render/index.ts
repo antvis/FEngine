@@ -319,7 +319,6 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
     animate: componentAnimate,
     children,
   } = component;
-  const { container } = options;
   animate = isBoolean(animate) ? animate : componentAnimate;
   const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
