@@ -65,6 +65,12 @@ class Element extends Base {
         this.adapteredEle.interactive = value;
         break;
       case 'visible':
+        if (value === true) {
+          this.adapteredEle.setAttribute('visibility', 'hidden');
+        } else {
+          this.adapteredEle.setAttribute('visibility', 'visible');
+        }
+        break;
       case 'zIndex':
         this.adapteredEle.style[name] = value;
         break;

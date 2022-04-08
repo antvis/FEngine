@@ -130,10 +130,12 @@ export class AdapterHammer extends EE {
       if (this.isDraging) {
         e = getEventTarget(transformEvtObj, AdapterEvent.drag, this.dragShape);
         this.emit(AdapterEvent.drag, e);
+        this.emit(AdapterEvent['*'], e);
       } else if ((isDraggable && distance > DRAG_OFFSET) || timeWindow > DRAG_TIME) {
         this.isDraging = true;
         e = getEventTarget(transformEvtObj, AdapterEvent.dragstart, this.dragShape);
         this.emit(AdapterEvent.dragstart, e);
+        this.emit(AdapterEvent['*'], e);
       }
     }
 
