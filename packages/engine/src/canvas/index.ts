@@ -122,21 +122,20 @@ class Canvas extends Component<CanvasProps> {
     // 获取当帧动画时长
     const endTime = animateController.getMaxEndTime();
 
-    animateController.animationEnd(this._animationEnd);
+    animateController.animationEnd(() => this._animationEnd());
   }
 
   _animationEnd() {
-    // console.log('当帧动画结束');
+    this.emit('animationEnd');
   }
 
   destroy() {}
 
-  on(type: string, listener) {
-    this._ee.on(type, listener);
-  }
-
   emit(type: string, event?: any) {
     this._ee.emit(type, event);
+  }
+  on(type: string, listener) {
+    this._ee.on(type, listener);
   }
 
   off(type: string, listener?) {
