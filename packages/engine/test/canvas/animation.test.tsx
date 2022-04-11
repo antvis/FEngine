@@ -68,6 +68,9 @@ class View extends Component {
                 },
               },
             }}
+            onPanEnd={() => {
+              console.log('pan end');
+            }}
           />
         </group>
       );

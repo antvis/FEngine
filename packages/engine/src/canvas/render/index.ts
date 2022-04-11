@@ -5,7 +5,7 @@ import Children from '../../children';
 import Component from '../../component';
 import AnimateController from '../animation/animateController';
 import renderJSXElement from './renderJSXElement';
-import createShape from './createShape';
+import { createShape, addEvent } from './createShape';
 import { createNodeTree, updateNodeTree } from './renderLayout';
 import computeLayout from '../css-layout';
 
@@ -90,6 +90,10 @@ function updateElement(nextElement, lastElement, options) {
 
   // 保留图形引用
   nextElement.shape = shape;
+
+  // 移除原先事件，添加新事件
+  shape.removeAllEventListeners();
+  addEvent(shape, nextProps);
 
   mix(shape.style, omit(nextStyle, nextAnimation?.update?.property || []));
 

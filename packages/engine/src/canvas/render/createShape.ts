@@ -19,6 +19,14 @@ function createShape(type: string, props, style) {
   if (!type) return null;
   const ShapeClass = classMap[type];
   // const { style } = props;
+
+  const shape = new ShapeClass({ style });
+  addEvent(shape, props);
+
+  return shape;
+}
+
+function addEvent(shape, props) {
   //  支持的事件列表
   const {
     onClick,
@@ -33,7 +41,6 @@ function createShape(type: string, props, style) {
     onPress,
     onSwipe,
   } = props;
-  const shape = new ShapeClass({ style });
 
   const hammer = new Hammer(shape);
 
@@ -50,8 +57,5 @@ function createShape(type: string, props, style) {
   onPanEnd && hammer.on('panend', onPanEnd);
   onPress && hammer.on('press', onPress);
   onSwipe && hammer.on('swipe', onSwipe);
-
-  return shape;
 }
-
-export default createShape;
+export { createShape, addEvent };
