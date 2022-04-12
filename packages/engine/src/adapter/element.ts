@@ -78,12 +78,35 @@ class Element extends Base {
   }
 
   attr(...args) {
-    if (args.length === 1 && typeof args[0] === 'object') {
-      args[0] = filterEmptyAttributes(args[0]);
+    // 属性读取
+    if (args.length === 0) {
+      // @ts-ignore
+      return this.adapteredEle.attr(...args);
     }
-    // @ts-ignore
-    const res = this.adapteredEle.attr(...args);
-    return res;
+    // 属性读取
+    if (args.length === 1 && typeof args[0] === 'string') {
+      if (args[0] === 'matrix') {
+        return this.getMatrix();
+      }
+      // @ts-ignore
+      return this.adapteredEle.attr(...args);
+    }
+    // 属性设置
+    let attrs = {};
+    if (args.length === 2 && typeof args[0] === 'string') {
+      attrs[args[0]] = args[1];
+    }
+    if (args.length === 1 && typeof args[0] === 'object') {
+      attrs = filterEmptyAttributes(args[0]);
+    }
+    const matrix = attrs['matrix'];
+    if (matrix) {
+      delete attrs['matrix'];
+    }
+    this.adapteredEle.attr(attrs);
+    if (matrix) {
+      this.setMatrix(matrix);
+    }
   }
 
   calcBBox() {
@@ -210,7 +233,7 @@ class Element extends Base {
   }
 
   getMatrix(): number[] {
-    const rotation = this.adapteredEle.getLocalEulerAngles();
+    const rotation = (this.adapteredEle.getLocalEulerAngles() * Math.PI) / 180;
     const [sx, sy] = this.adapteredEle.getLocalScale();
     const [tx, ty] = this.adapteredEle.getLocalPosition();
 
@@ -256,7 +279,7 @@ class Element extends Base {
 
     this.adapteredEle.setLocalScale(scalingX, scalingY);
     this.adapteredEle.setLocalPosition(mat[6], mat[7]);
-    this.adapteredEle.setLocalEulerAngles(angle);
+    this.adapteredEle.setLocalEulerAngles(-angle);
   }
 
   getTotalMatrix() {
@@ -372,7 +395,7 @@ class Element extends Base {
     }
     const formatToAttrs = getFormatToAttrs(toAttrs, this);
     const animation = this.adapteredEle.animate(
-      [getFormatFromAttrs(formatToAttrs, this), formatToAttrs],
+      [filterEmptyAttributes(getFormatFromAttrs(formatToAttrs, this)), formatToAttrs],
       {
         duration,
         easing,
@@ -690,6 +713,16 @@ class Element extends Base {
     return this.adapteredEle.getPoint(ratio);
   }
 
+  getStartTangent() {
+    // @ts-ignore
+    return this.adapteredEle.getStartTangent();
+  }
+
+  getEndTangent() {
+    // @ts-ignore
+    return this.adapteredEle.getEndTangent();
+  }
+
   getTotalLength(ratio) {
     // @ts-ignore
     return this.adapteredEle.getTotalLength(ratio);
@@ -704,7 +737,16 @@ class Element extends Base {
     return this;
   }
 
+  emit(...args) {
+    this.adapterHammer.emit(...args);
+  }
+  removeAllListeners(...args) {
+    this.adapterHammer.removeAllListeners(...args);
+  }
+
   applyMatrix() {}
+
+  sort() {}
 }
 
 export default Element;
