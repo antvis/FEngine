@@ -48,6 +48,7 @@ function getLayoutChild(children, layoutStack, parentLayout) {
 
     const elementAttrs = {
       ...getShapeAttrs(type, layout),
+      ...item.attrs,
       ...item.style,
     };
 
