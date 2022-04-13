@@ -249,6 +249,7 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
 
   // 设置 children 的引用
   parent.children = nextChildren;
+
   if (!isContainer(nextChildren)) {
     // TODO
     // @ts-ignore

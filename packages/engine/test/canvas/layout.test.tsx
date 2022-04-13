@@ -7,7 +7,7 @@ class View extends Component {
   render() {
     return (
       <group
-        style={{
+        attrs={{
           x: 50,
           y: 50,
           width: 250,
@@ -26,7 +26,7 @@ class View extends Component {
         />
         {[1, 2].map((d) => (
           <rect
-            style={{
+            attrs={{
               width: 40,
               height: 40,
               fill: 'red',

@@ -8,8 +8,11 @@ function createNodeTree(element) {
   const children = extendMap(props.children, (child) => {
     return createNodeTree(child);
   });
-  const style = px2hd(props.style);
-  const attrs = px2hd(props.attrs);
+
+  const style = {
+    ...px2hd(props.style),
+    ...px2hd(props.attrs),
+  };
 
   return {
     key,
@@ -23,7 +26,7 @@ function createNodeTree(element) {
 
     // 处理px2hd之后的配置
     style,
-    attrs,
+    // attrs,
   };
 }
 
@@ -43,11 +46,12 @@ function getLayoutChild(children, layoutStack, parentLayout) {
     const { type } = child;
 
     const item = layoutStack.splice(0, 1)[0];
-
+    console.log(parentLayout);
     const layout = mergeLayout(parentLayout, item.layout);
 
     const elementAttrs = {
       ...getShapeAttrs(type, layout),
+      ...item.attrs,
       ...item.style,
     };
 
@@ -64,10 +68,13 @@ function getLayoutChild(children, layoutStack, parentLayout) {
 
 function updateNodeTree(jsxTree, layoutTree) {
   const { children } = jsxTree.props;
+
   jsxTree.style = layoutTree.style;
   const { children: layoutStack } = layoutTree;
 
-  jsxTree.props.children = getLayoutChild(children, layoutStack, null);
+  if (children) {
+    jsxTree.props.children = getLayoutChild(children, layoutStack, null);
+  }
 }
 
 export { createNodeTree, mergeLayout, updateNodeTree };
