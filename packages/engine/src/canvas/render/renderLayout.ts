@@ -68,10 +68,14 @@ function getLayoutChild(children, layoutStack, parentLayout) {
 
 function updateNodeTree(jsxTree, layoutTree) {
   const { children } = jsxTree.props;
-
+  // const elementAttrs = {
+  //   ...layoutTree.style,
+  //   ...jsxTree.attrs,
+  //   ...jsxTree.style,
+  // };
   jsxTree.style = layoutTree.style;
   const { children: layoutStack } = layoutTree;
-
+  // debugger;
   if (children) {
     jsxTree.props.children = getLayoutChild(children, layoutStack, null);
   }

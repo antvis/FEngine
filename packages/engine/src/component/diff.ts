@@ -252,11 +252,13 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
 
   if (!isContainer(nextChildren)) {
     // TODO
+    debugger;
     // @ts-ignore
     parent.isShapeComponent = true;
     return;
   }
 
+  debugger;
   return diff(parent, nextChildren, lastChildren);
 }
 

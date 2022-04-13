@@ -18,7 +18,7 @@ class View extends Component {
         }}
       >
         <rect
-          style={{
+          attrs={{
             width: 40,
             height: 40,
             fill: 'red',
