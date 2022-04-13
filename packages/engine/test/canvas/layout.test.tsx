@@ -18,7 +18,7 @@ class View extends Component {
         }}
       >
         <rect
-          style={{
+          attrs={{
             width: 40,
             height: 40,
             fill: 'red',
@@ -26,7 +26,7 @@ class View extends Component {
         />
         {[1, 2].map((d) => (
           <rect
-            style={{
+            attrs={{
               width: 40,
               height: 40,
               fill: 'red',

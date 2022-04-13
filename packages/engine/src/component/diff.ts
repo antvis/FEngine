@@ -249,13 +249,16 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
 
   // 设置 children 的引用
   parent.children = nextChildren;
+
   if (!isContainer(nextChildren)) {
     // TODO
+    debugger;
     // @ts-ignore
     parent.isShapeComponent = true;
     return;
   }
 
+  debugger;
   return diff(parent, nextChildren, lastChildren);
 }
 
