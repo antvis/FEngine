@@ -88,6 +88,10 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     };
   }
 
+  const group = new Group();
+  component.container = group;
+  container.appendChild(group);
+
   // 设置ref
   if (ref) {
     ref.current = component;
