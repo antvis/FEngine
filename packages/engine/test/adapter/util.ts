@@ -1,9 +1,10 @@
-import { createContext, delay } from '../util';
-import { CanvasAdapter, CanvasRender } from '../../src';
+import { createContext } from '../util';
+import { CanvasAdapter } from '../../src';
+import { Renderer } from '@antv/g-mobile-canvas';
 
 export function createCanvasAdapterInstance(config?) {
   const context = createContext();
-  const renderer = new CanvasRender();
+  const renderer = new Renderer();
   const canvas = new CanvasAdapter({
     context,
     renderer: renderer,
