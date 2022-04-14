@@ -14,7 +14,7 @@ interface CanvasProps {
   context?: CanvasRenderingContext2D;
   width?: number;
   height?: number;
-  devicePixelRatio?: number;
+  pixelRatio?: number;
   padding?: number | string | (number | string)[];
   animate?: boolean;
   children?: any;
@@ -54,10 +54,11 @@ class Canvas extends Component<CanvasProps> {
   private canvas: GCanvas;
   private _ee: EE;
   private animateControllers: AnimateController[];
+  container: GCanvas;
 
   constructor(props: CanvasProps) {
     super(props);
-    const { context, renderer, width, height, animate = true, px2hd, devicePixelRatio = 1 } = props;
+    const { context, renderer, width, height, animate = true, px2hd, pixelRatio = 1 } = props;
 
     // 组件更新器
     const updater = createUpdater(this);
@@ -69,16 +70,18 @@ class Canvas extends Component<CanvasProps> {
       // measureText: measureText(canvas, px2hd),
     };
 
-    this.canvas = new GCanvas({
+    const canvas = new GCanvas({
       context,
-      devicePixelRatio,
+      devicePixelRatio: pixelRatio,
       renderer,
     });
 
+    this.canvas = canvas;
     this._ee = new EE();
     this.context = componentContext;
     this.updater = updater;
     this.animate = animate;
+    this.container = canvas;
     // 单帧动画
     this.animateControllers = [];
   }
@@ -116,7 +119,6 @@ class Canvas extends Component<CanvasProps> {
 
     render(children, {
       // @ts-ignore
-      container: canvas,
       animateController,
     });
 

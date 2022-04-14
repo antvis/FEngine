@@ -41,14 +41,17 @@ class View extends Component {
 describe('Canvas', () => {
   it('layout', async () => {
     const renderer = new Renderer();
+    const ref = { current: null };
 
     const { props } = (
       <Canvas renderer={renderer} context={context}>
-        <View />
+        <View ref={ref} />
       </Canvas>
     );
 
     const canvas = new Canvas(props);
     canvas.render();
+
+    ref.current.container.getChildren()[0].get('style');
   });
 });

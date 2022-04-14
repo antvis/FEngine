@@ -46,7 +46,7 @@ function getLayoutChild(children, layoutStack, parentLayout) {
     const { type } = child;
 
     const item = layoutStack.splice(0, 1)[0];
-    console.log(parentLayout);
+
     const layout = mergeLayout(parentLayout, item.layout);
 
     const elementAttrs = {

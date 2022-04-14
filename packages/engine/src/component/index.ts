@@ -1,3 +1,5 @@
+import { Canvas, Group } from '@antv/g';
+
 export interface ComponentContext {
   // px2hd: typeof px2hd;
   [key: string]: any;
@@ -16,6 +18,7 @@ class Component<P = any, S = any> {
     [key: string]: Component;
   };
   updater: Updater<S>;
+  container: any;
 
   // render 返回的节点
   children: JSX.Element;
@@ -28,7 +31,7 @@ class Component<P = any, S = any> {
   }
   willMount() {}
   didMount() {}
-  shouldUpdate() {}
+  shouldUpdate(nextProps: any) {}
   willReceiveProps(_props: P) {}
   willUpdate() {}
   didUpdate() {}

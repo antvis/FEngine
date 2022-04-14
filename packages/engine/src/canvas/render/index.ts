@@ -10,7 +10,7 @@ import { createNodeTree, updateNodeTree } from './renderLayout';
 import computeLayout from '../css-layout';
 
 interface Options {
-  container: GCanvas;
+  // container: GCanvas;
   animateController: AnimateController;
 }
 
@@ -316,6 +316,7 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
   const {
     context,
     updater,
+    container,
     // @ts-ignore
     __lastElement,
     // @ts-ignore
@@ -324,6 +325,7 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
     children,
   } = component;
   animate = isBoolean(animate) ? animate : componentAnimate;
+
   const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const shapeElement = renderJSXElement(children, context, updater);
@@ -336,7 +338,7 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
   // @ts-ignore
   component.__lastElement = shapeElement;
 
-  renderShape(shapeElement, lastElement, options);
+  renderShape(shapeElement, lastElement, { ...options, container });
 
   // const renderElement =
   //   animate !== false ? compareRenderTree(shapeElement, lastElement) : shapeElement;
@@ -374,4 +376,4 @@ function render(children, options: Options) {
   });
 }
 
-export { render };
+export { render, renderShapeComponent };
