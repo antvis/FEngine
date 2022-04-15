@@ -1,5 +1,5 @@
 import { convertToPath } from '@antv/g';
-import { isBoolean, isNil, mix, omit } from '@antv/util';
+import { isBoolean, isNil, mix, omit, pick } from '@antv/util';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import Children from '../../children';
 import Component from '../../component';
@@ -83,7 +83,7 @@ function deleteElement(element, options) {
 // 更新元素
 function updateElement(nextElement, lastElement, options) {
   const { props: nextProps, style: nextStyle } = nextElement;
-  const { props: lastProps, shape } = lastElement;
+  const { props: lastProps, style: lastStyle, shape } = lastElement;
   const { animation: nextAnimation, children: nextChildren } = nextProps;
   const { children: lastChildren } = lastProps;
   const { animateController } = options;
@@ -95,7 +95,18 @@ function updateElement(nextElement, lastElement, options) {
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 
+  // 剔除style中动画定义的属性, 动画执行
   mix(shape.style, omit(nextStyle, nextAnimation?.update?.property || []));
+
+  const endStyle = pick(nextStyle, nextAnimation?.update?.property || []);
+  const startStyle = pick(lastStyle, nextAnimation?.update?.property || []);
+  if (nextAnimation?.update) {
+    nextAnimation.update = {
+      ...nextAnimation.update,
+      end: endStyle,
+      start: startStyle,
+    };
+  }
 
   // 继续比较子元素
   renderShape(nextChildren, lastChildren, { ...options, container: shape });
