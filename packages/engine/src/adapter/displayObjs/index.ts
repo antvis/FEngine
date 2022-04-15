@@ -52,8 +52,5 @@ export function createDisplayObj(type, cfg) {
     AdapterClass = Group;
   }
 
-  // 加了Type有时会画不出来，先删掉
-  delete rest.type;
-
   return new AdapterClass({ style, ...rest });
 }

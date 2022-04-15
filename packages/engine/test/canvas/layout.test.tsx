@@ -1,7 +1,7 @@
 import { jsx, Canvas, Component } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
-import { Renderer } from '@antv/g-mobile';
+import { Renderer } from '@antv/g-mobile-canvas';
 
 class View extends Component {
   render() {

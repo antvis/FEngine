@@ -1,6 +1,6 @@
 import { jsx, Canvas, Component } from '../../src';
 import Timeline from '../../src/timeline';
-import { Renderer } from '@antv/g-mobile';
+import { Renderer } from '@antv/g-mobile-canvas';
 import { createContext } from '../util';
 const context = createContext();
 

@@ -77,6 +77,12 @@ class ArrowAdpater extends CustomElement<ArrowAdpaterProps> {
   getTotalLength(ratio) {
     return this.arrow.getBody().getTotalLength(ratio);
   }
+  getStartTangent() {
+    return this.arrow.getBody().getStartTangent();
+  }
+  getEndTangent() {
+    return this.arrow.getBody().getEndTangent();
+  }
 }
 
 export class ArrowPath extends ArrowAdpater {
