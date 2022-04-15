@@ -100,15 +100,12 @@ function updateElement(nextElement, lastElement, component) {
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 
-  // 需要构造动画起始和结束的属性
-  const startStyle = pick(lastStyle, updateEffectProperty || []);
-  const endStyle = pick(nextStyle, updateEffectProperty || []);
-  // 踢掉动画的属性
-  mix(shape.style, omit(nextStyle, updateEffectProperty || []));
-
-  // 继续比较子元素
-  renderElement(nextChildren, lastChildren, shape, component);
   if (animate && updateEffect) {
+    // 需要构造动画起始和结束的属性
+    const startStyle = pick(lastStyle, updateEffectProperty || []);
+    const endStyle = pick(nextStyle, updateEffectProperty || []);
+    // 踢掉动画的属性
+    mix(shape.style, omit(nextStyle, updateEffectProperty || []));
     // 执行动画
     const animation = doAnimate(shape, {
       ...updateEffect,
@@ -122,7 +119,12 @@ function updateElement(nextElement, lastElement, component) {
       },
     });
     timeline.add(animation);
+  } else {
+    mix(shape.style, nextStyle);
   }
+
+  // 继续比较子元素
+  renderElement(nextChildren, lastChildren, shape, component);
 }
 
 // 类型变化

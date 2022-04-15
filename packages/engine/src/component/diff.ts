@@ -88,10 +88,6 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     };
   }
 
-  const group = new Group();
-  component.container = group;
-  container.appendChild(group);
-
   // 设置ref
   if (ref) {
     ref.current = component;
@@ -270,7 +266,8 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
   if (!isContainer(nextChildren)) {
     parent.children = renderShape(parent, nextChildren);
   } else {
-    parent.children = diff(parent, nextChildren, lastChildren);
+    parent.children = nextChildren;
+    diff(parent, nextChildren, lastChildren);
   }
   // 设置 children 的引用
   // parent.children = nextChildren;

@@ -29,10 +29,6 @@ function measureText(container: Group, px2hd, theme) {
   return (text: string, font?) => {
     const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
 
-    font = {
-      ...font,
-    };
-
     const shape = new Text({
       style: {
         x: 0,
