@@ -2,7 +2,8 @@
 import Component from '../component';
 // import Layout from '../component/layout';
 import equal from '../component/equal';
-// import Animation from './animation';
+import { Text } from '@antv/g';
+import { px2hd as defaultPx2hd } from './util';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
@@ -25,56 +26,67 @@ interface CanvasProps {
   renderer?: any;
 }
 
-// function measureText(canvas, px2hd) {
-//   return (text: string, font?) => {
-//     const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
-//     const shape = canvas.addShape('text', {
-//       attrs: {
-//         x: 0,
-//         y: 0,
-//         fontSize: px2hd(fontSize),
-//         fontFamily,
-//         fontStyle,
-//         fontWeight,
-//         fontVariant,
-//         text,
-//       },
-//     });
-//     const { width, height } = shape.getBBox();
-//     shape.remove(true);
-//     return {
-//       width,
-//       height,
-//     };
-//   };
-// }
+function measureText(canvas, px2hd) {
+  return (text: string, font?) => {
+    const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
+
+    const shape = new Text({
+      style: {
+        x: 0,
+        y: 0,
+        fontSize: px2hd(fontSize),
+        fontFamily,
+        fontStyle,
+        fontWeight,
+        fontVariant,
+        text,
+      },
+    });
+    // const { width, height } = shape.getBBox();
+    // shape.remove(true);
+    return {
+      // width,
+      // height,
+    };
+  };
+}
 
 // 顶层Canvas标签
 class Canvas extends Component<CanvasProps> {
   private canvas: GCanvas;
   private _ee: EE;
   private animateControllers: AnimateController[];
+  private theme: any;
   container: GCanvas;
 
   constructor(props: CanvasProps) {
     super(props);
-    const { context, renderer, width, height, animate = true, px2hd, pixelRatio = 1 } = props;
+    const {
+      context,
+      renderer,
+      width,
+      height,
+      animate = true,
+      px2hd = defaultPx2hd,
+      pixelRatio = 1,
+      theme = {},
+    } = props;
 
     // 组件更新器
     const updater = createUpdater(this);
-
-    // 供全局使用的一些变量
-    const componentContext = {
-      root: this,
-      px2hd,
-      // measureText: measureText(canvas, px2hd),
-    };
 
     const canvas = new GCanvas({
       context,
       devicePixelRatio: pixelRatio,
       renderer,
     });
+
+    // 供全局使用的一些变量
+    const componentContext = {
+      root: this,
+      px2hd,
+      measureText: measureText(canvas, px2hd),
+    };
 
     this.canvas = canvas;
     this._ee = new EE();
