@@ -342,6 +342,9 @@ function renderShapeComponent(component: Component, options: Options, animate?: 
   const shapeElement = renderJSXElement(children, context, updater);
 
   // 布局计算
+  if (!shapeElement) {
+    return;
+  }
   const nodeTree = createNodeTree(shapeElement);
   computeLayout(nodeTree);
   updateNodeTree(shapeElement, nodeTree);

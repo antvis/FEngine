@@ -1,5 +1,7 @@
-import { Renderer as CanvasRender } from '@antv/g-mobile';
 import { renderShapeComponent as renderShape } from './canvas/render/index';
+import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
+import { Renderer as WebglRenderer } from '@antv/g-mobile-webgl';
+import { Renderer as SvgRenderer } from '@antv/g-mobile-svg';
 
 export * from './jsx';
 // export createElement 别名
@@ -10,5 +12,5 @@ export { default as Children } from './children';
 export { default as createRef } from './createRef';
 export { default as Timeline } from './timeline';
 
-export { CanvasRender, renderShape };
+export { CanvasRenderer, WebglRenderer, SvgRenderer, renderShape };
 export * from './adapter';

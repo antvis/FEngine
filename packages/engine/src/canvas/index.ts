@@ -26,27 +26,34 @@ interface CanvasProps {
   renderer?: any;
 }
 
-function measureText(canvas, px2hd) {
+function measureText(canvas, px2hd, theme) {
+  // TODO
   return (text: string, font?) => {
-    const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
+    const { fontSize: defaultFontsize, fontFamily: defaultFamily } = font || {};
+
+    font = {
+      ...font,
+      fontSize: px2hd(defaultFontsize) || theme.fontSize,
+      fontFamily: defaultFamily || theme.fontFamily,
+    };
+
+    const result = JSON.parse(JSON.stringify(font));
 
     const shape = new Text({
       style: {
+        ...result,
         x: 0,
         y: 0,
-        fontSize: px2hd(fontSize),
-        fontFamily,
-        fontStyle,
-        fontWeight,
-        fontVariant,
         text,
       },
     });
-    // const { width, height } = shape.getBBox();
-    // shape.remove(true);
+    canvas.appendChild(shape);
+    const { width, height } = shape.getBBox();
+
+    shape.remove(true);
     return {
-      // width,
-      // height,
+      width,
+      height,
     };
   };
 }
@@ -69,29 +76,35 @@ class Canvas extends Component<CanvasProps> {
       animate = true,
       px2hd = defaultPx2hd,
       pixelRatio = 1,
-      theme = {},
+      theme: customTheme = {},
     } = props;
 
     // 组件更新器
     const updater = createUpdater(this);
 
+    const theme = px2hd(customTheme);
+
     const canvas = new GCanvas({
       context,
       devicePixelRatio: pixelRatio,
       renderer,
+      width,
+      height,
     });
 
     // 供全局使用的一些变量
     const componentContext = {
       root: this,
       px2hd,
-      measureText: measureText(canvas, px2hd),
+      theme,
+      measureText: measureText(canvas, px2hd, theme),
     };
 
     this.canvas = canvas;
     this._ee = new EE();
     this.context = componentContext;
     this.updater = updater;
+    this.theme = theme;
     this.animate = animate;
     this.container = canvas;
     // 单帧动画
