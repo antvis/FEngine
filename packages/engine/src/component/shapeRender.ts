@@ -1,17 +1,67 @@
 import { convertToPath } from '@antv/g';
 import { isBoolean, isNil, mix, omit } from '@antv/util';
-import { Canvas as GCanvas } from '@antv/g-mobile';
-import Children from '../../children';
-import Component from '../../component';
-import AnimateController from '../animation/animateController';
-import renderJSXElement from './renderJSXElement';
-import { createShape, addEvent } from './createShape';
-import { createNodeTree, updateNodeTree } from './renderLayout';
-import computeLayout from '../css-layout';
+import Children from '../children';
+import Component from '../component';
+import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
+// import Hammer from 'hammer';
+import Hammer from '../canvas/event';
+import getShapeAttrs from './shapeAttr';
 
-interface Options {
-  container: GCanvas;
-  animateController: AnimateController;
+const classMap = {
+  group: Group,
+  text: Text,
+  circle: Circle,
+  path: Path,
+  ellipse: Ellipse,
+  rect: Rect,
+  image: Image,
+  line: Line,
+  polyline: Polyline,
+  polygon: Polygon,
+};
+
+function addEvent(shape, props) {
+  //  支持的事件列表
+  const {
+    onClick,
+    onDbClick,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    onTouchEndOutside,
+    onPanStart,
+    onPan,
+    onPanEnd,
+    onPress,
+    onSwipe,
+  } = props;
+
+  const hammer = new Hammer(shape);
+
+  onClick && hammer.on('click', onClick);
+  onDbClick && hammer.on('dbclick', onDbClick);
+
+  onTouchStart && hammer.on('touchstart', onTouchStart);
+  onTouchMove && hammer.on('touchmove', onTouchMove);
+  onTouchEnd && hammer.on('touchend', onTouchEnd);
+  onTouchEndOutside && hammer.on('touchendoutside', onTouchEndOutside);
+
+  onPanStart && hammer.on('panstart', onPanStart);
+  onPan && hammer.on('pan', onPan);
+  onPanEnd && hammer.on('panend', onPanEnd);
+  onPress && hammer.on('press', onPress);
+  onSwipe && hammer.on('swipe', onSwipe);
+}
+
+function createShape(type: string, style) {
+  if (!type) return null;
+  const ShapeClass = classMap[type];
+
+  const shape = new ShapeClass({
+    style,
+  });
+
+  return shape;
 }
 
 function doAnimate(shape, animate) {
@@ -29,16 +79,34 @@ function doAnimate(shape, animate) {
   return animation;
 }
 
-// 创建元素
-function createElement(element, options) {
-  const { container, animateController } = options;
+function mergeLayout(parent, layout) {
+  if (!parent || !layout) return layout;
+  const { left: parentLeft, top: parentTop } = parent;
+  const { left, top } = layout;
+  return {
+    ...layout,
+    left: parentLeft + left,
+    top: parentTop + top,
+  };
+}
 
+// 创建元素
+function createElement(component, element, container) {
   return Children.map(element, (item) => {
     if (!item) return item;
-    const { ref, type, props, style } = item;
+    const { type, props, layout } = item;
     const { animation, children } = props;
 
+    // const layout = mergeLayout(container.get('layout'), currentLayout);
+    const attrs = getShapeAttrs(type, layout);
+    const style = {
+      ...props.style,
+      ...attrs,
+    };
+    // console.log(style);
+
     const shape = createShape(type, style);
+    // shape.set('layout', layout);
     item.shape = shape;
 
     container.appendChild(shape);
@@ -47,14 +115,10 @@ function createElement(element, options) {
     // 执行动画
     const animator = doAnimate(shape, animation && animation.appear);
 
-    animator && animateController.append(animator);
-    // 设置ref
-    if (ref) {
-      ref.current = shape;
-    }
+    // animator && animateController.append(animator);
 
     // 继续创建自元素
-    createElement(children, { ...options, container: shape });
+    createElement(component, children, shape);
   });
 }
 
@@ -120,10 +184,10 @@ function morphElement(nextElement, lastElement, options) {
     'path',
     {
       path: lastPath,
-    },
-    {
-      ...nextStyle,
     }
+    // {
+    //   ...nextStyle,
+    // }
   );
   container.replaceChild(pathShape, lastShape);
 
@@ -261,7 +325,7 @@ function changeElementType(nextElement, lastElement, options) {
   const { type: nextType, props: nextProps } = nextElement;
   const { type: lastType } = lastElement;
   const { style } = nextProps;
-  nextElement.shape = createShape(nextType, nextProps, style);
+  // nextElement.shape = createShape(nextType, nextProps, style);
 
   // if (nextType === 'group') {
   //   return changeTypeToGroup(nextElement, lastElement);
@@ -275,7 +339,7 @@ function changeElementType(nextElement, lastElement, options) {
   return morphElement(nextElement, lastElement, options);
 }
 
-function renderShape(nextElements, lastElements, options) {
+function renderShape(component, nextElements, lastElements) {
   Children.compare(nextElements, lastElements, (nextElement, lastElement) => {
     // 都为空
     if (!nextElement && !lastElement) {
@@ -283,87 +347,34 @@ function renderShape(nextElements, lastElements, options) {
     }
     // 新增
     if (!lastElement) {
-      createElement(nextElement, options);
+      createElement(component, nextElement, component.container);
       return;
     }
     // 删除
-    if (!nextElement) {
-      deleteElement(lastElement, options);
-      return;
-    }
+    // if (!nextElement) {
+    //   deleteElement(lastElement, options);
+    //   return;
+    // }
 
-    // 普通的jsx元素, 且都非空
-    const { key: nextKey, type: nextType } = nextElement;
-    const { key: lastKey, type: lastType } = lastElement;
+    // // 普通的jsx元素, 且都非空
+    // const { key: nextKey, type: nextType } = nextElement;
+    // const { key: lastKey, type: lastType } = lastElement;
 
-    // key 值不相等
-    if (!isNil(nextKey) && nextKey !== lastKey) {
-      deleteElement(lastElement, options);
-      createElement(nextElement, options);
-      return;
-    }
+    // // key 值不相等
+    // if (!isNil(nextKey) && nextKey !== lastKey) {
+    //   deleteElement(lastElement, options);
+    //   createElement(nextElement, options);
+    //   return;
+    // }
 
-    // shape 类型的变化
-    if (nextType !== lastType) {
-      changeElementType(nextElement, lastElement, options);
-      return;
-    }
+    // // shape 类型的变化
+    // if (nextType !== lastType) {
+    //   changeElementType(nextElement, lastElement, options);
+    //   return;
+    // }
 
-    updateElement(nextElement, lastElement, options);
+    // updateElement(nextElement, lastElement, options);
   });
 }
 
-function renderShapeComponent(component: Component, options: Options, animate?: boolean) {
-  const {
-    context,
-    updater,
-    // @ts-ignore
-    __lastElement,
-    // @ts-ignore
-    transformFrom,
-    animate: componentAnimate,
-    children,
-  } = component;
-  animate = isBoolean(animate) ? animate : componentAnimate;
-  const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
-  // children 是 shape 的 jsx 结构, component.render() 返回的结构
-  const shapeElement = renderJSXElement(children, context, updater);
-
-  // 布局计算
-  const nodeTree = createNodeTree(shapeElement);
-  computeLayout(nodeTree);
-  updateNodeTree(shapeElement, nodeTree);
-
-  // @ts-ignore
-  component.__lastElement = shapeElement;
-
-  renderShape(shapeElement, lastElement, options);
-
-  // const renderElement =
-  //   animate !== false ? compareRenderTree(shapeElement, lastElement) : shapeElement;
-  // // @ts-ignore
-
-  // console.log(renderElement);
-
-  // 生成G的节点树, 存在数组的情况是根节点有变化，之前的树删除，新的树创建
-  // if (isArray(renderElement)) {
-  //   return renderElement.map((element) => {
-  //     return render(element, container, animate);
-  //   });
-  // } else {
-  //   return render(renderElement, container, animate);
-  // }
-}
-
-function renderComponent(component, options) {
-  const { isShapeComponent, children } = component;
-  if (isShapeComponent) {
-    renderShapeComponent(component, options, false);
-    return;
-  }
-  render(children, options);
-}
-
-function render(children, container) {}
-
-export { render };
+export { renderShape };

@@ -11,13 +11,13 @@ function cloneElement(element, props) {
   };
 }
 
-function map(children: any, fn: any) {
+function map<T, U>(children: T | T[] | null, fn: (child: T | null) => U | null): U | U[] | null {
   if (!children) {
-    return fn(children);
+    return fn(children as T);
   }
   if (isArray(children)) {
     return children.map((child) => {
-      return map(child, fn);
+      return map(child, fn) as U;
     });
   }
   return fn(children);

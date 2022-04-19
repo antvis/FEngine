@@ -8,8 +8,10 @@
     "@antv/event-emitter": "~0.1.3",
     "@antv/g": "~5.0.14",
     "@antv/g-mobile": "*",
+    "@antv/g-mobile-canvas": "*",
     "@antv/util": "~2.0.6",
     "@babel/runtime": "^7.12.5",
+    "d3-interpolate": "~3.0.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {},

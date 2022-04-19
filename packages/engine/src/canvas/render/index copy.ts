@@ -364,6 +364,15 @@ function renderComponent(component, options) {
   render(children, options);
 }
 
-function render(children, container) {}
+function render(children, options: Options) {
+  Children.map(children, (child) => {
+    if (!child) return child;
+    const { component } = child;
+    if (!component) {
+      return child;
+    }
+    renderComponent(child.component, options);
+  });
+}
 
 export { render };

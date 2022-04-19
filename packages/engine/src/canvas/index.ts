@@ -4,17 +4,18 @@ import Component from '../component';
 import equal from '../component/equal';
 // import Animation from './animation';
 import { createUpdater } from '../component/updater';
-import { renderChildren, renderComponent } from '../component/diff';
+import { renderChildren } from '../component/diff';
 import EE from '@antv/event-emitter';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import { render } from './render';
 import AnimateController from './animation/animateController';
+import { px2hd as defaultPx2hd } from './util';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
   width?: number;
   height?: number;
-  devicePixelRatio?: number;
+  pixelRatio?: number;
   padding?: number | string | (number | string)[];
   animate?: boolean;
   children?: any;
@@ -53,11 +54,18 @@ interface CanvasProps {
 class Canvas extends Component<CanvasProps> {
   private canvas: GCanvas;
   private _ee: EE;
-  private animateControllers: AnimateController[];
 
   constructor(props: CanvasProps) {
     super(props);
-    const { context, renderer, width, height, animate = true, px2hd, devicePixelRatio = 1 } = props;
+    const {
+      context,
+      renderer,
+      width,
+      height,
+      animate = true,
+      px2hd = defaultPx2hd,
+      pixelRatio,
+    } = props;
 
     // 组件更新器
     const updater = createUpdater(this);
@@ -69,9 +77,11 @@ class Canvas extends Component<CanvasProps> {
       // measureText: measureText(canvas, px2hd),
     };
 
-    this.canvas = new GCanvas({
+    const canvas = new GCanvas({
       context,
-      devicePixelRatio,
+      width,
+      height,
+      devicePixelRatio: pixelRatio,
       renderer,
     });
 
@@ -79,16 +89,17 @@ class Canvas extends Component<CanvasProps> {
     this.context = componentContext;
     this.updater = updater;
     this.animate = animate;
-    // 单帧动画
-    this.animateControllers = [];
+    this.canvas = canvas;
+    // @ts-ignore
+    this.container = canvas;
   }
 
   renderComponents(components: Component[]) {
     if (!components || !components.length) {
       return;
     }
-    renderComponent(components);
-    this._render();
+    // renderComponent(components);
+    // this._render();
   }
 
   update(nextProps: CanvasProps) {
@@ -105,24 +116,17 @@ class Canvas extends Component<CanvasProps> {
     const { children: lastChildren, props } = this;
     const { children: nextChildren } = props;
 
+    // @ts-ignore
     renderChildren(this, nextChildren, lastChildren);
-    this._render();
     return null;
   }
 
   _render() {
-    const { children, canvas, animateControllers } = this;
+    const { children, canvas } = this;
+    console.log(children);
+    render(children, canvas);
+
     const animateController = new AnimateController();
-
-    render(children, {
-      // @ts-ignore
-      container: canvas,
-      animateController,
-    });
-
-    // 获取当帧动画时长
-    const endTime = animateController.getMaxEndTime();
-
     animateController.animationEnd(() => this._animationEnd());
   }
 
@@ -130,7 +134,10 @@ class Canvas extends Component<CanvasProps> {
     this.emit('animationEnd');
   }
 
-  destroy() {}
+  didUnmount() {
+    const { canvas } = this;
+    canvas.destroy();
+  }
 
   emit(type: string, event?: any) {
     this._ee.emit(type, event);

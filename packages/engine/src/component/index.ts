@@ -1,3 +1,5 @@
+import { Group } from '@antv/g';
+
 export interface ComponentContext {
   // px2hd: typeof px2hd;
   [key: string]: any;
@@ -17,6 +19,7 @@ class Component<P = any, S = any> {
   };
   updater: Updater<S>;
 
+  container: Group;
   // render 返回的节点
   children: JSX.Element;
   animate: boolean;

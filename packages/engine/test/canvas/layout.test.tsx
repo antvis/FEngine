@@ -1,35 +1,33 @@
 import { jsx, Canvas, Component } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
-import { Renderer } from '@antv/g-mobile';
+import { Renderer } from '@antv/g-mobile-canvas';
 
 class View extends Component {
   render() {
+    const { count, top = 0 } = this.props;
     return (
       <group
-        attrs={{
-          x: 50,
-          y: 50,
-          width: 250,
-          display: 'flex',
+        style={{
+          left: 33,
+          top,
+          width: 100,
+          height: 100,
           flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-around',
         }}
       >
         <rect
           style={{
-            width: 40,
-            height: 40,
+            // width: 30,
+            flex: 1,
             fill: 'red',
           }}
         />
-        {[1, 2].map((d) => (
+        {new Array(count).fill(0).map((_, id) => (
           <rect
-            attrs={{
-              width: 40,
-              height: 40,
-              fill: 'red',
+            style={{
+              flex: 1,
+              fill: id === 1 ? 'green' : 'blue',
             }}
           />
         ))}
@@ -44,11 +42,21 @@ describe('Canvas', () => {
 
     const { props } = (
       <Canvas renderer={renderer} context={context}>
-        <View />
+        <View count={1} />
       </Canvas>
     );
 
     const canvas = new Canvas(props);
     canvas.render();
+
+    await delay(1000);
+
+    const update = (
+      <Canvas renderer={renderer} context={context}>
+        <View count={2} top={10} />
+      </Canvas>
+    );
+
+    canvas.update(update.props);
   });
 });
