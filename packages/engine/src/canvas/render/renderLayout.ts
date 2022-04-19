@@ -43,9 +43,12 @@ function mergeLayout(parent, layout) {
 
 function getLayoutChild(children, layoutStack, parentLayout) {
   return Children.map(children, (child) => {
+    if (!child) return;
     const { type } = child;
+    const { children } = child.props;
 
     const item = layoutStack.splice(0, 1)[0];
+    const { children: childrenLayoutStack } = item;
 
     const layout = mergeLayout(parentLayout, item.layout);
 
@@ -62,6 +65,9 @@ function getLayoutChild(children, layoutStack, parentLayout) {
       // lastLayout: layout.lastLayout,
     };
 
+    if (children) {
+      child.props.children = getLayoutChild(children, childrenLayoutStack, null);
+    }
     return child;
   });
 }

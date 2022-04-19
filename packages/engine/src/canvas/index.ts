@@ -60,7 +60,7 @@ function measureText(canvas, px2hd, theme) {
 
 // 顶层Canvas标签
 class Canvas extends Component<CanvasProps> {
-  private canvas: GCanvas;
+  canvas: GCanvas;
   private _ee: EE;
   private animateControllers: AnimateController[];
   private theme: any;
@@ -168,6 +168,17 @@ class Canvas extends Component<CanvasProps> {
 
   off(type: string, listener?) {
     this._ee.off(type, listener);
+  }
+
+  setContext(obj: object) {
+    this.context = {
+      ...this.context,
+      ...obj,
+    };
+  }
+
+  getCanvasConfig() {
+    return this.canvas.getConfig().canvas;
   }
 }
 

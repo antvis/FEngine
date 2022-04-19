@@ -33,6 +33,7 @@ class View extends Component {
             }}
           />
         ))}
+        {null}
       </group>
     );
   }
