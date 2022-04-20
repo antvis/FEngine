@@ -1291,7 +1291,7 @@ function layoutNode(node, parentMaxWidth, parentDirection) {
     node.lastLayout.direction = direction;
 
     // Reset child layouts
-    node.children.forEach(function (child) {
+    node.children.forEach(function(child) {
       child.layout.width = undefined;
       child.layout.height = undefined;
       child.layout.top = 0;
@@ -1314,7 +1314,8 @@ function layoutNode(node, parentMaxWidth, parentDirection) {
 function computeLayout(node) {
   if (!node) return node;
   const { style, children } = node;
-  if (style) {
+  // 定义flex布局时再进行css布局进行
+  if (style && style?.display === 'flex') {
     fillNodes(node);
     layoutNode(node, null, null);
     return node;

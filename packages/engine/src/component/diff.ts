@@ -2,6 +2,7 @@ import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';
 import Children from '../children';
+import { Group } from '@antv/g';
 
 interface Element extends JSX.Element {
   component: Component;
@@ -62,6 +63,7 @@ function getTransformFromComponentRef(transformFromRef) {
 function createComponent(parent: Component, element: JSX.Element): Component {
   const { type, props, ref } = element;
   const {
+    container,
     context,
     updater,
     //@ts-ignore
@@ -82,6 +84,10 @@ function createComponent(parent: Component, element: JSX.Element): Component {
       return type(this.props, context, updater);
     };
   }
+
+  const group = new Group();
+  component.container = group;
+  container.appendChild(group);
 
   // 设置ref
   if (ref) {
