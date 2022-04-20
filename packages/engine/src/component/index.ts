@@ -1,4 +1,4 @@
-import { Canvas, Group } from '@antv/g';
+import { Group } from '@antv/g';
 
 export interface ComponentContext {
   // px2hd: typeof px2hd;
@@ -18,8 +18,8 @@ class Component<P = any, S = any> {
     [key: string]: Component;
   };
   updater: Updater<S>;
-  container: any;
 
+  container: Group;
   // render 返回的节点
   children: JSX.Element;
   animate: boolean;

@@ -1,86 +1,39 @@
-import { extendMap, px2hd } from '../util';
-import Children from '../../children';
+import { extendMap } from '../util';
 import getShapeAttrs from '../shape';
 
-// 转换成布局所需要的布局树
-function createNodeTree(element) {
-  const { key, ref, _cache, type, props, status, animation } = element;
+function createNodeTree(element, px2hd) {
+  const { type, props } = element;
   const children = extendMap(props.children, (child) => {
-    return createNodeTree(child);
+    return createNodeTree(child, px2hd);
   });
-
-  const style = {
-    ...px2hd(props.style),
-    ...px2hd(props.attrs),
-  };
+  const { style, attrs } = props;
 
   return {
-    key,
-    ref,
-    _cache,
     type,
-    props,
+    style: {
+      ...px2hd(style),
+      ...px2hd(attrs),
+    },
     children,
-    status,
-    animation,
-
-    // 处理px2hd之后的配置
-    style,
-    // attrs,
+    // 保留对 element 的引用，用于把布局结果回填
+    element,
   };
 }
 
-function mergeLayout(parent, layout) {
-  if (!parent || !layout) return layout;
-  const { left: parentLeft, top: parentTop } = parent;
-  const { left, top } = layout;
-  return {
-    ...layout,
-    left: parentLeft + left,
-    top: parentTop + top,
+function fillElementLayout(node) {
+  const { type, style, element, children, layout } = node;
+  const attrs = getShapeAttrs(type, layout);
+
+  element.layout = layout;
+  element.style = {
+    ...style,
+    ...attrs,
   };
-}
-
-function getLayoutChild(children, layoutStack, parentLayout) {
-  return Children.map(children, (child) => {
-    if (!child) return;
-    const { type } = child;
-    const { children } = child.props;
-
-    const item = layoutStack.splice(0, 1)[0];
-    const { children: childrenLayoutStack } = item;
-
-    const layout = mergeLayout(parentLayout, item.layout);
-
-    const elementAttrs = {
-      ...getShapeAttrs(type, layout),
-      ...item.attrs,
-      ...item.style,
-    };
-
-    child = {
-      ...child,
-      style: elementAttrs,
-      // layout: layout.layout,
-      // lastLayout: layout.lastLayout,
-    };
-
-    if (children) {
-      child.props.children = getLayoutChild(children, childrenLayoutStack, null);
+  if (children && children.length) {
+    for (let i = 0, len = children.length; i < len; i++) {
+      fillElementLayout(children[i]);
     }
-    return child;
-  });
-}
-
-function updateNodeTree(jsxTree, layoutTree) {
-  const { children } = jsxTree.props;
-
-  jsxTree.style = layoutTree.style;
-  const { children: layoutStack } = layoutTree;
-
-  if (children) {
-    jsxTree.props.children = getLayoutChild(children, layoutStack, null);
   }
 }
 
-export { createNodeTree, mergeLayout, updateNodeTree };
+export { createNodeTree, fillElementLayout };

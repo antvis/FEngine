@@ -2,6 +2,7 @@ import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';
 import Children from '../children';
+import { renderShape } from '../canvas/render';
 import { Group } from '@antv/g';
 
 interface Element extends JSX.Element {
@@ -66,6 +67,8 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     container,
     context,
     updater,
+    // @ts-ignore
+    timeline,
     //@ts-ignore
     transformFrom,
   } = parent;
@@ -84,10 +87,6 @@ function createComponent(parent: Component, element: JSX.Element): Component {
       return type(this.props, context, updater);
     };
   }
-
-  const group = new Group();
-  component.container = group;
-  container.appendChild(group);
 
   // 设置ref
   if (ref) {
@@ -110,7 +109,11 @@ function createComponent(parent: Component, element: JSX.Element): Component {
 
   component.context = context;
   component.updater = updater;
-
+  // @ts-ignore
+  component.timeline = timeline;
+  const group = new Group();
+  container.appendChild(group);
+  component.container = group;
   return component;
 }
 
@@ -231,6 +234,13 @@ function diff(parent: Component, nextChildren, lastChildren) {
   // 4. 处理 render
   renderComponent(shouldRenderComponent);
 
+  // 按子组件顺序渲染内容
+  childrenArray.forEach((element: JSX.Element) => {
+    const { component } = element;
+    const { container: parentGroup } = parent;
+    parentGroup.appendChild(component.container);
+  });
+
   return nextChildren;
 }
 
@@ -253,17 +263,14 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
   // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
   nextChildren = pickElement(nextChildren);
 
-  // 设置 children 的引用
-  parent.children = nextChildren;
-
   if (!isContainer(nextChildren)) {
-    // TODO
-    // @ts-ignore
-    parent.isShapeComponent = true;
-    return;
+    parent.children = renderShape(parent, nextChildren);
+  } else {
+    parent.children = diff(parent, nextChildren, lastChildren);
   }
-
-  return diff(parent, nextChildren, lastChildren);
+  // 设置 children 的引用
+  // parent.children = nextChildren;
+  return parent.children;
 }
 
 export { renderChildren, renderComponent };

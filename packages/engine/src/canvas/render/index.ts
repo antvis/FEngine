@@ -1,92 +1,97 @@
-import { convertToPath } from '@antv/g';
 import { isBoolean, isNil, mix, omit, pick } from '@antv/util';
-import { Canvas as GCanvas } from '@antv/g-mobile';
+import { convertToPath, DisplayObject } from '@antv/g';
 import Children from '../../children';
 import Component from '../../component';
-import AnimateController from '../animation/animateController';
 import renderJSXElement from './renderJSXElement';
 import { createShape, addEvent } from './createShape';
-import { createNodeTree, updateNodeTree } from './renderLayout';
+import { createNodeTree, fillElementLayout } from './renderLayout';
 import computeLayout from '../css-layout';
+import Timeline from '../timeline';
 
-interface Options {
-  // container: GCanvas;
-  animateController: AnimateController;
-}
-
-function doAnimate(shape, animate) {
-  if (!animate) return null;
-  const { start, end, easing, duration, delay } = animate;
+function doAnimate(shape: DisplayObject, effect) {
+  if (!effect) return null;
+  const { start, end, easing, duration, delay, iterations } = effect;
+  // TODO: JSON render 不执行动画
   const animation = shape.animate([start, end], {
     fill: 'both',
     easing,
     duration,
     delay,
+    iterations,
   });
-  // const effect = animation.effect;
-  // const computedTiming = effect.getComputedTiming();
-  // const totalDuration = computedTiming.duration + computedTiming.delay;
   return animation;
 }
 
 // 创建元素
-function createElement(element, options) {
-  const { container, animateController } = options;
-
+function createElement(element, container, component) {
   return Children.map(element, (item) => {
     if (!item) return item;
     const { ref, type, props, style } = item;
-    const { animation, children } = props;
+    const { children, animation: animationEffect } = props;
 
     const shape = createShape(type, props, style);
 
     item.shape = shape;
     container.appendChild(shape);
 
-    // 执行动画
-    const animator = doAnimate(shape, animation && animation.appear);
+    const { animate, timeline } = component;
+    const appearEffect = animationEffect && animationEffect.appear;
 
-    animator && animateController.append(animator);
+    if (animate && appearEffect) {
+      // 执行动画
+      const animation = doAnimate(shape, appearEffect);
+      timeline.add(animation);
+    }
+
     // 设置ref
     if (ref) {
       ref.current = shape;
     }
 
     // 继续创建自元素
-    createElement(children, { ...options, container: shape });
+    createElement(children, shape, component);
   });
 }
 
 // 删除元素
-function deleteElement(element, options) {
-  const { container, animateController } = options;
+function deleteElement(element, component) {
+  const { animate, timeline } = component;
+
+  const childTimeline = new Timeline();
   Children.map(element, (item) => {
     if (!item) return item;
     const { props, shape, children } = item;
-    const { animation } = props;
-    const animate = animation && animation.leave;
+    const { animation: animationEffect } = props;
 
-    deleteElement(children, shape);
-    if (animate) {
-      const animator = doAnimate(shape, animate);
-      animator.onfinish = function() {
-        container.removeChild(shape);
-      };
+    const subChildTimeline = deleteElement(children, component);
+    childTimeline.concat(subChildTimeline);
+    const leaveEffect = animationEffect && animationEffect.leave;
+    if (animate && leaveEffect) {
+      const animation = doAnimate(shape, leaveEffect);
+      timeline.add(animation);
+      childTimeline.add(animation);
 
-      animateController.append(animator);
+      // 当子元素和自身动画全部都结束时，把元素从文档里删除
+      subChildTimeline.add(animation);
+      subChildTimeline.onEnd(() => {
+        shape.remove();
+      });
     } else {
-      container.removeChild(shape);
+      shape.remove();
     }
   });
+  return childTimeline;
 }
 
 // 更新元素
-function updateElement(nextElement, lastElement, options) {
+function updateElement(nextElement, lastElement, component) {
   const { props: nextProps, style: nextStyle } = nextElement;
   const { props: lastProps, style: lastStyle, shape } = lastElement;
-  const { animation: nextAnimation, children: nextChildren } = nextProps;
+  const { animation: nextAnimationEffect, children: nextChildren } = nextProps;
   const { children: lastChildren } = lastProps;
-  const { animateController } = options;
+  const { animate, timeline } = component;
+  const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
+  const updateEffectProperty = updateEffect?.property;
 
   // 保留图形引用
   nextElement.shape = shape;
@@ -95,68 +100,64 @@ function updateElement(nextElement, lastElement, options) {
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 
-  // 剔除style中动画定义的属性, 动画执行
-  mix(shape.style, omit(nextStyle, nextAnimation?.update?.property || []));
-
-  const endStyle = pick(nextStyle, nextAnimation?.update?.property || []);
-  const startStyle = pick(lastStyle, nextAnimation?.update?.property || []);
-  if (nextAnimation?.update) {
-    nextAnimation.update = {
-      ...nextAnimation.update,
-      end: endStyle,
-      start: startStyle,
-    };
-  }
+  // 需要构造动画起始和结束的属性
+  const startStyle = pick(lastStyle, updateEffectProperty || []);
+  const endStyle = pick(nextStyle, updateEffectProperty || []);
+  // 踢掉动画的属性
+  mix(shape.style, omit(nextStyle, updateEffectProperty || []));
 
   // 继续比较子元素
-  renderShape(nextChildren, lastChildren, { ...options, container: shape });
-  // 执行动画
-  const animator = doAnimate(shape, nextAnimation && nextAnimation.update);
-  animator && animateController.append(animator);
+  renderElement(nextChildren, lastChildren, shape, component);
+  if (animate && updateEffect) {
+    // 执行动画
+    const animation = doAnimate(shape, {
+      ...updateEffect,
+      start: {
+        ...startStyle,
+        ...updateEffect.start,
+      },
+      end: {
+        ...endStyle,
+        ...updateEffect.end,
+      },
+    });
+    timeline.add(animation);
+  }
 }
 
 // 类型变化
-function morphElement(nextElement, lastElement, options) {
-  const { props: nextProps, shape: nextShape } = nextElement;
+function morphElement(nextElement, lastElement, container, component) {
+  const { props: nextProps, shape: nextShape, style: nextStyle } = nextElement;
   const { shape: lastShape } = lastElement;
 
-  const { style: nextStyle, animation: nextAnimation } = nextProps;
-  const { container, animateController } = options;
+  const { animation: nextAnimationEffect } = nextProps;
+  const { animate, timeline } = component;
 
   const lastPath = convertToPath(lastShape);
   const nextPath = convertToPath(nextShape);
 
   const pathShape = createShape(
     'path',
-    {
-      path: lastPath,
-    },
+    {},
     {
       ...nextStyle,
     }
   );
-  container.replaceChild(pathShape, lastShape);
+  lastShape.replaceWith(pathShape);
 
-  const animate = nextAnimation && nextAnimation.update;
+  const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
 
-  if (animate) {
-    const { start, end, duration, delay, easing } = animate;
-    const animation = pathShape.animate(
-      [
-        { ...start, path: lastPath },
-        { ...end, path: nextPath },
-      ],
-      {
-        fill: 'both',
-        duration,
-        delay,
-        easing,
-      }
-    );
-    animation.onend = function() {
-      container.replaceChild(nextShape, pathShape);
+  if (animate && updateEffect) {
+    const { start, end } = updateEffect;
+    const animation = doAnimate(pathShape, {
+      ...updateEffect,
+      start: { ...start, path: lastPath },
+      end: { ...end, path: nextPath },
+    });
+    animation.onfinish = function() {
+      pathShape.replaceWith(nextShape);
     };
-    animateController.append(animation);
+    timeline.add(animation);
   }
 }
 
@@ -267,10 +268,9 @@ function morphElement(nextElement, lastElement, options) {
 //   ];
 // }
 
-function changeElementType(nextElement, lastElement, options) {
-  const { type: nextType, props: nextProps } = nextElement;
+function changeElementType(nextElement, lastElement, container, component) {
+  const { type: nextType, props: nextProps, style } = nextElement;
   const { type: lastType } = lastElement;
-  const { style } = nextProps;
   nextElement.shape = createShape(nextType, nextProps, style);
 
   // if (nextType === 'group') {
@@ -282,10 +282,10 @@ function changeElementType(nextElement, lastElement, options) {
   // }
 
   // 都不是group, 形变动画
-  return morphElement(nextElement, lastElement, options);
+  return morphElement(nextElement, lastElement, container, component);
 }
 
-function renderShape(nextElements, lastElements, options) {
+function renderElement(nextElements, lastElements, container, component: Component) {
   Children.compare(nextElements, lastElements, (nextElement, lastElement) => {
     // 都为空
     if (!nextElement && !lastElement) {
@@ -293,12 +293,12 @@ function renderShape(nextElements, lastElements, options) {
     }
     // 新增
     if (!lastElement) {
-      createElement(nextElement, options);
+      createElement(nextElement, container, component);
       return;
     }
     // 删除
     if (!nextElement) {
-      deleteElement(lastElement, options);
+      deleteElement(lastElement, component);
       return;
     }
 
@@ -308,86 +308,46 @@ function renderShape(nextElements, lastElements, options) {
 
     // key 值不相等
     if (!isNil(nextKey) && nextKey !== lastKey) {
-      deleteElement(lastElement, options);
-      createElement(nextElement, options);
+      deleteElement(lastElement, component);
+      createElement(nextElement, container, component);
       return;
     }
 
     // shape 类型的变化
     if (nextType !== lastType) {
-      changeElementType(nextElement, lastElement, options);
+      changeElementType(nextElement, lastElement, container, component);
       return;
     }
 
-    updateElement(nextElement, lastElement, options);
+    updateElement(nextElement, lastElement, component);
   });
 }
 
-function renderShapeComponent(component: Component, options: Options, animate?: boolean) {
+function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
   const {
     context,
     updater,
-    container,
-    // @ts-ignore
-    __lastElement,
+    children: _lastChildren,
     // @ts-ignore
     transformFrom,
     animate: componentAnimate,
-    children,
   } = component;
-  animate = isBoolean(animate) ? animate : componentAnimate;
 
-  const lastElement = __lastElement || (transformFrom && transformFrom.__lastElement);
+  animate = isBoolean(animate) ? animate : componentAnimate;
+  const lastChildren = _lastChildren || (transformFrom && transformFrom.children);
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
-  const shapeElement = renderJSXElement(children, context, updater);
+  const nextChildren = renderJSXElement(newChildren, context, updater);
 
   // 布局计算
-  if (!shapeElement) {
-    return;
-  }
-  const nodeTree = createNodeTree(shapeElement);
+  const nodeTree = createNodeTree(nextChildren, context.px2hd);
   computeLayout(nodeTree);
-  updateNodeTree(shapeElement, nodeTree);
+  fillElementLayout(nodeTree);
 
-  // @ts-ignore
-  component.__lastElement = shapeElement;
-
-  renderShape(shapeElement, lastElement, { ...options, container });
-
-  // const renderElement =
-  //   animate !== false ? compareRenderTree(shapeElement, lastElement) : shapeElement;
-  // // @ts-ignore
-
-  // console.log(renderElement);
-
-  // 生成G的节点树, 存在数组的情况是根节点有变化，之前的树删除，新的树创建
-  // if (isArray(renderElement)) {
-  //   return renderElement.map((element) => {
-  //     return render(element, container, animate);
-  //   });
-  // } else {
-  //   return render(renderElement, container, animate);
-  // }
+  // 以组件维度控制是否需要动画
+  component.animate = animate;
+  renderElement(nextChildren, lastChildren, component.container, component);
+  component.animate = componentAnimate;
+  return nextChildren;
 }
 
-function renderComponent(component, options) {
-  const { isShapeComponent, children } = component;
-  if (isShapeComponent) {
-    renderShapeComponent(component, options, false);
-    return;
-  }
-  render(children, options);
-}
-
-function render(children, options: Options) {
-  Children.map(children, (child) => {
-    if (!child) return child;
-    const { component } = child;
-    if (!component) {
-      return child;
-    }
-    renderComponent(child.component, options);
-  });
-}
-
-export { render, renderShapeComponent };
+export { renderShape };

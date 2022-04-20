@@ -5,31 +5,29 @@ import { Renderer } from '@antv/g-mobile-canvas';
 
 class View extends Component {
   render() {
+    const { count, top = 0 } = this.props;
     return (
       <group
-        attrs={{
-          x: 50,
-          y: 50,
-          width: 250,
+        style={{
           display: 'flex',
+          left: 33,
+          top,
+          width: 100,
+          height: 100,
           flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-around',
         }}
       >
         <rect
           style={{
-            width: 40,
-            height: 40,
+            flex: 1,
             fill: 'red',
           }}
         />
-        {[1, 2].map((d) => (
+        {new Array(count).fill(0).map((_, id) => (
           <rect
-            attrs={{
-              width: 40,
-              height: 40,
-              fill: 'red',
+            style={{
+              flex: 1,
+              fill: id === 1 ? 'green' : 'blue',
             }}
           />
         ))}
@@ -46,7 +44,7 @@ describe('Canvas', () => {
 
     const { props } = (
       <Canvas renderer={renderer} context={context}>
-        <View ref={ref} />
+        <View ref={ref} count={1} />
       </Canvas>
     );
 
@@ -54,5 +52,18 @@ describe('Canvas', () => {
     canvas.render();
 
     ref.current.container.getChildren()[0].get('style');
+
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+
+    const update = (
+      <Canvas renderer={renderer} context={context}>
+        <View count={2} top={10} />
+      </Canvas>
+    );
+
+    canvas.update(update.props);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
   });
 });

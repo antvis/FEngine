@@ -1,4 +1,4 @@
-import { renderShapeComponent as renderShape } from './canvas/render/index';
+import { renderShape } from './canvas/render/index';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { Renderer as WebglRenderer } from '@antv/g-mobile-webgl';
 import { Renderer as SvgRenderer } from '@antv/g-mobile-svg';
