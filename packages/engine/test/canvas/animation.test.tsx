@@ -10,8 +10,6 @@ class View extends Component {
       return (
         <group
           style={{
-            x: 50,
-            y: 50,
             width: 250,
             display: 'flex',
             flexDirection: 'row',
@@ -21,13 +19,13 @@ class View extends Component {
         >
           <circle
             style={{
-              r: 20,
+              r: 0,
               fill: '#000',
             }}
             animation={{
               appear: {
                 // easing: 'linear',
-                duration: 400,
+                duration: 200,
                 // delay: 0,
                 // property: ['fillOpacity'],
                 start: {
@@ -48,7 +46,7 @@ class View extends Component {
             animation={{
               appear: {
                 // easing: 'linear',
-                duration: 400,
+                duration: 200,
                 // delay: 0,
                 // property: ['fillOpacity'],
                 start: {
@@ -59,7 +57,7 @@ class View extends Component {
                 },
               },
               leave: {
-                duration: 400,
+                duration: 200,
                 start: {
                   width: 40,
                 },
@@ -79,8 +77,6 @@ class View extends Component {
     return (
       <group
         style={{
-          x: 50,
-          y: 70,
           width: 250,
           display: 'flex',
           flexDirection: 'row',
@@ -88,17 +84,6 @@ class View extends Component {
           justifyContent: 'space-around',
         }}
       >
-        <circle
-          style={{
-            r: 20,
-            fill: '#000',
-          }}
-          animation={{
-            update: {
-              duration: 1000,
-            },
-          }}
-        />
         {[1, 2, 3].map((d) => (
           <rect
             style={{
@@ -108,16 +93,11 @@ class View extends Component {
             }}
             animation={{
               update: {
-                // easing: 'linear',
-                duration: 1000,
+                easing: 'ease',
+                duration: 500,
                 // delay: 0,
-                property: ['fillOpacity', 'fill'],
-                start: {
-                  fill: '#000',
-                },
-                end: {
-                  fill: 'red',
-                },
+                property: ['fill', 'x', 'y'],
+                // iterations: Infinity,
               },
             }}
             onClick={() => {
@@ -145,7 +125,7 @@ class View extends Component {
 describe('Canvas', () => {
   it('morph animate', async () => {
     const renderer = new Renderer();
-    await delay(1000);
+    await delay(100);
 
     const { props } = (
       <Canvas renderer={renderer} context={context}>
@@ -157,6 +137,7 @@ describe('Canvas', () => {
     canvas.render();
 
     await delay(1000);
+    expect(context).toMatchImageSnapshot();
 
     const update = (
       <Canvas renderer={renderer} context={context}>
@@ -165,5 +146,7 @@ describe('Canvas', () => {
     );
 
     canvas.update(update.props);
+    await delay(1000);
+    expect(context).toMatchImageSnapshot();
   });
 });

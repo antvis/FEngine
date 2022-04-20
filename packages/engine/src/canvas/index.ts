@@ -2,14 +2,13 @@
 import Component from '../component';
 // import Layout from '../component/layout';
 import equal from '../component/equal';
-import { Text } from '@antv/g';
-import { px2hd as defaultPx2hd } from './util';
+import { Group, Text } from '@antv/g';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
 import { Canvas as GCanvas } from '@antv/g-mobile';
-import { render } from './render';
-import AnimateController from './animation/animateController';
+import Timeline from './timeline';
+import { px2hd as defaultPx2hd } from './util';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -26,28 +25,27 @@ interface CanvasProps {
   renderer?: any;
 }
 
-function measureText(canvas, px2hd, theme) {
-  // TODO
+function measureText(container: Group, px2hd, theme) {
   return (text: string, font?) => {
-    const { fontSize: defaultFontsize, fontFamily: defaultFamily } = font || {};
+    const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
 
     font = {
       ...font,
-      fontSize: px2hd(defaultFontsize) || theme.fontSize,
-      fontFamily: defaultFamily || theme.fontFamily,
     };
-
-    const result = JSON.parse(JSON.stringify(font));
 
     const shape = new Text({
       style: {
-        ...result,
         x: 0,
         y: 0,
+        fontSize: px2hd(fontSize) || theme.fontSize,
+        fontFamily: fontFamily || theme.fontFamily,
+        fontStyle,
+        fontWeight,
+        fontVariant,
         text,
       },
     });
-    canvas.appendChild(shape);
+    container.appendChild(shape);
     const { width, height } = shape.getBBox();
 
     shape.remove(true);
@@ -62,9 +60,8 @@ function measureText(canvas, px2hd, theme) {
 class Canvas extends Component<CanvasProps> {
   canvas: GCanvas;
   private _ee: EE;
-  private animateControllers: AnimateController[];
-  private theme: any;
-  container: GCanvas;
+  private timeline: Timeline;
+  theme: any;
 
   constructor(props: CanvasProps) {
     super(props);
@@ -91,32 +88,36 @@ class Canvas extends Component<CanvasProps> {
       width,
       height,
     });
+    const container = canvas.getRoot();
 
     // 供全局使用的一些变量
     const componentContext = {
       root: this,
       px2hd,
       theme,
-      measureText: measureText(canvas, px2hd, theme),
+      measureText: measureText(container, px2hd, theme),
     };
 
-    this.canvas = canvas;
     this._ee = new EE();
     this.context = componentContext;
     this.updater = updater;
     this.theme = theme;
     this.animate = animate;
-    this.container = canvas;
-    // 单帧动画
-    this.animateControllers = [];
+    this.canvas = canvas;
+    this.container = container;
+    this.timeline = new Timeline();
   }
 
   renderComponents(components: Component[]) {
     if (!components || !components.length) {
       return;
     }
+    const { timeline } = this;
+    timeline.reset();
     renderComponent(components);
-    this._render();
+    timeline.onEnd(() => {
+      this._animationEnd();
+    });
   }
 
   update(nextProps: CanvasProps) {
@@ -130,27 +131,15 @@ class Canvas extends Component<CanvasProps> {
   }
 
   render() {
-    const { children: lastChildren, props } = this;
+    const { children: lastChildren, props, timeline } = this;
     const { children: nextChildren } = props;
 
+    timeline.reset();
     renderChildren(this, nextChildren, lastChildren);
-    this._render();
-    return null;
-  }
-
-  _render() {
-    const { children, canvas, animateControllers } = this;
-    const animateController = new AnimateController();
-
-    render(children, {
-      // @ts-ignore
-      animateController,
+    timeline.onEnd(() => {
+      this._animationEnd();
     });
-
-    // 获取当帧动画时长
-    const endTime = animateController.getMaxEndTime();
-
-    animateController.animationEnd(() => this._animationEnd());
+    return null;
   }
 
   _animationEnd() {
