@@ -1,10 +1,10 @@
-import { jsx, Canvas, Component } from '../../src';
+import { jsx, Canvas, Component, createRef } from '../../src';
 import Timeline from '../../src/timeline';
 import { Renderer } from '@antv/g-mobile-canvas';
-import { createContext } from '../util';
+import { createContext, delay } from '../util';
 const context = createContext();
 
-class View extends Component {
+class Rect extends Component {
   render() {
     const { index, width = 0 } = this.props;
     return (
@@ -48,20 +48,70 @@ class View extends Component {
   }
 }
 
+const Cirlce = (props) => {
+  const { index } = props;
+  return (
+    <group>
+      <circle
+        style={{
+          x: 10,
+          y: 10,
+          r: 10,
+          fill: 'red',
+        }}
+        animation={{
+          appear: {
+            easing: 'linear',
+            duration: 300,
+            property: ['r'],
+            start: {
+              r: 0,
+            },
+            end: {
+              r: 10,
+            },
+          },
+          update: {
+            easing: 'linear',
+            duration: 300,
+            property: [],
+          },
+        }}
+      />
+      <text
+        style={{
+          x: 0,
+          y: 30,
+          text: `${index}`,
+          fill: '#000',
+          fontSize: '30px',
+        }}
+      />
+    </group>
+  );
+};
+
 describe('Timeline', () => {
-  it('timeline 播放', () => {
+  it('timeline 播放', async () => {
     const renderer = new Renderer();
+    const rectRef = createRef();
     const { props } = (
       <Canvas renderer={renderer} context={context}>
-        <Timeline delay={1000} start={0}>
-          {[10, 100, 60, 200, 30].map((v, index) => {
-            return <View index={index} width={v} />;
+        <Timeline start={0}>
+          {[10, 100].map((v, index) => {
+            return <Rect ref={rectRef} index={index} width={v} />;
           })}
+          <Cirlce transformFrom={rectRef} index={2} />
         </Timeline>
       </Canvas>
     );
 
+    await delay(100);
+
     const canvas = new Canvas(props);
     canvas.render();
+
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
   });
 });

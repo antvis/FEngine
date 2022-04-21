@@ -309,13 +309,19 @@ function renderElement(nextElements, lastElements, container, component: Compone
 
     // 普通的jsx元素, 且都非空
     const { key: nextKey, type: nextType } = nextElement;
-    const { key: lastKey, type: lastType } = lastElement;
+    const { key: lastKey, type: lastType, shape: lastShape } = lastElement;
 
     // key 值不相等
     if (!isNil(nextKey) && nextKey !== lastKey) {
       deleteElement(lastElement, component);
       createElement(nextElement, container, component);
       return;
+    }
+
+    // 不在文档流
+    if (!lastShape.isConnected) {
+      lastElement.shape = lastShape.cloneNode();
+      container.appendChild(lastElement.shape);
     }
 
     // shape 类型的变化
@@ -362,4 +368,5 @@ function renderShape(component: Component, newChildren: JSX.Element, animate?: b
   const { shape } = child;
   return shape;
 }
-export { renderShape, renderShapeGroup };
+
+export { renderShape, renderShapeGroup, deleteElement };
