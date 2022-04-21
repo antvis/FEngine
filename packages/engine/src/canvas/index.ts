@@ -28,23 +28,22 @@ interface CanvasProps {
 function measureText(container: Group, px2hd, theme) {
   return (text: string, font?) => {
     const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
-
-    font = {
-      ...font,
-    };
-
-    const shape = new Text({
-      style: {
-        x: 0,
-        y: 0,
-        fontSize: px2hd(fontSize) || theme.fontSize,
-        fontFamily: fontFamily || theme.fontFamily,
-        fontStyle,
-        fontWeight,
-        fontVariant,
-        text,
-      },
-    });
+    // TODO: 属性为undefine时报错
+    const result = JSON.parse(
+      JSON.stringify({
+        style: {
+          x: 0,
+          y: 0,
+          fontSize: px2hd(fontSize) || theme.fontSize,
+          fontFamily: fontFamily || theme.fontFamily,
+          fontStyle,
+          fontWeight,
+          fontVariant,
+          text,
+        },
+      })
+    );
+    const shape = new Text(result);
     container.appendChild(shape);
     const { width, height } = shape.getBBox();
 
@@ -93,6 +92,7 @@ class Canvas extends Component<CanvasProps> {
     // 供全局使用的一些变量
     const componentContext = {
       root: this,
+      canvas,
       px2hd,
       theme,
       measureText: measureText(container, px2hd, theme),
@@ -135,6 +135,7 @@ class Canvas extends Component<CanvasProps> {
     const { children: nextChildren } = props;
 
     timeline.reset();
+
     renderChildren(this, nextChildren, lastChildren);
     timeline.onEnd(() => {
       this._animationEnd();

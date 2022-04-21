@@ -10,7 +10,7 @@ import Timeline from '../timeline';
 
 function doAnimate(shape: DisplayObject, effect) {
   if (!effect) return null;
-  const { start, end, easing, duration, delay, iterations } = effect;
+  const { start, end, easing, duration, delay, iterations, onFrame, onEnd } = effect;
   // TODO: JSON render 不执行动画
   const animation = shape.animate([start, end], {
     fill: 'both',
@@ -19,6 +19,9 @@ function doAnimate(shape: DisplayObject, effect) {
     delay,
     iterations,
   });
+
+  animation.onfinish = onEnd;
+  animation.onframe = onFrame;
   return animation;
 }
 
@@ -100,15 +103,12 @@ function updateElement(nextElement, lastElement, component) {
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 
-  // 需要构造动画起始和结束的属性
-  const startStyle = pick(lastStyle, updateEffectProperty || []);
-  const endStyle = pick(nextStyle, updateEffectProperty || []);
-  // 踢掉动画的属性
-  mix(shape.style, omit(nextStyle, updateEffectProperty || []));
-
-  // 继续比较子元素
-  renderElement(nextChildren, lastChildren, shape, component);
   if (animate && updateEffect) {
+    // 需要构造动画起始和结束的属性
+    const startStyle = pick(lastStyle, updateEffectProperty || []);
+    const endStyle = pick(nextStyle, updateEffectProperty || []);
+    // 踢掉动画的属性
+    mix(shape.style, omit(nextStyle, updateEffectProperty || []));
     // 执行动画
     const animation = doAnimate(shape, {
       ...updateEffect,
@@ -122,7 +122,12 @@ function updateElement(nextElement, lastElement, component) {
       },
     });
     timeline.add(animation);
+  } else {
+    mix(shape.style, nextStyle);
   }
+
+  // 继续比较子元素
+  renderElement(nextChildren, lastChildren, shape, component);
 }
 
 // 类型变化
@@ -323,7 +328,7 @@ function renderElement(nextElements, lastElements, container, component: Compone
   });
 }
 
-function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
+function renderShapeGroup(component: Component, newChildren: JSX.Element, animate?: boolean) {
   const {
     context,
     updater,
@@ -338,6 +343,8 @@ function renderShape(component: Component, newChildren: JSX.Element, animate?: b
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const nextChildren = renderJSXElement(newChildren, context, updater);
 
+  if (!nextChildren) return null;
+
   // 布局计算
   const nodeTree = createNodeTree(nextChildren, context.px2hd);
   computeLayout(nodeTree);
@@ -350,4 +357,9 @@ function renderShape(component: Component, newChildren: JSX.Element, animate?: b
   return nextChildren;
 }
 
-export { renderShape };
+function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
+  const child = renderShapeGroup(component, newChildren, animate);
+  const { shape } = child;
+  return shape;
+}
+export { renderShape, renderShapeGroup };

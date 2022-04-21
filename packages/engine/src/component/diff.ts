@@ -2,7 +2,7 @@ import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';
 import Children from '../children';
-import { renderShape } from '../canvas/render';
+import { renderShapeGroup } from '../canvas/render';
 import { Group } from '@antv/g';
 
 interface Element extends JSX.Element {
@@ -264,9 +264,10 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
   nextChildren = pickElement(nextChildren);
 
   if (!isContainer(nextChildren)) {
-    parent.children = renderShape(parent, nextChildren);
+    parent.children = renderShapeGroup(parent, nextChildren);
   } else {
-    parent.children = diff(parent, nextChildren, lastChildren);
+    parent.children = nextChildren;
+    diff(parent, nextChildren, lastChildren);
   }
   // 设置 children 的引用
   // parent.children = nextChildren;
