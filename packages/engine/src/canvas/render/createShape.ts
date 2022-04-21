@@ -1,5 +1,4 @@
 import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
-// import Hammer from 'hammer';
 import Hammer from '../event/index';
 
 const classMap = {

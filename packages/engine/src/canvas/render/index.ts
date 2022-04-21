@@ -325,7 +325,7 @@ function renderElement(nextElements, lastElements, container, component: Compone
   });
 }
 
-function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
+function renderShapeGroup(component: Component, newChildren: JSX.Element, animate?: boolean) {
   const {
     context,
     updater,
@@ -340,6 +340,8 @@ function renderShape(component: Component, newChildren: JSX.Element, animate?: b
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const nextChildren = renderJSXElement(newChildren, context, updater);
 
+  if (!nextChildren) return null;
+
   // 布局计算
   const nodeTree = createNodeTree(nextChildren, context.px2hd);
   computeLayout(nodeTree);
@@ -352,4 +354,9 @@ function renderShape(component: Component, newChildren: JSX.Element, animate?: b
   return nextChildren;
 }
 
-export { renderShape };
+function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
+  const child = renderShapeGroup(component, newChildren, animate);
+  const { shape } = child;
+  return shape;
+}
+export { renderShape, renderShapeGroup };
