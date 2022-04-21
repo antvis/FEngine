@@ -10,7 +10,7 @@ import Timeline from '../timeline';
 
 function doAnimate(shape: DisplayObject, effect) {
   if (!effect) return null;
-  const { start, end, easing, duration, delay, iterations } = effect;
+  const { start, end, easing, duration, delay, iterations, onFrame, onEnd } = effect;
   // TODO: JSON render 不执行动画
   const animation = shape.animate([start, end], {
     fill: 'both',
@@ -19,6 +19,9 @@ function doAnimate(shape: DisplayObject, effect) {
     delay,
     iterations,
   });
+
+  animation.onfinish = onEnd;
+  animation.onframe = onFrame;
   return animation;
 }
 
