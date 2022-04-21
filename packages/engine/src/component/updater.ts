@@ -38,6 +38,7 @@ function createUpdater(canvas) {
 
     // 清空
     renderQueue.length = 0;
+    callbackQueue.length = 0;
   }
 
   function enqueueSetState(component, state, callback?: () => void) {

@@ -2,7 +2,7 @@ import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';
 import Children from '../children';
-import { renderShapeGroup } from '../canvas/render';
+import { renderShapeGroup, deleteElement } from '../canvas/render';
 import { Group } from '@antv/g';
 
 interface Element extends JSX.Element {
@@ -30,35 +30,11 @@ function setComponentAnimate(child: Component, parent: Component) {
   child.animate = isBoolean(childAnimate) ? childAnimate : parentAnimate;
 }
 
-function getTransformComponent(component: Component) {
-  if (!component) return null;
-  // @ts-ignore
-  const { __lastElement, children } = component;
-  if (__lastElement) {
-    return component;
-  }
-  if (!children) {
-    return null;
-  }
-
-  let componentFromChildren = null;
-  Children.map(children, (item) => {
-    if (componentFromChildren) return;
-    if (!item) return;
-    const component = getTransformComponent(item.component);
-    if (component) {
-      componentFromChildren = component;
-    }
-  });
-  return componentFromChildren;
-}
-
 function getTransformFromComponentRef(transformFromRef) {
   if (!transformFromRef || !transformFromRef.current) {
     return null;
   }
-  const transformFromComponent = transformFromRef.current;
-  return getTransformComponent(transformFromComponent);
+  return transformFromRef.current;
 }
 
 function createComponent(parent: Component, element: JSX.Element): Component {
@@ -141,27 +117,28 @@ function renderComponent(component: Component | Component[]) {
   });
 }
 
-function destroyElement(elements: JSX.Element) {
+function destroyElement(parent: Component, elements: JSX.Element) {
   Children.map(elements, (element) => {
     if (!element) return;
     const { component } = element;
     if (!component) {
+      deleteElement(element, parent);
       return;
     }
     component.willUnmount();
-    destroyElement(component.children);
+    destroyElement(component, component.children);
     component.didUnmount();
   });
 }
 
-function diffElement(nextElement: JSX.Element, lastElement: JSX.Element) {
+function diffElement(nextElement: JSX.Element, lastElement: JSX.Element, parent: Component) {
   if (!nextElement && !lastElement) {
     return null;
   }
 
   // 删除
   if (!nextElement && lastElement) {
-    destroyElement(lastElement);
+    destroyElement(parent, lastElement);
     return null;
   }
 
@@ -175,7 +152,7 @@ function diffElement(nextElement: JSX.Element, lastElement: JSX.Element) {
   const { type: lastType, props: lastProps, component: lastComponent } = lastElement;
 
   if (nextType !== lastType) {
-    destroyElement(lastElement);
+    destroyElement(parent, lastElement);
     return nextElement;
   }
 
@@ -198,7 +175,7 @@ function diff(parent: Component, nextChildren, lastChildren) {
   let childrenArray = [];
   // 1. 第一轮比较， 直接destroy的元素处理掉，destroy 的元素不需要进入下一阶段
   Children.compare(nextChildren, lastChildren, (next, last) => {
-    const element = diffElement(next, last);
+    const element = diffElement(next, last, parent);
 
     if (element) {
       childrenArray = childrenArray.concat(Children.toArray(element).filter(Boolean));

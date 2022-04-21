@@ -14,7 +14,5 @@ export default function(type: ElementType, config, ...children): JSX.Element {
     ref,
     type,
     props,
-    // 存储一些过程中的cache值
-    _cache: {},
   };
 }

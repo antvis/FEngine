@@ -4,7 +4,7 @@ import Children from '../../children';
 // 主要是把function节点，全部转换成string标签节点
 function renderJSXElement(element: JSX.Element, context, updater): JSX.Element {
   if (!element) return element;
-  const { type, key, ref, props, _cache = {} } = element;
+  const { type, key, ref, props } = element;
 
   // render children first
   const children = Children.map(props.children, (child: JSX.Element) => {
@@ -15,7 +15,6 @@ function renderJSXElement(element: JSX.Element, context, updater): JSX.Element {
     type,
     key,
     ref,
-    _cache,
     props: {
       ...props,
       children,
