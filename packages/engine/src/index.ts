@@ -11,6 +11,7 @@ export { default as Component } from './component';
 export { default as Children } from './children';
 export { default as createRef } from './createRef';
 export { default as Timeline } from './timeline';
+export { default as Hammer } from './canvas/event';
 
 export { CanvasRenderer, WebglRenderer, SvgRenderer, renderShape };
 export * from './adapter';

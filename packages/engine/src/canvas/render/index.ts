@@ -5,6 +5,7 @@ import Component from '../../component';
 import renderJSXElement from './renderJSXElement';
 import { createShape, addEvent } from './createShape';
 import { createNodeTree, fillElementLayout } from './renderLayout';
+import { DEFAULT_STYLE_PROPS } from '../util';
 import computeLayout from '../css-layout';
 import Timeline from '../timeline';
 
@@ -99,7 +100,8 @@ function updateElement(nextElement, lastElement, component) {
   // 保留图形引用
   nextElement.shape = shape;
 
-  // 移除原先事件，添加新事件
+  // shape  reset一下
+  mix(shape.style, DEFAULT_STYLE_PROPS);
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 

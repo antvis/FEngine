@@ -16,6 +16,7 @@ const classMap = {
 
 function createShape(type: string, props, style) {
   if (!type) return null;
+
   const ShapeClass = classMap[type];
   // const { style } = props;
 
@@ -40,6 +41,24 @@ function addEvent(shape, props) {
     onPress,
     onSwipe,
   } = props;
+
+  if (
+    !(
+      onClick ||
+      onDbClick ||
+      onTouchStart ||
+      onTouchMove ||
+      onTouchEnd ||
+      onTouchEndOutside ||
+      onPanStart ||
+      onPan ||
+      onPanEnd ||
+      onPress ||
+      onSwipe
+    )
+  ) {
+    return;
+  }
 
   const hammer = new Hammer(shape);
 
