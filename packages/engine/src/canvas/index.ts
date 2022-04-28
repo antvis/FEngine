@@ -1,4 +1,4 @@
-// import { deepMix } from '@antv/util';
+import { mix } from '@antv/util';
 import Component from '../component';
 // import Layout from '../component/layout';
 import equal from '../component/equal';
@@ -87,6 +87,15 @@ class Canvas extends Component<CanvasProps> {
       width,
       height,
     });
+    const defaultStyle = {
+      fontSize: '12px',
+      fontFamily: 'auto',
+      textBaseline: 'bottom',
+      fontStyle: 'normal',
+      fontVariant: 'normal',
+      fontWeight: 'normal',
+    };
+    mix(canvas.document.documentElement.style, defaultStyle);
     const container = canvas.getRoot();
 
     // 供全局使用的一些变量

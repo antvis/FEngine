@@ -148,8 +148,8 @@ const DEFAULT_STYLE_PROPS: {
   fill?: string;
   stroke?: string;
 } = {
-  anchor: [0, 0, 0],
-  origin: [0, 0, 0],
+  // anchor: [0, 0, 0],
+  // origin: [0, 0, 0],
   opacity: 1,
   fillOpacity: 1,
   strokeOpacity: 1,
