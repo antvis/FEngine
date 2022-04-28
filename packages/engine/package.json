@@ -1,9 +1,7 @@
 {
   "name": "@antv/f-engine",
   "version": "0.0.0",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "types": "es/index.d.ts",
+  "main": "src/index.ts",
   "dependencies": {
     "@antv/event-emitter": "~0.1.3",
     "@antv/g": "~5.0.14",
