@@ -88,7 +88,6 @@ class Canvas extends Component<CanvasProps> {
       height,
       supportTouchEvent: true,
     });
-
     const container = canvas.getRoot();
     // 设置全局样式
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
