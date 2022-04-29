@@ -34,7 +34,16 @@ function getTransformFromComponentRef(transformFromRef) {
   if (!transformFromRef || !transformFromRef.current) {
     return null;
   }
-  return transformFromRef.current;
+  let ref = transformFromRef.current;
+
+  if (isContainer(ref.children)) {
+    while (isContainer(ref.children)) {
+      ref = ref.children;
+    }
+    ref = ref.component;
+  }
+
+  return ref;
 }
 
 function createComponent(parent: Component, element: JSX.Element): Component {
@@ -52,6 +61,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
   const { transformFrom: transformFromRef, ...receiveProps } = props;
 
   let component: Component;
+
   // @ts-ignore
   if (type.prototype && type.prototype.isF2Component) {
     // @ts-ignore
@@ -66,7 +76,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
 
   // 设置ref
   if (ref) {
-    ref.current = component;
+    element.ref.current = component;
   }
 
   // 因为view 可能在子组件，所以这里要透传到子组件
@@ -79,6 +89,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     const transformFromComponent = transformFromRef
       ? getTransformFromComponentRef(transformFromRef)
       : null;
+
     // @ts-ignore
     component.transformFrom = transformFromComponent;
   }

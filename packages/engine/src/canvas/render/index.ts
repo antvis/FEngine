@@ -347,7 +347,9 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
   } = component;
 
   animate = isBoolean(animate) ? animate : componentAnimate;
+
   const lastChildren = _lastChildren || (transformFrom && transformFrom.children);
+
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const nextChildren = renderJSXElement(newChildren, context, updater);
 
@@ -360,8 +362,9 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
 
   // 以组件维度控制是否需要动画
   component.animate = animate;
+
   renderElement(nextChildren, lastChildren, component.container, component);
-  component.animate = componentAnimate;
+
   return nextChildren;
 }
 
