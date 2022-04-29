@@ -115,6 +115,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     const transformFromComponent = transformFromRef
       ? getTransformFromComponentRef(transformFromRef)
       : null;
+
     // @ts-ignore
     component.transformFrom = transformFromComponent;
   }
