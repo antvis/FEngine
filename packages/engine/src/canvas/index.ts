@@ -86,6 +86,7 @@ class Canvas extends Component<CanvasProps> {
       renderer,
       width,
       height,
+      supportTouchEvent: true,
     });
 
     const container = canvas.getRoot();

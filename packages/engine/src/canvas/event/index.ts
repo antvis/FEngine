@@ -4,9 +4,14 @@ import { Point } from './type';
 const PRESS_DELAY = 250;
 
 function convertPoints(ev) {
-  const points = [];
-  const { x, y, clientX, clientY } = ev.canvas;
-  points.push({ x, y });
+  const pos = ev.touches || [ev.canvas];
+  const points = pos.map((d) => {
+    return {
+      x: d.x,
+      y: d.y,
+    };
+  });
+  ev.points = points;
   return points;
 }
 class Hammer extends EE {
@@ -41,6 +46,7 @@ class Hammer extends EE {
     this.shape.addEventListener('touchendoutside', this._touchendoutside);
   }
   _click = (ev) => {
+    convertPoints(ev);
     if (ev.detail === 2) {
       // 双击
       this.emit('dbclick', ev);
@@ -51,8 +57,6 @@ class Hammer extends EE {
   };
 
   _start = (ev) => {
-    this.emit('touchstart', ev);
-
     // 防止上次的内容没有清理掉，重新reset下
     this.reset();
     // 记录touch start 的时间
@@ -60,6 +64,8 @@ class Hammer extends EE {
     // 记录touch start 的点
 
     const points = convertPoints(ev);
+
+    this.emit('touchstart', ev);
     this.startPoints = points;
 
     if (points.length > 1) {
@@ -131,11 +137,13 @@ class Hammer extends EE {
   };
 
   _touchend = (ev) => {
+    convertPoints(ev);
     this.emit('touchend', ev);
     this._end(ev);
   };
 
   _touchendoutside = (ev) => {
+    convertPoints(ev);
     this.emit('touchendoutside', ev);
     this._end(ev);
   };
@@ -168,8 +176,7 @@ class Hammer extends EE {
 
     this.reset();
 
-    //TODO: 修改为 ev.touches
-    const touches = [];
+    const touches = ev.touches;
     // 当多指只释放了1指时也会触发end, 这时重新触发一次start
     if (touches && touches.length > 0) {
       this._start(ev);
