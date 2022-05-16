@@ -29,7 +29,33 @@ function setComponentAnimate(child: Component, parent: Component) {
   const { animate: childAnimate } = childProps;
   child.animate = isBoolean(childAnimate) ? childAnimate : parentAnimate;
 }
+function getTransformComponent(component: Component) {
+  if (!component) return null;
+  // @ts-ignore
+  const { children } = component;
+  if (!children) {
+    return null;
+  }
 
+  let componentFromChildren = null;
+  Children.map(children, (item) => {
+    if (componentFromChildren) return;
+    if (!item) return;
+    const component = getTransformComponent(item.component);
+    if (component) {
+      componentFromChildren = component;
+    }
+  });
+  return componentFromChildren;
+}
+
+// function getTransformFromComponentRef(transformFromRef) {
+//   if (!transformFromRef || !transformFromRef.current) {
+//     return null;
+//   }
+//   const transformFromComponent = transformFromRef.current;
+//   return getTransformComponent(transformFromComponent);
+// }
 function getTransformFromComponentRef(transformFromRef) {
   if (!transformFromRef || !transformFromRef.current) {
     return null;
@@ -89,7 +115,6 @@ function createComponent(parent: Component, element: JSX.Element): Component {
     const transformFromComponent = transformFromRef
       ? getTransformFromComponentRef(transformFromRef)
       : null;
-
     // @ts-ignore
     component.transformFrom = transformFromComponent;
   }
@@ -116,9 +141,11 @@ function renderComponent(component: Component | Component[]) {
   });
 
   Children.map(component, (item: Component) => {
+    // @ts-ignore
     const { children: lastChildren } = item;
     const mount = isUndefined(lastChildren);
     const newChildren = item.render();
+
     renderChildren(item, newChildren, lastChildren);
     if (mount) {
       item.didMount();
@@ -129,6 +156,7 @@ function renderComponent(component: Component | Component[]) {
 }
 
 function destroyElement(parent: Component, elements: JSX.Element) {
+  if (!parent) return;
   Children.map(elements, (element) => {
     if (!element) return;
     const { component } = element;
@@ -137,7 +165,9 @@ function destroyElement(parent: Component, elements: JSX.Element) {
       return;
     }
     component.willUnmount();
-    destroyElement(component, component.children);
+    setTimeout(() => {
+      destroyElement(component, component.children);
+    });
     component.didUnmount();
   });
 }
@@ -163,6 +193,7 @@ function diffElement(nextElement: JSX.Element, lastElement: JSX.Element, parent:
   const { type: lastType, props: lastProps, component: lastComponent } = lastElement;
 
   if (nextType !== lastType) {
+    // TODO 需要destroyElement children拿走以后要置null
     destroyElement(parent, lastElement);
     return nextElement;
   }

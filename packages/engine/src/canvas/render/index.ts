@@ -148,9 +148,12 @@ function morphElement(nextElement, lastElement, container, component) {
     {},
     {
       ...nextStyle,
+      path: lastPath,
     }
   );
-  lastShape.replaceWith(pathShape);
+  // lastShape.replaceWith(pathShape);
+  lastShape.remove();
+  container.appendChild(pathShape);
 
   const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
 
@@ -279,7 +282,6 @@ function changeElementType(nextElement, lastElement, container, component) {
   const { type: nextType, props: nextProps, style } = nextElement;
   const { type: lastType } = lastElement;
   nextElement.shape = createShape(nextType, nextProps, style);
-
   // if (nextType === 'group') {
   //   return changeTypeToGroup(nextElement, lastElement);
   // }
@@ -348,7 +350,13 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
 
   animate = isBoolean(animate) ? animate : componentAnimate;
 
-  const lastChildren = _lastChildren || (transformFrom && transformFrom.children);
+  let lastChildren;
+  if (_lastChildren) {
+    lastChildren = _lastChildren;
+  } else if (transformFrom && transformFrom.children) {
+    lastChildren = transformFrom.children;
+    transformFrom.children = null;
+  }
 
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const nextChildren = renderJSXElement(newChildren, context, updater);
