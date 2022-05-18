@@ -1,6 +1,5 @@
-// import { deepMix } from '@antv/util';
+import { mix, deepMix, omit, pick } from '@antv/util';
 import Component from '../component';
-// import Layout from '../component/layout';
 import equal from '../component/equal';
 import { Group, Text } from '@antv/g';
 import { createUpdater } from '../component/updater';
@@ -8,6 +7,7 @@ import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import Timeline from './timeline';
+import defaultTheme from './theme';
 import { px2hd as defaultPx2hd } from './util';
 
 interface CanvasProps {
@@ -25,7 +25,7 @@ interface CanvasProps {
   renderer?: any;
 }
 
-function measureText(container: Group, px2hd, theme) {
+function measureText(container: Group, px2hd) {
   return (text: string, font?) => {
     const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
     // TODO: 属性为undefine时报错
@@ -34,8 +34,8 @@ function measureText(container: Group, px2hd, theme) {
         style: {
           x: 0,
           y: 0,
-          fontSize: px2hd(fontSize) || theme.fontSize,
-          fontFamily: fontFamily || theme.fontFamily,
+          fontSize: px2hd(fontSize),
+          fontFamily: fontFamily,
           fontStyle,
           fontWeight,
           fontVariant,
@@ -78,7 +78,7 @@ class Canvas extends Component<CanvasProps> {
     // 组件更新器
     const updater = createUpdater(this);
 
-    const theme = px2hd(customTheme);
+    const theme = px2hd(deepMix({}, defaultTheme, customTheme));
 
     const canvas = new GCanvas({
       context,
@@ -86,8 +86,13 @@ class Canvas extends Component<CanvasProps> {
       renderer,
       width,
       height,
+      supportTouchEvent: true,
     });
+
     const container = canvas.getRoot();
+    // 设置全局样式
+    const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
+    mix(container.style, defalutStyle);
 
     // 供全局使用的一些变量
     const componentContext = {
@@ -95,7 +100,7 @@ class Canvas extends Component<CanvasProps> {
       canvas,
       px2hd,
       theme,
-      measureText: measureText(container, px2hd, theme),
+      measureText: measureText(container, px2hd),
     };
 
     this._ee = new EE();
@@ -168,7 +173,7 @@ class Canvas extends Component<CanvasProps> {
   }
 
   getCanvasConfig() {
-    return this.canvas.getConfig().canvas;
+    return this.canvas.getConfig();
   }
 }
 

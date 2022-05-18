@@ -6,6 +6,7 @@ import {
   isArray,
 } from '@antv/util';
 
+
 // 默认设置50
 let ONE_REM: number;
 try {
@@ -138,6 +139,24 @@ function getElementsByClassName(className: string, element) {
   return rst;
 }
 
+const DEFAULT_STYLE_PROPS: {
+  anchor?: Array<Number>;
+  origin?:  Array<Number>;
+  opacity?: number;
+  fillOpacity?: number;
+  strokeOpacity?: number;
+  fill?: string;
+  stroke?: string;
+} = {
+  // anchor: [0, 0, 0],
+  // origin: [0, 0, 0],
+  opacity: 1,
+  fillOpacity: 1,
+  strokeOpacity: 1,
+  fill: 'transparent',
+  stroke: 'transparent',
+};
+
 export {
   // px2hd 含义更清晰
   batch2hd as px2hd,
@@ -146,4 +165,5 @@ export {
   toTimeStamp,
   isInBBox,
   getElementsByClassName,
+  DEFAULT_STYLE_PROPS
 };

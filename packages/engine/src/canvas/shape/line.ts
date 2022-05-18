@@ -6,6 +6,5 @@ export default (layout) => {
     y1: top + halfHeight,
     x2: left + width,
     y2: top + halfHeight,
-    lineWidth: height,
   };
 };

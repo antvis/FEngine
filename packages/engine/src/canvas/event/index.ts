@@ -3,6 +3,17 @@ import { Point } from './type';
 
 const PRESS_DELAY = 250;
 
+function convertPoints(ev) {
+  const pos = ev.touches || [ev.canvas];
+  const points = pos.map((d) => {
+    return {
+      x: d.x,
+      y: d.y,
+    };
+  });
+  ev.points = points;
+  return points;
+}
 class Hammer extends EE {
   shape: any;
   processEvent: { [eventType: string]: boolean };
@@ -35,6 +46,7 @@ class Hammer extends EE {
     this.shape.addEventListener('touchendoutside', this._touchendoutside);
   }
   _click = (ev) => {
+    convertPoints(ev);
     if (ev.detail === 2) {
       // 双击
       this.emit('dbclick', ev);
@@ -45,15 +57,15 @@ class Hammer extends EE {
   };
 
   _start = (ev) => {
-    this.emit('touchstart', ev);
-
     // 防止上次的内容没有清理掉，重新reset下
     this.reset();
     // 记录touch start 的时间
     this.startTime = Date.now();
     // 记录touch start 的点
 
-    const points = [ev.canvas];
+    const points = convertPoints(ev);
+
+    this.emit('touchstart', ev);
     this.startPoints = points;
 
     if (points.length > 1) {
@@ -75,7 +87,7 @@ class Hammer extends EE {
   };
 
   _move = (ev) => {
-    const points = [ev.canvas];
+    const points = convertPoints(ev);
     if (!points) return;
     this.clearPressTimeout();
 
@@ -102,6 +114,7 @@ class Hammer extends EE {
       // 获取press或者pan的事件类型
       // press 按住滑动, pan表示平移
       // 如果start后立刻move，则触发pan, 如果有停顿，则触发press
+
       const eventType = this.getEventType(points);
 
       ev.direction = direction;
@@ -124,11 +137,13 @@ class Hammer extends EE {
   };
 
   _touchend = (ev) => {
+    convertPoints(ev);
     this.emit('touchend', ev);
     this._end(ev);
   };
 
   _touchendoutside = (ev) => {
+    convertPoints(ev);
     this.emit('touchendoutside', ev);
     this._end(ev);
   };
@@ -161,8 +176,7 @@ class Hammer extends EE {
 
     this.reset();
 
-    //TODO: 修改为 ev.touches
-    const touches = [];
+    const touches = ev.touches;
     // 当多指只释放了1指时也会触发end, 这时重新触发一次start
     if (touches && touches.length > 0) {
       this._start(ev);
@@ -175,20 +189,21 @@ class Hammer extends EE {
       return eventType;
     }
     let type;
-    // const panEventListeners = shape.emitter._events.pan;
-    // console.log(panEventListeners);
-    // // 如果没有pan事件的监听，默认都是press
-    // if (!panEventListeners || !panEventListeners.length) {
-    //   type = 'press';
-    // } else {
-    // 如果有pan事件的处理，press则需要停顿250ms, 且移动距离小于10
-    const now = Date.now();
-    if (now - startTime > PRESS_DELAY && calcDistance(startPoints[0], points[0]) < 10) {
+    // @ts-ignore
+    const panEventListeners = this._events.pan;
+
+    // 如果没有pan事件的监听，默认都是press
+    if (!panEventListeners) {
       type = 'press';
     } else {
-      type = 'pan';
+      // 如果有pan事件的处理，press则需要停顿250ms, 且移动距离小于10
+      const now = Date.now();
+      if (now - startTime > PRESS_DELAY && calcDistance(startPoints[0], points[0]) < 10) {
+        type = 'press';
+      } else {
+        type = 'pan';
+      }
     }
-    // }
     this.eventType = type;
     return type;
   }

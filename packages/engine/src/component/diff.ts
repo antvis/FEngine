@@ -29,12 +29,47 @@ function setComponentAnimate(child: Component, parent: Component) {
   const { animate: childAnimate } = childProps;
   child.animate = isBoolean(childAnimate) ? childAnimate : parentAnimate;
 }
+function getTransformComponent(component: Component) {
+  if (!component) return null;
+  // @ts-ignore
+  const { children } = component;
+  if (!children) {
+    return null;
+  }
 
+  let componentFromChildren = null;
+  Children.map(children, (item) => {
+    if (componentFromChildren) return;
+    if (!item) return;
+    const component = getTransformComponent(item.component);
+    if (component) {
+      componentFromChildren = component;
+    }
+  });
+  return componentFromChildren;
+}
+
+// function getTransformFromComponentRef(transformFromRef) {
+//   if (!transformFromRef || !transformFromRef.current) {
+//     return null;
+//   }
+//   const transformFromComponent = transformFromRef.current;
+//   return getTransformComponent(transformFromComponent);
+// }
 function getTransformFromComponentRef(transformFromRef) {
   if (!transformFromRef || !transformFromRef.current) {
     return null;
   }
-  return transformFromRef.current;
+  let ref = transformFromRef.current;
+
+  if (isContainer(ref.children)) {
+    while (isContainer(ref.children)) {
+      ref = ref.children;
+    }
+    ref = ref.component;
+  }
+
+  return ref;
 }
 
 function createComponent(parent: Component, element: JSX.Element): Component {
@@ -52,6 +87,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
   const { transformFrom: transformFromRef, ...receiveProps } = props;
 
   let component: Component;
+
   // @ts-ignore
   if (type.prototype && type.prototype.isF2Component) {
     // @ts-ignore
@@ -66,7 +102,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
 
   // 设置ref
   if (ref) {
-    ref.current = component;
+    element.ref.current = component;
   }
 
   // 因为view 可能在子组件，所以这里要透传到子组件
@@ -105,9 +141,11 @@ function renderComponent(component: Component | Component[]) {
   });
 
   Children.map(component, (item: Component) => {
+    // @ts-ignore
     const { children: lastChildren } = item;
     const mount = isUndefined(lastChildren);
     const newChildren = item.render();
+
     renderChildren(item, newChildren, lastChildren);
     if (mount) {
       item.didMount();
@@ -118,6 +156,7 @@ function renderComponent(component: Component | Component[]) {
 }
 
 function destroyElement(parent: Component, elements: JSX.Element) {
+  if (!parent) return;
   Children.map(elements, (element) => {
     if (!element) return;
     const { component } = element;
@@ -126,7 +165,9 @@ function destroyElement(parent: Component, elements: JSX.Element) {
       return;
     }
     component.willUnmount();
-    destroyElement(component, component.children);
+    setTimeout(() => {
+      destroyElement(component, component.children);
+    });
     component.didUnmount();
   });
 }
@@ -152,6 +193,7 @@ function diffElement(nextElement: JSX.Element, lastElement: JSX.Element, parent:
   const { type: lastType, props: lastProps, component: lastComponent } = lastElement;
 
   if (nextType !== lastType) {
+    // TODO 需要destroyElement children拿走以后要置null
     destroyElement(parent, lastElement);
     return nextElement;
   }

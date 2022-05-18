@@ -5,6 +5,7 @@ import Component from '../../component';
 import renderJSXElement from './renderJSXElement';
 import { createShape, addEvent } from './createShape';
 import { createNodeTree, fillElementLayout } from './renderLayout';
+import { DEFAULT_STYLE_PROPS } from '../util';
 import computeLayout from '../css-layout';
 import Timeline from '../timeline';
 
@@ -99,7 +100,8 @@ function updateElement(nextElement, lastElement, component) {
   // 保留图形引用
   nextElement.shape = shape;
 
-  // 移除原先事件，添加新事件
+  // shape  reset一下
+  mix(shape.style, DEFAULT_STYLE_PROPS);
   shape.removeAllEventListeners();
   addEvent(shape, nextProps);
 
@@ -146,9 +148,12 @@ function morphElement(nextElement, lastElement, container, component) {
     {},
     {
       ...nextStyle,
+      path: lastPath,
     }
   );
-  lastShape.replaceWith(pathShape);
+  // lastShape.replaceWith(pathShape);
+  lastShape.remove();
+  container.appendChild(pathShape);
 
   const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
 
@@ -277,7 +282,6 @@ function changeElementType(nextElement, lastElement, container, component) {
   const { type: nextType, props: nextProps, style } = nextElement;
   const { type: lastType } = lastElement;
   nextElement.shape = createShape(nextType, nextProps, style);
-
   // if (nextType === 'group') {
   //   return changeTypeToGroup(nextElement, lastElement);
   // }
@@ -345,7 +349,15 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
   } = component;
 
   animate = isBoolean(animate) ? animate : componentAnimate;
-  const lastChildren = _lastChildren || (transformFrom && transformFrom.children);
+
+  let lastChildren;
+  if (_lastChildren) {
+    lastChildren = _lastChildren;
+  } else if (transformFrom && transformFrom.children) {
+    lastChildren = transformFrom.children;
+    transformFrom.children = null;
+  }
+
   // children 是 shape 的 jsx 结构, component.render() 返回的结构
   const nextChildren = renderJSXElement(newChildren, context, updater);
 
@@ -358,8 +370,9 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
 
   // 以组件维度控制是否需要动画
   component.animate = animate;
+
   renderElement(nextChildren, lastChildren, component.container, component);
-  component.animate = componentAnimate;
+
   return nextChildren;
 }
 
