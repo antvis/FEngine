@@ -1,5 +1,18 @@
-import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
+import {
+  Group,
+  Text,
+  Circle,
+  Ellipse,
+  Rect,
+  Path,
+  Image,
+  Line,
+  Polyline,
+  Polygon,
+  isNil,
+} from '@antv/g';
 import Hammer from '../event/index';
+import { checkCSSRule } from '../util';
 
 const classMap = {
   group: Group,
@@ -20,7 +33,9 @@ function createShape(type: string, props, style) {
   const ShapeClass = classMap[type];
   // const { style } = props;
 
-  const shape = new ShapeClass({ style });
+  const result = checkCSSRule(style);
+
+  const shape = new ShapeClass({ style: result });
   addEvent(shape, props);
 
   return shape;

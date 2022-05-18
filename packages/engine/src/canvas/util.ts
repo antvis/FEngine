@@ -4,6 +4,7 @@ import {
   isNumber,
   isString,
   isArray,
+  isNil
 } from '@antv/util';
 
 
@@ -157,6 +158,32 @@ const DEFAULT_STYLE_PROPS: {
   stroke: 'transparent',
 };
 
+
+// css规则表
+const DEFAULT_CSS_RULE = {
+  text: 'string',
+  x: 'number',
+  y: 'number',
+  x1: 'number',
+  x2: 'number',
+  y1: 'number',
+  y2: 'number',
+  width: 'number',
+  height: 'number'
+}
+
+function checkCSSRule(style, func = (value)=>!isNil(value)) {
+  const cssStyle = {}
+  for(const key in style) {
+    // 过滤undefine NAN
+    if(!style.hasOwnProperty(key) || !func(style[key]) ) continue
+    // 类型校验
+    if(DEFAULT_CSS_RULE[key] && typeof style[key] !== DEFAULT_CSS_RULE[key]) continue
+
+    cssStyle[key] = style[key]
+  }
+  return cssStyle
+}
 export {
   // px2hd 含义更清晰
   batch2hd as px2hd,
@@ -164,6 +191,7 @@ export {
   parsePadding,
   toTimeStamp,
   isInBBox,
+  checkCSSRule,
   getElementsByClassName,
   DEFAULT_STYLE_PROPS
 };
