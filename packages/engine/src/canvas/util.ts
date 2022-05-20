@@ -6,7 +6,7 @@ import {
   isArray,
   isNil
 } from '@antv/util';
-
+import { DEFAULT_CSS_RULE } from './cssRule';
 
 // 默认设置50
 let ONE_REM: number;
@@ -159,26 +159,14 @@ const DEFAULT_STYLE_PROPS: {
 };
 
 
-// css规则表
-const DEFAULT_CSS_RULE = {
-  text: 'string',
-  x: 'number',
-  y: 'number',
-  x1: 'number',
-  x2: 'number',
-  y1: 'number',
-  y2: 'number',
-  width: 'number',
-  height: 'number'
-}
 
-function checkCSSRule(style, func = (value)=>!isNil(value)) {
+function checkCSSRule(type, style, func = (value)=>!isNil(value)) {
   const cssStyle = {}
   for(const key in style) {
     // 过滤undefine NAN
     if(!style.hasOwnProperty(key) || !func(style[key]) ) continue
     // 类型校验
-    if(DEFAULT_CSS_RULE[key] && typeof style[key] !== DEFAULT_CSS_RULE[key]) continue
+    if(DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key] && Object.prototype.toString.call(style[key]) !== `[object ${DEFAULT_CSS_RULE[type][key]}]`) continue
 
     cssStyle[key] = style[key]
   }

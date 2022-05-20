@@ -40,7 +40,7 @@ function measureText(container: Group, px2hd) {
       text: text,
     };
 
-    const result = checkCSSRule(style);
+    const result = checkCSSRule('text', style);
     // @ts-ignore
     const shape = new Text({ style: result });
     container.appendChild(shape);
