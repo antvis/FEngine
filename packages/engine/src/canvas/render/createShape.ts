@@ -1,16 +1,4 @@
-import {
-  Group,
-  Text,
-  Circle,
-  Ellipse,
-  Rect,
-  Path,
-  Image,
-  Line,
-  Polyline,
-  Polygon,
-  isNil,
-} from '@antv/g';
+import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
 import Hammer from '../event/index';
 import { checkCSSRule } from '../util';
 
