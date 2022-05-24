@@ -8,7 +8,7 @@ import EE from '@antv/event-emitter';
 import { Canvas as GCanvas } from '@antv/g-mobile';
 import Timeline from './timeline';
 import defaultTheme from './theme';
-import { px2hd as defaultPx2hd } from './util';
+import { px2hd as defaultPx2hd, checkCSSRule } from './util';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -28,22 +28,21 @@ interface CanvasProps {
 function measureText(container: Group, px2hd) {
   return (text: string, font?) => {
     const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
-    // TODO: 属性为undefine时报错
-    const result = JSON.parse(
-      JSON.stringify({
-        style: {
-          x: 0,
-          y: 0,
-          fontSize: px2hd(fontSize),
-          fontFamily: fontFamily,
-          fontStyle,
-          fontWeight,
-          fontVariant,
-          text,
-        },
-      })
-    );
-    const shape = new Text(result);
+
+    const style = {
+      x: 0,
+      y: 0,
+      fontSize: px2hd(fontSize),
+      fontFamily: fontFamily,
+      fontStyle,
+      fontWeight,
+      fontVariant,
+      text: text,
+    };
+
+    const result = checkCSSRule('text', style);
+    // @ts-ignore
+    const shape = new Text({ style: result });
     container.appendChild(shape);
     const { width, height } = shape.getBBox();
 
@@ -88,7 +87,6 @@ class Canvas extends Component<CanvasProps> {
       height,
       supportTouchEvent: true,
     });
-
     const container = canvas.getRoot();
     // 设置全局样式
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));

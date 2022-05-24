@@ -1,0 +1,123 @@
+const elementStyle = {
+  fillStyle: 'String',
+  font: 'String',
+  globalAlpha: 'Number',
+  lineCap: 'String',
+  lineWidth: 'Number',
+  lineJoin: 'String',
+
+  miterLimit: 'Number',
+  shadowBlur: 'Number',
+  shadowColor: 'String',
+  shadowOffsetX: 'Number',
+  shadowOffsetY: 'Number',
+
+  strokeStyle: 'String',
+  textAlign: 'String',
+  textBaseline: 'String',
+  lineDash: 'Arrary',
+
+  shadow: 'String',
+  matrix: 'Arrary',
+  stroke: 'String',
+  fill: 'String',
+  opacity: 'Number',
+  fillOpacity: 'Number',
+  strokeOpacity: 'Number',
+};
+
+// css规则表 TODO：补充
+export const DEFAULT_CSS_RULE = {
+  group: {
+    ...elementStyle,
+  },
+  text: {
+    ...elementStyle,
+    x: 'Number',
+    y: 'Number',
+    text: 'String',
+    width: 'Number',
+    height: 'Number',
+
+    fontSize: 'Number',
+    fontFamily: 'String',
+    fontStyle: 'String',
+    fontWeight: 'Number',
+    fontVariant: 'String',
+  },
+  circle: {
+    ...elementStyle,
+    x: 'Number',
+    y: 'Number',
+    r: 'Number',
+  },
+  path: {
+    ...elementStyle,
+    cy: 'Number',
+    cx: 'Number',
+    ry: 'Number',
+    rx: 'Number',
+  },
+  ellipse: {
+    ...elementStyle,
+  },
+  rect: {
+    ...elementStyle,
+    width: 'Number',
+    height: 'Number',
+    x: 'Number',
+    y: 'Number',
+    radius: 'Number',
+  },
+  image: {
+    ...elementStyle,
+    width: 'Number',
+    height: 'Number',
+    x: 'Number',
+    y: 'Number',
+    img: 'String',
+    src: 'String',
+  },
+  line: {
+    ...elementStyle,
+    x1: 'Number',
+    x2: 'Number',
+    y1: 'Number',
+    y2: 'Number',
+  },
+  polyline: {
+    ...elementStyle,
+    points: 'Array',
+    smooth: 'Boolean',
+  },
+  polygon: {
+    ...elementStyle,
+    points: 'Array',
+  },
+  arc: {
+    ...elementStyle,
+    x: 'Number',
+    y: 'Number',
+    r: 'Number',
+    startAngle: 'Number',
+    endAngle: 'Number',
+    anticlockwise: 'Boolean',
+  },
+  marker: {
+    ...elementStyle,
+    x: 'Number',
+    y: 'Number',
+    radius: 'Number',
+    symbol: 'String',
+  },
+  sector: {
+    ...elementStyle,
+    x: 'Number',
+    y: 'Number',
+    startAngle: 'Number',
+    endAngle: 'Number',
+    r: 'Number',
+    r0: 'Number',
+    anticlockwise: 'Boolean',
+  },
+};

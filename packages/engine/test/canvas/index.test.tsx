@@ -7,7 +7,7 @@ class View extends Component {
   render() {
     return (
       <group>
-        <rect
+        {/* <rect
           style={{
             x: 10,
             y: 10,
@@ -27,7 +27,7 @@ class View extends Component {
           onPanEnd={() => {
             console.log('drag end');
           }}
-        />
+        /> */}
         <circle
           style={{
             x: 150,
@@ -45,7 +45,7 @@ class View extends Component {
             console.log('touchEnd');
           }}
         />
-        <path
+        {/* <path
           style={{
             path: [
               ['M', 100, 100],
@@ -72,7 +72,7 @@ class View extends Component {
             img:
               'https://gw.alipayobjects.com/mdn/rms_6ae20b/afts/img/A*N4ZMS7gHsUIAAAAAAAAAAABkARQnAQ',
           }}
-        />
+        /> */}
       </group>
     );
   }

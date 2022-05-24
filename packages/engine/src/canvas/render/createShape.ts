@@ -1,5 +1,7 @@
 import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
+import { Arc, Marker, Sector } from '../../shape';
 import Hammer from '../event/index';
+import { checkCSSRule } from '../util';
 
 const classMap = {
   group: Group,
@@ -12,6 +14,9 @@ const classMap = {
   line: Line,
   polyline: Polyline,
   polygon: Polygon,
+  arc: Arc,
+  marker: Marker,
+  sector: Sector,
 };
 
 function createShape(type: string, props, style) {
@@ -20,7 +25,9 @@ function createShape(type: string, props, style) {
   const ShapeClass = classMap[type];
   // const { style } = props;
 
-  const shape = new ShapeClass({ style });
+  const result = checkCSSRule(type, style);
+
+  const shape = new ShapeClass({ style: result });
   addEvent(shape, props);
 
   return shape;

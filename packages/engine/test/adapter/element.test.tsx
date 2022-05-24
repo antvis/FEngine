@@ -50,22 +50,22 @@ describe('element test', () => {
     it('group cavasBBox', () => {
       expect(group.getCanvasBBox()).toEqual({
         height: 52,
-        maxX: 266,
-        maxY: 147,
-        minX: 95,
-        minY: 95,
+        maxX: 166,
+        maxY: 47,
+        minX: -5,
+        minY: -5,
         width: 171,
-        x: 95,
-        y: 95,
+        x: -5,
+        y: -5,
       });
     });
 
     it('group matrix', async () => {
-      expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 100, 100, 1]);
+      expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 0, 0, 1]);
       group.translate(50, 50);
-      expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 150, 150, 1]);
+      expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 50, 50, 1]);
       group.scale(2, 2);
-      expect(group.getMatrix()).toEqual([2, 0, 0, -0, 2, 0, 300, 300, 1]);
+      expect(group.getMatrix()).toEqual([2, 0, 0, -0, 2, 0, 100, 100, 1]);
       group.rotate(Math.PI / 4);
       expect(group.getMatrix()).toEqual([
         1.4142136157581708,
@@ -74,8 +74,8 @@ describe('element test', () => {
         -1.4142135089880172,
         1.4142136157581708,
         0,
-        2.842170943040401e-14,
-        424.2640686035156,
+        1.4210854715202004e-14,
+        141.42135620117188,
         1,
       ]);
       group.resetMatrix();

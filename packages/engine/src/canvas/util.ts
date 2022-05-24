@@ -4,8 +4,9 @@ import {
   isNumber,
   isString,
   isArray,
+  isNil
 } from '@antv/util';
-
+import { DEFAULT_CSS_RULE } from './cssRule';
 
 // 默认设置50
 let ONE_REM: number;
@@ -157,6 +158,20 @@ const DEFAULT_STYLE_PROPS: {
   stroke: 'transparent',
 };
 
+
+
+function checkCSSRule(type, style, func = (value)=>!isNil(value)) {
+  const cssStyle = {}
+  for(const key in style) {
+    // 过滤undefine NAN
+    if(!style.hasOwnProperty(key) || !func(style[key]) ) continue
+    // 类型校验
+    if(DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key] && Object.prototype.toString.call(style[key]) !== `[object ${DEFAULT_CSS_RULE[type][key]}]`) continue
+
+    cssStyle[key] = style[key]
+  }
+  return cssStyle
+}
 export {
   // px2hd 含义更清晰
   batch2hd as px2hd,
@@ -164,6 +179,7 @@ export {
   parsePadding,
   toTimeStamp,
   isInBBox,
+  checkCSSRule,
   getElementsByClassName,
   DEFAULT_STYLE_PROPS
 };
