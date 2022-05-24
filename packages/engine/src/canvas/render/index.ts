@@ -364,7 +364,7 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
   if (!nextChildren) return null;
 
   // 布局计算
-  const nodeTree = createNodeTree(nextChildren, context.px2hd);
+  const nodeTree = createNodeTree(nextChildren, context);
   computeLayout(nodeTree);
   fillElementLayout(nodeTree);
 

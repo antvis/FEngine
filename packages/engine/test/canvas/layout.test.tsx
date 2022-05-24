@@ -37,6 +37,49 @@ class View extends Component {
   }
 }
 
+class View2 extends Component {
+  render() {
+    const { count, top = 0 } = this.props;
+    return (
+      <group
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: 300,
+          height: 100,
+        }}
+      >
+        {new Array(3).fill(0).map((_, id) => (
+          <group
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+            }}
+          >
+            <circle
+              style={{
+                width: 25,
+                height: 25,
+                marginRight: '10px',
+                fill: '#bfbfbf',
+              }}
+            />
+            <text
+              style={{
+                fill: '#808080',
+                text: 'a',
+              }}
+            />
+          </group>
+        ))}
+      </group>
+    );
+  }
+}
 describe('Canvas', () => {
   it('layout', async () => {
     const renderer = new Renderer();
@@ -63,6 +106,21 @@ describe('Canvas', () => {
     );
 
     canvas.update(update.props);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('text', async () => {
+    const renderer = new Renderer();
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <View2 />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });

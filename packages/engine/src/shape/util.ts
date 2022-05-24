@@ -1,4 +1,4 @@
-function arcToPath(x, y, r, startAngle, endAngle, anticlockwise) {
+function arcToPath(x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) {
   let start;
   let end;
 
@@ -13,8 +13,8 @@ function arcToPath(x, y, r, startAngle, endAngle, anticlockwise) {
   const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
 
   const d = [
-    ['M', start.x, start.y],
-    ['A', r, r, 0, largeArcFlag, 0, end.x, end.y],
+    // ['M', start.x, start.y],
+    ['A', r, r, 0, largeArcFlag, sweepFlag ? 1 : 0, end.x, end.y],
   ];
 
   return d;
