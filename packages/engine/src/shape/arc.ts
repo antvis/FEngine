@@ -1,7 +1,7 @@
 import type { DisplayObjectConfig } from '@antv/g';
 import { CustomElement, Path } from '@antv/g';
 import { deepMix } from '@antv/util';
-import { arcToPath } from './util';
+import { arcToPath } from './util/util';
 import { ArcStyleProps } from './types';
 
 const defaultStyle = {
@@ -18,7 +18,7 @@ export class Arc extends CustomElement<ArcStyleProps> {
   constructor(config: DisplayObjectConfig<ArcStyleProps>) {
 
     const style = deepMix({}, defaultStyle, config.style)
-
+   
     super({
       style,
       type: Arc.tag,
@@ -26,7 +26,7 @@ export class Arc extends CustomElement<ArcStyleProps> {
 
     const { x, y, r, startAngle, endAngle, anticlockwise, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
 
-    if (startAngle !== endAngle) {
+    if (startAngle !== endAngle && r!== 0) {
       const path =  new Path({
         style: {
           opacity, 

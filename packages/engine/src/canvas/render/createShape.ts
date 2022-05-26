@@ -1,5 +1,5 @@
 import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
-import { Arc, Marker, Sector } from '../../shape';
+import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
 import Hammer from '../event/index';
 import { checkCSSRule } from '../util';
 
@@ -12,7 +12,7 @@ const classMap = {
   rect: Rect,
   image: Image,
   line: Line,
-  polyline: Polyline,
+  polyline: SmoothPolyline,
   polygon: Polygon,
   arc: Arc,
   marker: Marker,

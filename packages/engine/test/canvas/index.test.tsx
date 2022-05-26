@@ -6,7 +6,11 @@ import { Renderer } from '@antv/g-mobile-canvas';
 class View extends Component {
   render() {
     return (
-      <group>
+      <group
+        style={{
+          fill: 'yellow',
+        }}
+      >
         {/* <rect
           style={{
             x: 10,
@@ -43,6 +47,18 @@ class View extends Component {
           }}
           onTouchEnd={() => {
             console.log('touchEnd');
+          }}
+        />
+        <polygon
+          style={{
+            points: [
+              [0, 100],
+              [100, 100],
+              [100, 200],
+              [0, 200],
+            ],
+            stroke: '#1890FF',
+            lineWidth: 2,
           }}
         />
         {/* <path
@@ -148,11 +164,11 @@ describe('Canvas', () => {
     const { props } = (
       <Canvas renderer={renderer} context={context}>
         <View />
-        <View1 />
+        {/* <View1 />
         <View2>
           <View />
           <View1 />
-        </View2>
+        </View2> */}
       </Canvas>
     );
 

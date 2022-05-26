@@ -15,7 +15,7 @@ const elementStyle = {
   strokeStyle: 'String',
   textAlign: 'String',
   textBaseline: 'String',
-  lineDash: 'Arrary',
+  // lineDash: 'Arrary',
 
   shadow: 'String',
   matrix: 'Arrary',
@@ -47,19 +47,19 @@ export const DEFAULT_CSS_RULE = {
   },
   circle: {
     ...elementStyle,
-    x: 'Number',
-    y: 'Number',
+    cx: 'Number',
+    cy: 'Number',
     r: 'Number',
   },
   path: {
+    ...elementStyle,
+  },
+  ellipse: {
     ...elementStyle,
     cy: 'Number',
     cx: 'Number',
     ry: 'Number',
     rx: 'Number',
-  },
-  ellipse: {
-    ...elementStyle,
   },
   rect: {
     ...elementStyle,
