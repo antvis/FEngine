@@ -47,12 +47,7 @@ export class Sector extends CustomElement<SectorStyleProps> {
     }
 
     private createPath(x, y, startAngle, endAngle, r, r0, anticlockwise){
-        // const d = [
-        //   ['M', 100, 100],
-        //   ['L', 100, 110],
-        //   ['A', 20, 20, 0, 0, 1, 80, 90],
-        // ]
-        let d = []
+        const d = []
         const unitX = Math.cos(startAngle);
         const unitY = Math.sin(startAngle);
 
@@ -71,11 +66,8 @@ export class Sector extends CustomElement<SectorStyleProps> {
         if (r0 !== 0) {
             d.push(arc(x, y, r0, startAngle, endAngle, anticlockwise))
         }
-        // debugger
       }
-      // d.push(["L", unitX * r0 + x, unitY * r0 + y])
-      d.push(["Z"]);
-        return `${d.join(" ")}`
+        return d.join(" ")
     }
 
     attributeChangedCallback<Key extends keyof SectorStyleProps>(
