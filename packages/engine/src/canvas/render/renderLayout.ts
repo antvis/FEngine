@@ -1,19 +1,31 @@
 import { extendMap } from '../util';
 import getShapeAttrs from '../shape';
 
-function createNodeTree(element, px2hd) {
+function createNodeTree(element, context) {
   const { type, props } = element;
+  const { px2hd, measureText, root } = context;
+  // const {container} = root
   const children = extendMap(props.children, (child) => {
-    return createNodeTree(child, px2hd);
+    return createNodeTree(child, context);
   });
   const { style, attrs } = props;
+  let mergeStyle = {
+    ...px2hd(style),
+    ...px2hd(attrs),
+  };
+  // 文本需要计算文本的宽高来进行flex布局
+  if (type === 'text') {
+    const { width, height } = measureText(style?.text || attrs?.text);
+    mergeStyle = {
+      width,
+      height,
+      ...mergeStyle,
+    };
+  }
 
   return {
     type,
-    style: {
-      ...px2hd(style),
-      ...px2hd(attrs),
-    },
+    style: mergeStyle,
     children,
     // 保留对 element 的引用，用于把布局结果回填
     element,

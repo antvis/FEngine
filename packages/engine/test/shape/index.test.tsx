@@ -7,13 +7,28 @@ class View extends Component {
   render() {
     return (
       <group>
+        <polyline
+          style={{
+            points: [
+              [40, 50],
+              [100, 50],
+              [100, 100],
+              [150, 100],
+              [150, 150],
+              [200, 150],
+              [200, 200],
+            ],
+            stroke: 'red',
+            lineWidth: 6,
+          }}
+        />
         <arc
           style={{
             stroke: '#F04864',
-            r: 100,
-            x: 100,
-            y: 100,
-            endAngle: Math.PI,
+            r: 50,
+            x: 150,
+            y: 112.5,
+            endAngle: (Math.PI * 4) / 3,
             anticlockwise: true,
           }}
         />
@@ -27,14 +42,15 @@ class View extends Component {
         />
         <sector
           style={{
-            stroke: '#F04864',
-            x: 50,
-            y: 0,
+            stroke: 'black',
+            fill: '#F04864',
+            x: 118,
+            y: 97,
             lineWidth: 1,
-            r: 50,
-            r0: 20,
-            startAngle: 0,
-            endAngle: Math.PI,
+            r: 39,
+            r0: 30,
+            startAngle: 1.57,
+            endAngle: 3.58,
             anticlockwise: false,
           }}
         />

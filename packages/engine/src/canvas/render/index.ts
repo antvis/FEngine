@@ -11,7 +11,29 @@ import Timeline from '../timeline';
 
 function doAnimate(shape: DisplayObject, effect) {
   if (!effect) return null;
-  const { start, end, easing, duration, delay, iterations, onFrame, onEnd } = effect;
+  const { start, end, easing, duration, delay, iterations, onFrame, onEnd, clip } = effect;
+
+  // 裁剪动画 TODO:未测试
+  // if (clip) {
+  //   const { type, attrs, style, start: clipStart, end: clipEnd } = clip;
+  //   const clipElement = createShape(
+  //     type,
+  //     {},
+  //     {
+  //       ...attrs,
+  //       ...style,
+  //       ...clipStart,
+  //     }
+  //   );
+  //   shape.style.clipPath = clipElement;
+  //   clipElement.animate([clipStart, clipEnd], {
+  //     fill: 'both',
+  //     easing,
+  //     duration,
+  //     delay,
+  //     iterations,
+  //   });
+  // }
   // TODO: JSON render 不执行动画
   const animation = shape.animate([start, end], {
     fill: 'both',
@@ -364,7 +386,7 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
   if (!nextChildren) return null;
 
   // 布局计算
-  const nodeTree = createNodeTree(nextChildren, context.px2hd);
+  const nodeTree = createNodeTree(nextChildren, context);
   computeLayout(nodeTree);
   fillElementLayout(nodeTree);
 

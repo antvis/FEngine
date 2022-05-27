@@ -1,4 +1,4 @@
-import type { BaseStyleProps } from '@antv/g';
+import type { BaseStyleProps, PolylineStyleProps } from '@antv/g';
 
 export interface ArcStyleProps extends BaseStyleProps {
     x?: number;
@@ -21,9 +21,13 @@ export interface MarkerStyleProps extends BaseStyleProps {
 export interface SectorStyleProps extends BaseStyleProps {
     x?: number;
     y?: number;
-    startAngle: number;
-    endAngle: number;
-    r: number;
-    r0: number;
+    startAngle?: number;
+    endAngle?: number;
+    r?: number;
+    r0?: number;
     anticlockwise?: boolean;
+}
+
+export interface SmoothPolylineStyleProps extends PolylineStyleProps {
+    shape?: 'smooth' | 'line'
 }
