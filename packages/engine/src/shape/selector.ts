@@ -75,6 +75,7 @@ export class Sector extends CustomElement<SectorStyleProps> {
       oldValue: SectorStyleProps[Key],
       newValue: SectorStyleProps[Key],
     ) {
+
         this.applySectorStyle({ [name]: newValue }, this.path)
     } 
     

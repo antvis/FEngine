@@ -1,5 +1,6 @@
 import Element from './element';
-import { Canvas } from '@antv/g-mobile';
+import { Canvas } from '@antv/g';
+import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { ADAPTER_ELE_PROPER_NAME } from './utils';
 import { AdapterHammer } from './event';
 
@@ -9,7 +10,7 @@ class CanvasAdapter extends Element {
     super(cfg);
     this.set('renderer', cfg.renderer);
     this.canvasEle = new Canvas({
-      context: cfg.context,
+      canvas: createMobileCanvasElement(cfg.context),
       renderer: cfg.renderer,
       width: cfg.width,
       height: cfg.height,

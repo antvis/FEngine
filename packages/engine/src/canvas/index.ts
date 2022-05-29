@@ -1,11 +1,11 @@
 import { mix, deepMix, omit, pick } from '@antv/util';
 import Component from '../component';
 import equal from '../component/equal';
-import { Group, Text } from '@antv/g';
+import { Group, Text, Canvas as GCanvas } from '@antv/g';
+import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
-import { Canvas as GCanvas } from '@antv/g-mobile';
 import Timeline from './timeline';
 import defaultTheme from './theme';
 import { px2hd as defaultPx2hd, checkCSSRule } from './util';
@@ -23,6 +23,8 @@ interface CanvasProps {
   style?: any;
   container?: any;
   renderer?: any;
+  createImage?: (src?: string) => HTMLImageElement;
+  landscape?: boolean;
 }
 
 function measureText(container: Group, px2hd) {
@@ -60,6 +62,7 @@ class Canvas extends Component<CanvasProps> {
   private _ee: EE;
   private timeline: Timeline;
   theme: any;
+  landscape: boolean;
 
   constructor(props: CanvasProps) {
     super(props);
@@ -72,6 +75,8 @@ class Canvas extends Component<CanvasProps> {
       px2hd = defaultPx2hd,
       pixelRatio = 1,
       theme: customTheme = {},
+      createImage,
+      landscape,
     } = props;
 
     // 组件更新器
@@ -79,13 +84,16 @@ class Canvas extends Component<CanvasProps> {
 
     const theme = px2hd(deepMix({}, defaultTheme, customTheme));
 
+    const canvasElement = createMobileCanvasElement(context);
+
     const canvas = new GCanvas({
-      context,
+      canvas: canvasElement,
       devicePixelRatio: pixelRatio,
       renderer,
       width,
       height,
       supportTouchEvent: true,
+      createImage,
     });
     const container = canvas.getRoot();
     // 设置全局样式
@@ -109,6 +117,8 @@ class Canvas extends Component<CanvasProps> {
     this.canvas = canvas;
     this.container = container;
     this.timeline = new Timeline();
+    // todo: 横屏事件逻辑
+    this.landscape = landscape;
   }
 
   renderComponents(components: Component[]) {

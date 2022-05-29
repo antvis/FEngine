@@ -1,6 +1,7 @@
 function arcToPath(x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) {
   // 没办法画完整的 Math.PI * 2
   const endAngleOriginal = endAngle;
+
   if (endAngleOriginal - startAngle === Math.PI * 2) {
     endAngle = Math.PI * 2 - 0.001;
   }
@@ -41,7 +42,7 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 
 function arc(x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) {
   const { end } = getStartEnd(x, y, r, startAngle, endAngle, anticlockwise);
-  const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+  const largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
   return ['A', r, r, 0, largeArcFlag, sweepFlag ? 1 : 0, end.x, end.y];
 }
 export { arcToPath, polarToCartesian, arc };
