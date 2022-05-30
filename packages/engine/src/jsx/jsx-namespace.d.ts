@@ -44,5 +44,6 @@ export namespace JSX {
     custom: CustomProps;
     marker: MarkerProps;
     image: ImageProps;
+    path: any;
   }
 }

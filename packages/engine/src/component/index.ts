@@ -1,3 +1,4 @@
+import { JSX } from '../jsx/jsx-namespace';
 import { Group } from '@antv/g';
 
 export interface ComponentContext {
@@ -19,6 +20,7 @@ class Component<P = any, S = any> {
   };
   updater: Updater<S>;
 
+  // 对应 G 的group, 每个组件渲染的父接节点
   container: Group;
   // render 返回的节点
   children: JSX.Element;
@@ -31,7 +33,7 @@ class Component<P = any, S = any> {
   }
   willMount() {}
   didMount() {}
-  shouldUpdate(nextProps: any) {}
+  shouldUpdate(_nextProps: P) {}
   willReceiveProps(_props: P) {}
   willUpdate() {}
   didUpdate() {}
