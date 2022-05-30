@@ -26,7 +26,7 @@ const elementStyle = {
   strokeOpacity: 'Number',
 };
 
-// css规则表 TODO：补充
+// css规则表 TODO：补充 / 多种类型
 export const DEFAULT_CSS_RULE = {
   group: {
     ...elementStyle,
@@ -99,8 +99,8 @@ export const DEFAULT_CSS_RULE = {
     x: 'Number',
     y: 'Number',
     r: 'Number',
-    startAngle: 'Number',
-    endAngle: 'Number',
+    // startAngle: 'Number',
+    // endAngle: 'Number',
     anticlockwise: 'Boolean',
   },
   marker: {
@@ -114,8 +114,8 @@ export const DEFAULT_CSS_RULE = {
     ...elementStyle,
     x: 'Number',
     y: 'Number',
-    startAngle: 'Number',
-    endAngle: 'Number',
+    // startAngle: 'Number',
+    // endAngle: 'Number',
     r: 'Number',
     r0: 'Number',
     anticlockwise: 'Boolean',

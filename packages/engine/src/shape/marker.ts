@@ -41,7 +41,7 @@ export class Marker extends CustomElement<MarkerStyleProps> {
         type: Marker.tag,
       });
 
-      const { x, y, radius, symbol, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
+      const { radius, symbol, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
       const method = SYMBOLS[symbol]
 
         const path =  new Path({
@@ -52,7 +52,7 @@ export class Marker extends CustomElement<MarkerStyleProps> {
             lineWidth,
             fill,
             fillOpacity,
-            path: method( x, y, radius)
+            path: method( 0, 0, radius)
           },
         });
         this.appendChild(path);
