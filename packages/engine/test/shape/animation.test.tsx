@@ -15,23 +15,23 @@ class View extends Component {
           lineWidth: 1,
           r: 39,
           r0: 30,
-          startAngle: 1.57,
-          endAngle: 3.58,
+          startAngle: '0rad',
+          endAngle: '3.58rad',
           anticlockwise: false,
         }}
         animation={{
           appear: {
             easing: 'ease',
             // duration: 3000,
-            duration: 1000,
+            duration: 2000,
             // iterations: Infinity,
             // easing: 'cubic-bezier(0.250, 0.460, 0.450, 0.940)',
-            property: ['opacity'],
+            property: ['endAngle'],
             start: {
-              opacity: 0,
+              endAngle: '0rad',
             },
             end: {
-              opacity: 1,
+              endAngle: '3.58rad',
             },
           },
         }}

@@ -28,6 +28,14 @@ export interface SectorStyleProps extends BaseStyleProps {
     anticlockwise?: boolean;
 }
 
+export interface CreatePathProps {
+    startRadAngle?: number;
+    endRadAngle?: Number;
+    r?: number,
+    r0?: number,
+    anticlockwise?: boolean,
+}
+
 export interface SmoothPolylineStyleProps extends PolylineStyleProps {
     shape?: 'smooth' | 'line'
 }

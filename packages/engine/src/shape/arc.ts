@@ -24,7 +24,7 @@ export class Arc extends CustomElement<ArcStyleProps> {
       type: Arc.tag,
     });
 
-    const { x, y, r, startAngle, endAngle, anticlockwise, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
+    const { r, startAngle, endAngle, anticlockwise, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
 
     if (startAngle !== endAngle && r!== 0) {
       const path =  new Path({
@@ -35,7 +35,7 @@ export class Arc extends CustomElement<ArcStyleProps> {
           lineWidth,
           fill,
           fillOpacity,
-          path: arcToPath( x, y, r, startAngle, endAngle, anticlockwise).join(" ")
+          path: arcToPath( 0, 0, r, startAngle, endAngle, anticlockwise).join(" ")
         },
       });
       this.appendChild(path);

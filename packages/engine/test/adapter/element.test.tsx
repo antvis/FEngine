@@ -65,7 +65,7 @@ describe('element test', () => {
       group.translate(50, 50);
       expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 150, 150, 1]);
       group.scale(2, 2);
-      expect(group.getMatrix()).toEqual([2, 0, 0, -0, 2, 0, 100, 100, 1]);
+      expect(group.getMatrix()).toEqual([2, 0, 0, -0, 2, 0, 300, 300, 1]);
       group.rotate(Math.PI / 4);
       expect(group.getMatrix()).toEqual([
         1.4142136157581708,
@@ -74,8 +74,8 @@ describe('element test', () => {
         -1.4142135089880172,
         1.4142136157581708,
         0,
-        1.4210854715202004e-14,
-        141.42135620117188,
+        2.842170943040401e-14,
+        424.2640686035156,
         1,
       ]);
       group.resetMatrix();
