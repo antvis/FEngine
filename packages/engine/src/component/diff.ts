@@ -1,3 +1,4 @@
+import { JSX } from '../jsx/jsx-namespace';
 import { isArray, isUndefined, isBoolean, pick } from '@antv/util';
 import Component from './index';
 import equal from './equal';

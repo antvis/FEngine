@@ -1,3 +1,4 @@
+import { JSX } from '../../jsx/jsx-namespace';
 import { isBoolean, isNil, mix, omit, pick } from '@antv/util';
 import { convertToPath, DisplayObject } from '@antv/g';
 import Children from '../../children';

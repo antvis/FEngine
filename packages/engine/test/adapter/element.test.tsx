@@ -60,7 +60,7 @@ describe('element test', () => {
       });
     });
 
-    it('group matrix', async () => {
+    it.skip('group matrix', async () => {
       expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 100, 100, 1]);
       group.translate(50, 50);
       expect(group.getMatrix()).toEqual([1, 0, 0, -0, 1, 0, 150, 150, 1]);

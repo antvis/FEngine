@@ -5,6 +5,7 @@ import { Renderer as SvgRenderer } from '@antv/g-mobile-svg';
 import { DisplayObject } from '@antv/g';
 
 export * from './jsx';
+export { JSX } from './jsx/jsx-namespace';
 // export createElement 别名
 export { jsx as createElement, Fragment, jsx } from './jsx';
 export { default as Canvas } from './canvas';

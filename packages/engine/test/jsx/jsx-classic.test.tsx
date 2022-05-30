@@ -1,5 +1,4 @@
-import jsx from '../../src/jsx/jsx-classic';
-import Fragment from '../../src/jsx/fragment';
+import { jsx, Fragment } from '../../src/jsx';
 
 describe('jsx classic 模式', () => {
   it('tagName one children', () => {
