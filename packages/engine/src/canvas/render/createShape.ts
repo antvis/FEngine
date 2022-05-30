@@ -19,15 +19,14 @@ const classMap = {
   sector: Sector,
 };
 
-function createShape(type: string, props, style) {
+function createShape(type: string, props, originStyle) {
   if (!type) return null;
-
+  const { style, attrs, ...other } = props;
   const ShapeClass = classMap[type];
-  // const { style } = props;
 
-  const result = checkCSSRule(type, style);
+  const result = checkCSSRule(type, originStyle);
 
-  const shape = new ShapeClass({ style: result });
+  const shape = new ShapeClass({ ...other, style: result });
   addEvent(shape, props);
 
   return shape;

@@ -4,6 +4,7 @@ import { Point } from './type';
 const PRESS_DELAY = 250;
 
 function convertPoints(ev) {
+  // todo：缺横屏处理逻辑
   const pos = ev.touches || [ev.canvas];
   const points = pos.map((d) => {
     return {
