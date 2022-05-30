@@ -67,7 +67,7 @@ export const DEFAULT_CSS_RULE = {
     height: 'Number',
     x: 'Number',
     y: 'Number',
-    radius: 'Number',
+    radius: 'Array',
   },
   image: {
     ...elementStyle,
