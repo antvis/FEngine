@@ -1,8 +1,16 @@
-import JSX from './interface';
+import { JSX as JSXNamespace } from './jsx-namespace';
 import { ElementType } from '../types';
 
+export namespace jsx {
+  export namespace JSX {
+    export type Element = JSXNamespace.Element;
+    export type ElementClass = JSXNamespace.ElementClass;
+    export type IntrinsicElements = JSXNamespace.IntrinsicElements;
+  }
+}
+
 // 实现jsx-classic 入口
-export default function(type: ElementType, config, ...children): JSX.Element {
+export function jsx(type: ElementType, config, ...children): JSXNamespace.Element {
   const { key, ref, ...props } = config || {};
 
   // 保持和automatic模式一致

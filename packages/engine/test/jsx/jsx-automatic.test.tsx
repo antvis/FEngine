@@ -1,7 +1,7 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource ../../src/jsx */
 
-import jsx from '../../src/jsx/jsx-automatic';
+import { jsx } from '../../src/jsx/jsx-automatic';
 import Fragment from '../../src/jsx/fragment';
 
 describe('jsx automatic 模式', () => {
