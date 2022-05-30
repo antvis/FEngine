@@ -164,11 +164,11 @@ describe('Canvas', () => {
     const { props } = (
       <Canvas renderer={renderer} context={context}>
         <View />
-        {/* <View1 />
+        <View1 />
         <View2>
           <View />
           <View1 />
-        </View2> */}
+        </View2>
       </Canvas>
     );
 

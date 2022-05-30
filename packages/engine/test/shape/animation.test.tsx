@@ -6,36 +6,58 @@ import { Renderer } from '@antv/g-mobile-canvas';
 class View extends Component {
   render() {
     return (
-      <sector
-        style={{
-          stroke: 'black',
-          fill: '#F04864',
-          x: 118,
-          y: 97,
-          lineWidth: 1,
-          r: 39,
-          r0: 30,
-          startAngle: '0rad',
-          endAngle: '3.58rad',
-          anticlockwise: false,
-        }}
-        animation={{
-          appear: {
-            easing: 'ease',
-            // duration: 3000,
-            duration: 2000,
-            // iterations: Infinity,
-            // easing: 'cubic-bezier(0.250, 0.460, 0.450, 0.940)',
-            property: ['endAngle'],
-            start: {
-              endAngle: '0rad',
+      <group>
+        <arc
+          style={{
+            stroke: '#F04864',
+            r: 50,
+            x: 150,
+            y: 112.5,
+            endAngle: `${(Math.PI * 4) / 3}rad`,
+            // anticlockwise: true,
+          }}
+          animation={{
+            appear: {
+              easing: 'ease',
+              duration: 5000,
+              property: ['endAngle'],
+              start: {
+                endAngle: '0rad',
+              },
+              end: {
+                endAngle: `${(Math.PI * 4) / 3}rad`,
+              },
             },
-            end: {
-              endAngle: '3.58rad',
+          }}
+        />
+        <sector
+          style={{
+            stroke: 'black',
+            fill: '#F04864',
+            x: 118,
+            y: 97,
+            lineWidth: 1,
+            r: 39,
+            r0: 30,
+            startAngle: '0rad',
+            endAngle: '3.89rad',
+            anticlockwise: true,
+          }}
+          animation={{
+            appear: {
+              easing: 'ease',
+              duration: 2000,
+              property: ['endAngle'],
+              start: {
+                endAngle: '0rad',
+              },
+              end: {
+                endAngle: '3.89rad',
+              },
             },
-          },
-        }}
-      />
+          }}
+        />
+      </group>
     );
   }
 }
@@ -43,11 +65,10 @@ class View extends Component {
 describe('Canvas', () => {
   it('custom shape animation', async () => {
     const renderer = new Renderer();
-    const ref = { current: null };
 
     const { props } = (
       <Canvas renderer={renderer} context={context}>
-        <View ref={ref} />
+        <View />
       </Canvas>
     );
 

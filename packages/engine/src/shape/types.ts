@@ -3,12 +3,17 @@ import type { BaseStyleProps, PolylineStyleProps } from '@antv/g';
 export interface ArcStyleProps extends BaseStyleProps {
     x?: number;
     y?: number;
-    r: number;
-    startAngle: number;
-    endAngle: number;
+    r?: number;
+    startAngle?: number;
+    endAngle?: number;
     anticlockwise?: boolean;
 }
-
+export interface ArcToPathProps {
+    r?: number;
+    endRadAngle?: number;
+    startRadAngle?: number;
+    anticlockwise?: boolean;
+}
 export interface MarkerStyleProps extends BaseStyleProps {
     x: number;
     y: number;
