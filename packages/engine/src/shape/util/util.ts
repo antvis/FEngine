@@ -1,4 +1,4 @@
-import { CSS, PropertySyntax } from '@antv/g';
+import { CSS, isNumber, PropertySyntax } from '@antv/g';
 
 const arcToPath = (x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) => {
   // 没办法画完整的 Math.PI * 2
@@ -48,16 +48,14 @@ const arc = (x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) =>
   return ['A', r, r, 0, largeArcFlag, sweepFlag ? 1 : 0, end.x, end.y];
 };
 
-const getRadAngle = (angle): number => {
-  if (Object.prototype.toString.call(angle) === `[object Number]`) {
+const getRadAngle = (angle: string | number): number => {
+  if (isNumber(angle)) {
     return angle;
   }
-  const { value, unit } = CSSNumericValue.parse(angle);
-  if (unit === 'rad') {
-    return value;
-  } else if (unit === 'deg') {
-    return value * (Math.PI / 180.0);
+  if (/^(\d.)+deg$/.test(angle)) {
+    return parseFloat(angle) * (Math.PI / 180);
   }
+  return parseFloat(angle);
 };
 
 const cssRegister = (objects) => {
