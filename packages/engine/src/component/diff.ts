@@ -30,10 +30,14 @@ function setComponentAnimate(child: Component, parent: Component) {
   const { animate: childAnimate } = childProps;
   child.animate = isBoolean(childAnimate) ? childAnimate : parentAnimate;
 }
+
 function getTransformComponent(component: Component) {
   if (!component) return null;
   // @ts-ignore
-  const { children } = component;
+  const { children, childrenIsShape } = component;
+  if (childrenIsShape) {
+    return component;
+  }
   if (!children) {
     return null;
   }
@@ -50,27 +54,12 @@ function getTransformComponent(component: Component) {
   return componentFromChildren;
 }
 
-// function getTransformFromComponentRef(transformFromRef) {
-//   if (!transformFromRef || !transformFromRef.current) {
-//     return null;
-//   }
-//   const transformFromComponent = transformFromRef.current;
-//   return getTransformComponent(transformFromComponent);
-// }
 function getTransformFromComponentRef(transformFromRef) {
   if (!transformFromRef || !transformFromRef.current) {
     return null;
   }
-  let ref = transformFromRef.current;
-
-  if (isContainer(ref.children)) {
-    while (isContainer(ref.children)) {
-      ref = ref.children;
-    }
-    ref = ref.component;
-  }
-
-  return ref;
+  const transformFromComponent = transformFromRef.current;
+  return getTransformComponent(transformFromComponent);
 }
 
 function createComponent(parent: Component, element: JSX.Element): Component {
@@ -162,13 +151,13 @@ function destroyElement(parent: Component, elements: JSX.Element) {
     if (!element) return;
     const { component } = element;
     if (!component) {
-      deleteElement(element, parent);
+      setTimeout(() => {
+        deleteElement(element, parent);
+      });
       return;
     }
     component.willUnmount();
-    setTimeout(() => {
-      destroyElement(component, component.children);
-    });
+    destroyElement(component, component.children);
     component.didUnmount();
   });
 }
@@ -285,6 +274,8 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
 
   if (!isContainer(nextChildren)) {
     parent.children = renderShapeGroup(parent, nextChildren);
+    // @ts-ignore
+    parent.childrenIsShape = true;
   } else {
     parent.children = nextChildren;
     diff(parent, nextChildren, lastChildren);
