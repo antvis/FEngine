@@ -1,12 +1,11 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, isNil, mix, omit, pick } from '@antv/util';
+import { isBoolean, isNil, pick } from '@antv/util';
 import { convertToPath, DisplayObject } from '@antv/g';
 import Children from '../../children';
 import Component from '../../component';
 import renderJSXElement from './renderJSXElement';
-import { createShape, addEvent } from './createShape';
+import { createShape } from './createShape';
 import { createNodeTree, fillElementLayout } from './renderLayout';
-import { DEFAULT_STYLE_PROPS } from '../util';
 import computeLayout from '../css-layout';
 import Timeline from '../timeline';
 
@@ -44,6 +43,8 @@ function doAnimate(shape: DisplayObject, effect) {
     iterations,
   });
 
+  if (!animation) return null;
+
   animation.onfinish = onEnd;
   animation.onframe = onFrame;
   return animation;
@@ -65,8 +66,15 @@ function createElement(element, container, component) {
     const appearEffect = animationEffect && animationEffect.appear;
 
     if (animate && appearEffect) {
+      const endStyle = pick(style, appearEffect.property || []);
       // 执行动画
-      const animation = doAnimate(shape, appearEffect);
+      const animation = doAnimate(shape, {
+        ...appearEffect,
+        end: {
+          ...endStyle,
+          ...appearEffect.end,
+        },
+      });
       timeline.add(animation);
     }
 
@@ -100,19 +108,38 @@ function deleteElement(element, component) {
 
       // 当子元素和自身动画全部都结束时，把元素从文档里删除
       subChildTimeline.add(animation);
-      subChildTimeline.onEnd(() => {
-        shape.remove();
-      });
-    } else {
-      shape.remove();
     }
+    subChildTimeline.onEnd(() => {
+      shape.remove();
+    });
   });
   return childTimeline;
 }
 
 // 更新元素
-function updateElement(nextElement, lastElement, component) {
-  const { props: nextProps, style: nextStyle } = nextElement;
+function updateElement(nextElement, lastElement, container, component) {
+  // 普通的jsx元素, 且都非空
+  const { key: nextKey, type: nextType } = nextElement;
+  const { key: lastKey, type: lastType } = lastElement;
+
+  // key 值不相等
+  if (!isNil(nextKey) && nextKey !== lastKey) {
+    deleteElement(lastElement, component);
+    createElement(nextElement, container, component);
+    return;
+  }
+
+  if (nextType === lastType) {
+    changeElement(nextElement, lastElement, container, component);
+    return;
+  }
+  // shape 类型的变化
+  changeElementType(nextElement, lastElement, container, component);
+}
+
+// 执行元素变化
+function changeElement(nextElement, lastElement, container, component) {
+  const { type: nextType, props: nextProps, style: nextStyle } = nextElement;
   const { props: lastProps, style: lastStyle, shape } = lastElement;
   const { animation: nextAnimationEffect, children: nextChildren } = nextProps;
   const { children: lastChildren } = lastProps;
@@ -120,22 +147,19 @@ function updateElement(nextElement, lastElement, component) {
   const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
   const updateEffectProperty = updateEffect?.property;
 
-  // 保留图形引用
-  nextElement.shape = shape;
-
-  // shape  reset一下
-  mix(shape.style, DEFAULT_STYLE_PROPS);
-  shape.removeAllEventListeners();
-  addEvent(shape, nextProps);
+  // 因为其他样式可能有变化，这里要重新创建
+  const nextShape = createShape(nextType, nextProps, nextStyle);
+  shape && shape.remove();
+  container.appendChild(nextShape);
+  nextElement.shape = nextShape;
 
   if (animate && updateEffect) {
     // 需要构造动画起始和结束的属性
     const startStyle = pick(lastStyle, updateEffectProperty || []);
     const endStyle = pick(nextStyle, updateEffectProperty || []);
-    // 踢掉动画的属性
-    mix(shape.style, omit(nextStyle, updateEffectProperty || []));
+
     // 执行动画
-    const animation = doAnimate(shape, {
+    const animation = doAnimate(nextShape, {
       ...updateEffect,
       start: {
         ...startStyle,
@@ -147,21 +171,37 @@ function updateElement(nextElement, lastElement, component) {
       },
     });
     timeline.add(animation);
-  } else {
-    mix(shape.style, nextStyle);
   }
 
   // 继续比较子元素
-  renderElement(nextChildren, lastChildren, shape, component);
+  renderElement(nextChildren, lastChildren, nextShape, component);
+}
+
+function changeElementType(nextElement, lastElement, container, component) {
+  const { type: nextType } = nextElement;
+  const { type: lastType } = lastElement;
+  if (nextType === 'group') {
+    return changeTypeToGroup(nextElement, lastElement, container, component);
+  }
+
+  if (lastType === 'group') {
+    return changeTypeFromGroup(nextElement, lastElement, container, component);
+  }
+
+  // 都不是group, 形变动画
+  return morphElement(nextElement, lastElement, container, component);
 }
 
 // 类型变化
 function morphElement(nextElement, lastElement, container, component) {
-  const { props: nextProps, shape: nextShape, style: nextStyle } = nextElement;
+  const { type: nextType, props: nextProps, style: nextStyle } = nextElement;
   const { shape: lastShape } = lastElement;
 
   const { animation: nextAnimationEffect } = nextProps;
   const { animate, timeline } = component;
+
+  const nextShape = createShape(nextType, nextProps, nextStyle);
+  nextElement.shape = nextShape;
 
   const lastPath = convertToPath(lastShape);
   const nextPath = convertToPath(nextShape);
@@ -174,7 +214,6 @@ function morphElement(nextElement, lastElement, container, component) {
       path: lastPath,
     }
   );
-  // lastShape.replaceWith(pathShape);
   lastShape.remove();
   container.appendChild(pathShape);
 
@@ -194,127 +233,48 @@ function morphElement(nextElement, lastElement, container, component) {
   }
 }
 
-// function changeTypeToGroup(nextGroupElement, lastShapeElement) {
-//   const { key, type, ref, props: groupProps, _cache: _groupCache } = nextGroupElement;
-//   const { type: lastType, _cache: _lastCache } = lastShapeElement;
-
-//   const { children: groupChildren } = groupProps;
-
-//   // let existTransform = false;
-//   const children = Children.map(groupChildren, (nextElement) => {
-//     if (!nextElement) return nextElement;
-//     const { key, ref, type: nextType, props: nextProps, _cache: _nextCache } = nextElement;
-//     // if (nextType === 'group') {
-//     //   return changeTypeToGroup(nextElement, lastShapeElement);
-//     // }
-//     if (nextType !== lastType) {
-//       return morphElement(nextElement, lastShapeElement);
-//     }
-//     // existTransform = true;
-//     const { animation: nextAnimation, ...nextReceiveProps } = nextProps;
-//     const animation = nextAnimation && nextAnimation.update;
-//     return {
-//       ref,
-//       key,
-//       type: nextType,
-//       props: nextReceiveProps,
-//       _cache: mix(_nextCache, _lastCache),
-//       animation,
-//       status: ELEMENT_UPDATE,
-//     };
-//   });
-
-//   return {
-//     key,
-//     type,
-//     ref,
-//     props: {
-//       ...groupProps,
-//       children,
-//     },
-//     _cache: _groupCache,
-//     status: ELEMENT_UPDATE,
-//   };
-// }
-
-// function changeTypeFromGroup(nextShapeElement, lastGroupElement) {
-//   const {
-//     ref: nextRef,
-//     key: nextKey,
-//     type: nextType,
-//     props: nextShapeProps,
-//     _cache: _nextCache,
-//   } = nextShapeElement;
-//   const { type: lastType, props: lastProps } = lastGroupElement;
-//   const { animation: nextAnimation, ...nextReceiveProps } = nextShapeProps;
-//   const { children: groupChildren } = lastProps;
-//   const animation = nextAnimation && nextAnimation.update;
-//   if (!animation) {
-//     // return [deleteElement(lastGroupElement), appearElement[nextShapeElement]];
-//   }
-
-//   let transformChild = null;
-//   const children = Children.map(groupChildren, (child) => {
-//     if (!child) return child;
-//     const { type: childType, _cache: _childCache } = child;
-//     if (childType !== nextType) {
-//       // TODO: child 形变
-//       return deleteElement(child);
-//     }
-//     if (!transformChild) {
-//       transformChild = child;
-//     }
-//     return {
-//       type: nextType,
-//       props: nextShapeProps,
-//       _cache: _childCache,
-//       animation,
-//       status: ELEMENT_UPDATE,
-//     };
-//   });
-
-//   if (!transformChild) {
-//     // return [deleteElement(lastGroupElement), appearElement(nextShapeElement)];
-//   }
-
-//   const nextElement = {
-//     ref: nextRef,
-//     key: nextKey,
-//     type: nextType,
-//     props: nextReceiveProps,
-//     _cache: mix(_nextCache, transformChild._cache),
-//     animation,
-//     status: ELEMENT_UPDATE,
-//   };
-
-//   // 保留group 结构
-//   return [
-//     {
-//       type: lastType,
-//       props: {
-//         ...lastProps,
-//         children,
-//       },
-//       status: ELEMENT_DELETE,
-//     },
-//     nextElement,
-//   ];
-// }
-
-function changeElementType(nextElement, lastElement, container, component) {
-  const { type: nextType, props: nextProps, style } = nextElement;
+function changeTypeToGroup(
+  nextElement: JSX.Element,
+  lastElement: JSX.Element,
+  container,
+  component
+) {
+  const { props: nextProps } = nextElement;
   const { type: lastType } = lastElement;
-  nextElement.shape = createShape(nextType, nextProps, style);
-  // if (nextType === 'group') {
-  //   return changeTypeToGroup(nextElement, lastElement);
-  // }
+  const { children: groupChildren } = nextProps;
 
-  // if (lastType === 'group') {
-  //   return changeTypeFromGroup(nextElement, lastElement);
-  // }
+  // 处理 group 下面子元素的变化
+  Children.map(groupChildren, (child) => {
+    if (!child) return child;
+    const { type: childType } = child;
 
-  // 都不是group, 形变动画
-  return morphElement(nextElement, lastElement, container, component);
+    if (childType !== lastType) {
+      return morphElement(child, lastElement, container, component);
+    }
+    changeElement(child, lastElement, container, component);
+  });
+}
+
+function changeTypeFromGroup(
+  nextElement: JSX.Element,
+  lastElement: JSX.Element,
+  container,
+  component
+) {
+  const { type: nextType } = nextElement;
+  const { props: lastProps } = lastElement;
+  const { children: groupChildren } = lastProps;
+
+  // 处理 group 下面子元素的变化
+  Children.map(groupChildren, (child) => {
+    if (!child) return child;
+    const { type: childType } = child;
+
+    if (childType !== nextType) {
+      return morphElement(nextElement, child, container, component);
+    }
+    changeElement(nextElement, child, container, component);
+  });
 }
 
 function renderElement(nextElements, lastElements, container, component: Component) {
@@ -334,30 +294,7 @@ function renderElement(nextElements, lastElements, container, component: Compone
       return;
     }
 
-    // 普通的jsx元素, 且都非空
-    const { key: nextKey, type: nextType } = nextElement;
-    const { key: lastKey, type: lastType, shape: lastShape } = lastElement;
-
-    // key 值不相等
-    if (!isNil(nextKey) && nextKey !== lastKey) {
-      deleteElement(lastElement, component);
-      createElement(nextElement, container, component);
-      return;
-    }
-
-    // 不在文档流
-    if (!lastShape.isConnected) {
-      lastElement.shape = lastShape.cloneNode();
-      container.appendChild(lastElement.shape);
-    }
-
-    // shape 类型的变化
-    if (nextType !== lastType) {
-      changeElementType(nextElement, lastElement, container, component);
-      return;
-    }
-
-    updateElement(nextElement, lastElement, component);
+    updateElement(nextElement, lastElement, container, component);
   });
 }
 
