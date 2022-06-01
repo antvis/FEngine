@@ -140,25 +140,6 @@ function getElementsByClassName(className: string, element) {
   return rst;
 }
 
-const DEFAULT_STYLE_PROPS: {
-  anchor?: Array<Number>;
-  origin?:  Array<Number>;
-  opacity?: number;
-  fillOpacity?: number;
-  strokeOpacity?: number;
-  fill?: string;
-  stroke?: string;
-} = {
-  // anchor: [0, 0, 0],
-  // origin: [0, 0, 0],
-  opacity: 1,
-  fillOpacity: 1,
-  strokeOpacity: 1,
-  fill: 'transparent',
-  stroke: 'transparent',
-};
-
-
 
 function checkCSSRule(type, style, func = (value)=>!isNil(value)) {
   const cssStyle = {}
@@ -181,5 +162,4 @@ export {
   isInBBox,
   checkCSSRule,
   getElementsByClassName,
-  DEFAULT_STYLE_PROPS
 };
