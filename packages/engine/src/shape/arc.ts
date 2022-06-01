@@ -56,6 +56,11 @@ export class Arc extends CustomElement<ArcStyleProps> {
     }
   }
 
+
+  getShape() {
+    return this.path
+  }
+
   attributeChangedCallback<Key extends keyof ArcStyleProps>(
     name: Key,
     oldValue: ArcStyleProps[Key],

@@ -1,5 +1,5 @@
 import { Polyline, Path, CustomElement } from '@antv/g';
-import type { DisplayObjectConfig } from '@antv/g';
+import type { DisplayObjectConfig, DisplayObject } from '@antv/g';
 import { deepMix } from '@antv/util';
 import * as Smooth from './util/smooth';
 import { SmoothPolylineStyleProps } from './types'
@@ -10,6 +10,7 @@ const defaultStyle = {
 
 export class SmoothPolyline extends CustomElement<SmoothPolylineStyleProps> {
   static tag = 'smooth-polyline';
+  private shape: DisplayObject;
 
   constructor(config: DisplayObjectConfig<SmoothPolylineStyleProps>) {
 
@@ -49,12 +50,18 @@ export class SmoothPolyline extends CustomElement<SmoothPolylineStyleProps> {
           path: d.join(" ")
         }
       })
+      this.shape = path
       this.appendChild(path);
     } else {
       const polyline =  new Polyline({
         style: other,
       });
+      this.shape = polyline
       this.appendChild(polyline);
     }
+  }
+
+  getShape() {
+    return this.shape
   }
 }

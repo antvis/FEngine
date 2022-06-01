@@ -32,6 +32,8 @@ const SYMBOLS = {
 
 export class Marker extends CustomElement<MarkerStyleProps> {
     static tag = 'marker';
+    private path: Path;
+
     constructor(config: DisplayObjectConfig<MarkerStyleProps>) {
   
       const style = deepMix({}, defaultStyle, config.style)
@@ -56,5 +58,9 @@ export class Marker extends CustomElement<MarkerStyleProps> {
           },
         });
         this.appendChild(path);
+    }
+
+    getShape() {
+      return this.path
     }
 }

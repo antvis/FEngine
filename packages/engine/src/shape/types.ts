@@ -34,6 +34,8 @@ export interface SectorStyleProps extends BaseStyleProps {
 }
 
 export interface CreatePathProps {
+    x?: number;
+    y?: number;
     startRadAngle?: number;
     endRadAngle?: Number;
     r?: number,
