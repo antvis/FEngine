@@ -199,7 +199,7 @@ function morphElement(nextElement, lastElement, container, component) {
 
   const { animation: nextAnimationEffect } = nextProps;
   const { animate, timeline } = component;
-  debugger;
+
   const nextShape = createShape(nextType, nextProps, nextStyle);
   nextElement.shape = nextShape;
 
@@ -312,9 +312,7 @@ function renderShapeGroup(component: Component, newChildren: JSX.Element, animat
   animate = isBoolean(animate) ? animate : componentAnimate;
 
   let lastChildren;
-  if (transformFrom) {
-    console.log('transformFrom', transformFrom);
-  }
+
   if (_lastChildren) {
     lastChildren = _lastChildren;
   } else if (transformFrom && transformFrom.children) {

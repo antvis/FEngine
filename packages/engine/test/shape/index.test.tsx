@@ -7,7 +7,7 @@ class View extends Component {
   render() {
     return (
       <group>
-        {/* <polyline
+        <polyline
           style={{
             points: [
               [40, 50],
@@ -21,25 +21,25 @@ class View extends Component {
             stroke: 'red',
             lineWidth: 6,
           }}
-        /> */}
-        {/* <arc
+        />
+        <arc
           style={{
             stroke: '#F04864',
             r: 50,
             x: 150,
             y: 112.5,
-            endAngle: (Math.PI * 4) / 2,
+            endAngle: (Math.PI * 4) / 3,
             anticlockwise: true,
           }}
-        /> */}
-        {/* <marker
+        />
+        <marker
           style={{
             fill: '#F04864',
             radius: 10,
             x: 50,
             y: 100,
           }}
-        /> */}
+        />
         <sector
           style={{
             stroke: 'black',
@@ -49,8 +49,8 @@ class View extends Component {
             lineWidth: 1,
             r: 39,
             r0: 30,
-            startAngle: 0,
-            endAngle: (Math.PI * 4) / 2,
+            startAngle: 1.57,
+            endAngle: 3.58,
             anticlockwise: false,
           }}
         />
@@ -73,6 +73,6 @@ describe('Canvas', () => {
     const canvas = new Canvas(props);
     canvas.render();
     await delay(200);
-    // expect(context).toMatchImageSnapshot();
+    expect(context).toMatchImageSnapshot();
   });
 });

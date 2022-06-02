@@ -84,7 +84,6 @@ export class Sector extends CustomElement<SectorStyleProps> {
   }
 
   private createPath(x, y, startAngle, endAngle, r, r0, anticlockwise) {
-    debugger;
     const d = [];
     const unitX = Math.cos(startAngle);
     const unitY = Math.sin(startAngle);

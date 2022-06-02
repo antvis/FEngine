@@ -182,9 +182,25 @@ function diffElement(nextElement: JSX.Element, lastElement: JSX.Element, parent:
   const { type: nextType, props: nextProps } = nextElement;
   const { type: lastType, props: lastProps, component: lastComponent } = lastElement;
 
+  // 这里一定是function
   if (nextType !== lastType) {
-    // TODO 需要destroyElement children拿走以后要置null
-    destroyElement(parent, lastElement);
+    if (
+      // @ts-ignore
+      !nextType.prototype?.isF2Component &&
+      // @ts-ignore
+      !lastType.prototype?.isF2Component
+    ) {
+      const { type } = nextElement;
+      const { context, updater } = parent;
+      nextElement.component = lastComponent;
+      nextElement.component.render = function() {
+        // @ts-ignore
+        return type(this.props, context, updater);
+      };
+    } else {
+      destroyElement(parent, lastElement);
+    }
+
     return nextElement;
   }
 

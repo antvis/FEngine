@@ -51,7 +51,7 @@ const arc = (x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) =>
   }
 
   const { end } = getStartEnd(x, y, r, startAngle, endAngle, anticlockwise);
-  let largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
+  const largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
 
   return ['A', r, r, 0, largeArcFlag, sweepFlag ? 1 : 0, end.x, end.y];
 };
