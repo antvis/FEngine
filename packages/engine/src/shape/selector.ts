@@ -1,7 +1,7 @@
 import { CustomElement, Path, DisplayObject, DisplayObjectConfig, isNil } from '@antv/g';
 import { deepMix } from '@antv/util';
 import { SectorStyleProps, CreatePathProps } from './types';
-import { arc, getRadAngle, cssRegister } from './util/util';
+import { arc, getRadAngle, cssRegister, clearWapperStyle } from './util/util';
 
 const defaultStyle = {
   x: 0,
@@ -11,6 +11,7 @@ const defaultStyle = {
   r0: 0,
   startAngle: '0rad',
   endAngle: `${Math.PI * 2}rad`,
+  // stroke: 'red',
   anticlockwise: false,
 };
 
@@ -28,6 +29,8 @@ export class Sector extends CustomElement<SectorStyleProps> {
     });
 
     const {
+      x,
+      y,
       startAngle,
       endAngle,
       r,
@@ -41,6 +44,7 @@ export class Sector extends CustomElement<SectorStyleProps> {
       fillOpacity,
     } = this.attributes;
 
+    clearWapperStyle(this);
     cssRegister(['startAngle', 'endAngle']);
 
     const startRadAngle = getRadAngle(startAngle);
@@ -55,8 +59,8 @@ export class Sector extends CustomElement<SectorStyleProps> {
         fill,
         fillOpacity,
         path: this.createPath(
-          0,
-          0,
+          x,
+          y,
           startRadAngle,
           Math.min(endRadAngle, startRadAngle + Math.PI * 2),
           r,
@@ -72,6 +76,8 @@ export class Sector extends CustomElement<SectorStyleProps> {
       r,
       r0,
       anticlockwise,
+      x,
+      y,
     };
     this.path = path;
     this.appendChild(path);
@@ -88,7 +94,6 @@ export class Sector extends CustomElement<SectorStyleProps> {
 
     // 当扇形的角度非常小的时候，就不进行弧线的绘制；或者整个只有1个扇形时，会出现end<0的情况不绘制
     if (Math.abs(endAngle - startAngle) > 0.0001 || (startAngle === 0 && endAngle < 0)) {
-      // debugger;
       d.push(arc(x, y, r, startAngle, endAngle, true, !anticlockwise));
 
       d.push(['L', Math.cos(endAngle) * r0 + x, Math.sin(endAngle) * r0 + y]);
@@ -98,6 +103,10 @@ export class Sector extends CustomElement<SectorStyleProps> {
       }
     }
     return d.join(' ');
+  }
+
+  getShape() {
+    return this.path;
   }
 
   attributeChangedCallback<Key extends keyof SectorStyleProps>(
@@ -145,10 +154,10 @@ export class Sector extends CustomElement<SectorStyleProps> {
     }
 
     if (!isNil(endAngle)) {
-      const { startRadAngle, r, r0, anticlockwise } = this.oldProps;
+      const { x, y, startRadAngle, r, r0, anticlockwise } = this.oldProps;
       shape.style.path = this.createPath(
-        0,
-        0,
+        x,
+        y,
         startRadAngle,
         anticlockwise
           ? -Math.min(getRadAngle(endAngle), startRadAngle + Math.PI * 2)
@@ -160,10 +169,10 @@ export class Sector extends CustomElement<SectorStyleProps> {
     }
 
     if (!isNil(startAngle)) {
-      const { endRadAngle, r, r0, anticlockwise } = this.oldProps;
+      const { x, y, endRadAngle, r, r0, anticlockwise } = this.oldProps;
       shape.style.path = this.createPath(
-        0,
-        0,
+        x,
+        y,
         getRadAngle(startAngle),
         endRadAngle,
         r,

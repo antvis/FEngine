@@ -9,6 +9,8 @@ export interface ArcStyleProps extends BaseStyleProps {
     anticlockwise?: boolean;
 }
 export interface ArcToPathProps {
+    x?:number;
+    y?:number;
     r?: number;
     endRadAngle?: number;
     startRadAngle?: number;
@@ -34,6 +36,8 @@ export interface SectorStyleProps extends BaseStyleProps {
 }
 
 export interface CreatePathProps {
+    x?: number;
+    y?: number;
     startRadAngle?: number;
     endRadAngle?: Number;
     r?: number,

@@ -1,11 +1,11 @@
-import { CSS, isNumber, PropertySyntax } from '@antv/g';
+import { CSS, DisplayObject, isNumber, PropertySyntax } from '@antv/g';
 
 const arcToPath = (x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) => {
   // 没办法画完整的 Math.PI * 2
   const endAngleOriginal = endAngle;
 
   if (endAngleOriginal - startAngle === Math.PI * 2) {
-    endAngle = Math.PI * 2 - 0.001;
+    endAngle = Math.PI * 2 - 0.001 + startAngle;
   }
 
   const { start, end } = getStartEnd(x, y, r, startAngle, endAngle, anticlockwise);
@@ -43,8 +43,16 @@ const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
 };
 
 const arc = (x, y, r, startAngle, endAngle, anticlockwise, sweepFlag = false) => {
+  // 没办法画完整的 Math.PI * 2
+  const endAngleOriginal = endAngle;
+  if (endAngleOriginal - startAngle === Math.PI * 2) {
+    endAngle = endAngle - 0.001;
+    startAngle = startAngle + 0.001;
+  }
+
   const { end } = getStartEnd(x, y, r, startAngle, endAngle, anticlockwise);
   const largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
+
   return ['A', r, r, 0, largeArcFlag, sweepFlag ? 1 : 0, end.x, end.y];
 };
 
@@ -70,4 +78,9 @@ const cssRegister = (objects) => {
   );
 };
 
-export { arcToPath, polarToCartesian, arc, getRadAngle, cssRegister };
+const clearWapperStyle = (shape: DisplayObject) => {
+  shape.setAttribute('x', 0);
+  shape.setAttribute('y', 0);
+};
+
+export { arcToPath, polarToCartesian, arc, getRadAngle, cssRegister, clearWapperStyle };

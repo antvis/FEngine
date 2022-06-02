@@ -1,7 +1,7 @@
 import type { DisplayObjectConfig } from '@antv/g';
 import { CustomElement, Path, DisplayObject, isNil } from '@antv/g';
 import { deepMix } from '@antv/util';
-import { arcToPath, cssRegister, getRadAngle } from './util/util';
+import { arcToPath, cssRegister, getRadAngle, clearWapperStyle } from './util/util';
 import { ArcStyleProps, ArcToPathProps } from './types';
 
 const defaultStyle = {
@@ -27,8 +27,9 @@ export class Arc extends CustomElement<ArcStyleProps> {
       type: Arc.tag,
     });
 
-    const { r, startAngle, endAngle, anticlockwise, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
+    const { x, y, r, startAngle, endAngle, anticlockwise, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity } = this.attributes;
     cssRegister(['startAngle', 'endAngle']);
+    clearWapperStyle(this);
 
     const startRadAngle = getRadAngle(startAngle);
     const endRadAngle = getRadAngle(endAngle);
@@ -42,7 +43,7 @@ export class Arc extends CustomElement<ArcStyleProps> {
           lineWidth,
           fill,
           fillOpacity,
-          path: arcToPath( 0, 0, r, startRadAngle, endRadAngle, anticlockwise).join(" ")
+          path: arcToPath( x, y, r, startRadAngle, endRadAngle, anticlockwise).join(" ")
         },
       });
       this.path = path;
@@ -54,6 +55,11 @@ export class Arc extends CustomElement<ArcStyleProps> {
       };
       this.appendChild(path);
     }
+  }
+
+
+  getShape() {
+    return this.path
   }
 
   attributeChangedCallback<Key extends keyof ArcStyleProps>(
@@ -101,16 +107,16 @@ export class Arc extends CustomElement<ArcStyleProps> {
     }
 
     if (!isNil(endAngle)) {
-      const { startRadAngle, r, anticlockwise } = this.oldProps;
+      const { x, y, startRadAngle, r, anticlockwise } = this.oldProps;
       shape.style.path = arcToPath(
-        0, 0, r, startRadAngle, anticlockwise ? -getRadAngle(endAngle) : getRadAngle(endAngle), anticlockwise
+        x, y, r, startRadAngle, anticlockwise ? -getRadAngle(endAngle) : getRadAngle(endAngle), anticlockwise
       ).join(" ");
     }
 
     if (!isNil(startAngle)) {
       const { endRadAngle, r, anticlockwise } = this.oldProps;
       shape.style.path = arcToPath(
-        0, 0, r, getRadAngle(startAngle), endRadAngle, anticlockwise
+        x, y, r, getRadAngle(startAngle), endRadAngle, anticlockwise
       ).join(" ");
     }
   }
