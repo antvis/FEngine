@@ -35,10 +35,15 @@ const getStartEnd = (x, y, r, startAngle, endAngle, anticlockwise) => {
   return { start, end };
 };
 
-const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+const polarToCartesian = (
+  centerX: number,
+  centerY: number,
+  radius: number,
+  angleInRadian: number
+) => {
   return {
-    x: centerX + radius * Math.cos(angleInDegrees),
-    y: centerY + radius * Math.sin(angleInDegrees),
+    x: centerX + radius * Math.cos(angleInRadian),
+    y: centerY + radius * Math.sin(angleInRadian),
   };
 };
 

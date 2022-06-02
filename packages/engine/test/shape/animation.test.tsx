@@ -13,6 +13,7 @@ class View extends Component {
             r: 50,
             x: 150,
             y: 112.5,
+            startAngle: '0rad',
             endAngle: `${(Math.PI * 4) / 3}rad`,
             // anticlockwise: true,
           }}
