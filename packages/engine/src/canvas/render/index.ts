@@ -203,9 +203,8 @@ function morphElement(nextElement, lastElement, container, component) {
   const nextShape = createShape(nextType, nextProps, nextStyle);
   nextElement.shape = nextShape;
 
-  // 如果是CustomElement,通过getShape获取shape
-  const lastPath = convertToPath(lastShape.isCustomElement ? lastShape.getShape() : lastShape);
-  const nextPath = convertToPath(nextShape.isCustomElement ? nextShape.getShape() : nextShape);
+  const lastPath = convertToPath(lastShape);
+  const nextPath = convertToPath(nextShape);
 
   const pathShape = createShape(
     'path',
