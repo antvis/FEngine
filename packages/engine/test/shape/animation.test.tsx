@@ -10,12 +10,11 @@ class View extends Component {
         <arc
           style={{
             stroke: '#F04864',
-            r: 50,
-            x: 150,
-            y: 112.5,
+            r: 40,
+            x: 50,
+            y: 50,
             startAngle: '0rad',
             endAngle: `${(Math.PI * 4) / 3}rad`,
-            // anticlockwise: true,
           }}
           animation={{
             appear: {
@@ -35,24 +34,27 @@ class View extends Component {
           style={{
             stroke: 'black',
             fill: '#F04864',
-            x: 118,
-            y: 97,
-            lineWidth: 1,
-            r: 39,
-            r0: 30,
+            x: 150,
+            y: 100,
+            lineWidth: 2,
+            r: 50,
+            // r0: 30,
             startAngle: '0rad',
             endAngle: '3.89rad',
             anticlockwise: true,
+            radius: [5, 10],
           }}
           animation={{
             appear: {
               easing: 'ease',
               duration: 2000,
-              property: ['endAngle'],
+              property: ['endAngle', 'r'],
               start: {
+                r: 30,
                 endAngle: '0rad',
               },
               end: {
+                r: 50,
                 endAngle: '3.89rad',
               },
             },
