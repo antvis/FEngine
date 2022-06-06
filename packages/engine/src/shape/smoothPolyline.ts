@@ -8,60 +8,55 @@ const defaultStyle = {
   shape: 'line' 
 }
 
-export class SmoothPolyline extends CustomElement<SmoothPolylineStyleProps> {
+export class SmoothPolyline extends Path {
   static tag = 'smooth-polyline';
-  private shape: DisplayObject;
+  parsedStyle: any;
 
-  constructor(config: DisplayObjectConfig<SmoothPolylineStyleProps>) {
+  constructor(config) {
+    super(config);
+    this.updatePath();
+  }
 
-    const style = deepMix({}, defaultStyle, config.style)
-    const { smooth, ...other } = style
+  setAttribute(name, value, force?: boolean) {
+    super.setAttribute(name, value, force);
+    if (['smooth'].indexOf(name) > -1) {
+      this.updatePath();
+    }
+  }
 
-    const { points } = style
-    super({
-      style,
-      type: SmoothPolyline.tag,
-    });
 
-    if(smooth) {
-     
-      const d = [
-        ['M', points[0][0], points[0][1]]
-      ]
+  private updatePath() {
+    const { smooth, points, ...other } = this.parsedStyle;
+    const { points: pos } = points
+
+    const d = [
+      ['M', pos[0][0], pos[0][1]]
+    ]
+
+    if(smooth) { 
       const constaint = [
         [0, 0],
         [1, 1],
       ];
-      const sps = Smooth.smooth(points.map( d => {
+      const sps = Smooth.smooth(pos.map( d => {
         return {
           x: d[0],
           y: d[1]
         }
       }), false, constaint);
-
+    
       for (let i = 0, n = sps.length; i < n; i++) {
         const sp = sps[i];
         d.push(['C',sp[1], sp[2], sp[3], sp[4], sp[5], sp[6]]);
       }
-
-      const path = new Path({
-        style: {
-          ...other,
-          path: d.join(" ")
-        }
-      })
-      this.shape = path
-      this.appendChild(path);
     } else {
-      const polyline =  new Polyline({
-        style: other,
-      });
-      this.shape = polyline
-      this.appendChild(polyline);
+      let i;
+      let l;
+      for (i = 1, l = pos.length - 1; i < l; i++) {
+        d.push(['L', pos[i][0], pos[i][1]]);
+      }
+      d.push(['L', pos[l][0], pos[l][1]]); 
     }
-  }
-
-  getShape() {
-    return this.shape
+    super.setAttribute('path',  d.join(" "));
   }
 }

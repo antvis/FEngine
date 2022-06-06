@@ -28,7 +28,7 @@ class View extends Component {
             r: 50,
             x: 150,
             y: 112.5,
-            endAngle: (Math.PI * 4) / 3,
+            endAngle: `${(Math.PI * 4) / 3} rad`,
             anticlockwise: true,
           }}
         />
@@ -49,8 +49,8 @@ class View extends Component {
             lineWidth: 1,
             r: 39,
             r0: 30,
-            startAngle: 1.57,
-            endAngle: 3.58,
+            startAngle: '1.57 rad',
+            endAngle: '3.58 rad',
             anticlockwise: false,
           }}
         />
