@@ -38,7 +38,7 @@ class View extends Component {
             y: 100,
             lineWidth: 2,
             r: 50,
-            // r0: 30,
+            r0: 30,
             startAngle: '0rad',
             endAngle: '3.89rad',
             anticlockwise: true,

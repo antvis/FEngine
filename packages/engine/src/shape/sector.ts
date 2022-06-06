@@ -114,7 +114,7 @@ export class Sector extends Path {
       x.value,
       y.value,
       startAngle ? deg2rad(startAngle.value) : 0,
-      endAngle ? deg2rad(endAngle.value) : 360,
+      endAngle ? deg2rad(endAngle.value) : PI2,
       r ? r.value : 0,
       r0 ? r0.value : 0,
       radius ? radius.map((r) => r.value) : [0, 0, 0, 0]
@@ -222,44 +222,28 @@ export class Sector extends Path {
 
       // Have the corners merged?
       if (limitedOutBorderRadiusMax < outBorderRadiusMax && crStart === crEnd) {
-        const outStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
-        const outStartBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-        const outStartBorderRadiusEndPoint = polarToCartesian(
-          x,
-          y,
-          r,
-          outStartBorderRadiusEndAngle
-        );
         sectorPathCommands.push([
           'A',
           limitedOutBorderRadiusMax,
           limitedOutBorderRadiusMax,
           0,
-          computeArcSweep(outStartBorderRadiusStartAngle, outStartBorderRadiusEndAngle),
+          0,
           1,
-          outStartBorderRadiusEndPoint.x,
-          outStartBorderRadiusEndPoint.y,
+          x + ct0.cx + ct0.x1,
+          y + ct0.cy + ct0.y0,
         ]);
       } else {
         // draw the two corners and the ring
         if (crStart > 0) {
-          const outStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
-          const outStartBorderRadiusEndAngle = mathATan2(ct0.y1, ct0.x1);
-          const outStartBorderRadiusEndPoint = polarToCartesian(
-            x,
-            y,
-            r,
-            outStartBorderRadiusEndAngle
-          );
           sectorPathCommands.push([
             'A',
             crStart,
             crStart,
             0,
-            computeArcSweep(outStartBorderRadiusStartAngle, outStartBorderRadiusEndAngle),
+            0,
             1,
-            outStartBorderRadiusEndPoint.x,
-            outStartBorderRadiusEndPoint.y,
+            x + ct0.cx + ct0.x1,
+            y + ct0.cy + ct0.y1,
           ]);
         }
 
@@ -277,14 +261,12 @@ export class Sector extends Path {
           outRadiusEndPoint.y,
         ]);
         if (crEnd > 0) {
-          const outEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
-          const outEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
           sectorPathCommands.push([
             'A',
             crEnd,
             crEnd,
             0,
-            computeArcSweep(outEndBorderRadiusStartAngle, outEndBorderRadiusEndAngle),
+            0,
             1,
             x + ct1.cx + ct1.x0,
             y + ct1.cy + ct1.y0,
@@ -301,108 +283,86 @@ export class Sector extends Path {
       sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
     }
     // the inner ring has corners
-    else if (limitedInnerBorderRadiusMax > e) {
-      const crStart = mathMin(innerStartRadius, limitedInnerBorderRadiusMax);
-      const crEnd = mathMin(innerEndRadius, limitedInnerBorderRadiusMax);
-      const ct0 = computeCornerTangents(xire, yire, xre, yre, r0, -crEnd, clockwise);
-      const ct1 = computeCornerTangents(xrs, yrs, xirs, yirs, r0, -crStart, clockwise);
+    // else if (limitedInnerBorderRadiusMax > e) {
+    //   const crStart = mathMin(innerStartRadius, limitedInnerBorderRadiusMax);
+    //   const crEnd = mathMin(innerEndRadius, limitedInnerBorderRadiusMax);
+    //   const ct0 = computeCornerTangents(xire, yire, xre, yre, r0, -crEnd, clockwise);
+    //   const ct1 = computeCornerTangents(xrs, yrs, xirs, yirs, r0, -crStart, clockwise);
 
-      sectorPathCommands.push(['L', x + ct0.cx + ct0.x0, y + ct0.cy + ct0.y0]);
-      // ctx.lineTo(cx + ct0.cx + ct0.x0, cy + ct0.cy + ct0.y0);
+    //   sectorPathCommands.push(['L', x + ct0.cx + ct0.x0, y + ct0.cy + ct0.y0]);
 
-      // Have the corners merged?
-      if (limitedInnerBorderRadiusMax < innerBorderRadiusMax && crStart === crEnd) {
-        const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
-        const innerStartBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-        const innerStartBorderRadiusEndPoint = polarToCartesian(
-          x,
-          y,
-          r0,
-          innerStartBorderRadiusEndAngle
-        );
-        sectorPathCommands.push([
-          'A',
-          limitedOutBorderRadiusMax,
-          limitedOutBorderRadiusMax,
-          0,
-          computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
-          1,
-          innerStartBorderRadiusEndPoint.x,
-          innerStartBorderRadiusEndPoint.y,
-        ]);
-      }
-      // draw the two corners and the ring
-      // else {
-      //   if (crEnd > 0) {
-      //     const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
-      //     const innerStartBorderRadiusEndAngle = mathATan2(ct0.y1, ct0.x1);
-      //     const innerStartBorderRadiusEndPoint = polarToCartesian(
-      //       x,
-      //       y,
-      //       r0,
-      //       innerStartBorderRadiusEndAngle
-      //     );
-      //     sectorPathCommands.push([
-      //       'A',
-      //       crEnd,
-      //       crEnd,
-      //       0,
-      //       computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
-      //       0,
-      //       innerStartBorderRadiusEndPoint.x,
-      //       innerStartBorderRadiusEndPoint.y,
-      //     ]);
-      //   }
-      //   const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
-      //   const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
-      //   const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
-      //   // sectorPathCommands.push([
-      //   //   'A',
-      //   //   r0,
-      //   //   r0,
-      //   //   0,
-      //   //   computeArcSweep(innerRadiusStartAngle, innerRadiusEndAngle),
-      //   //   1,
-      //   //   innerRadiusEndPoint.x,
-      //   //   innerRadiusEndPoint.y,
-      //   // ]);
-      //   sectorPathCommands.push(['L', innerRadiusEndPoint.x, innerRadiusEndPoint.y]);
-      //   // ctx.arc(
-      //   //   cx,
-      //   //   cy,
-      //   //   innerRadius,
-      //   //   mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1),
-      //   //   mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1),
-      //   //   clockwise
-      //   // );
-      //   // if (crStart > 0) {
-      //   //   const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
-      //   //   const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-      //   //   sectorPathCommands.push([
-      //   //     'A',
-      //   //     crStart,
-      //   //     crStart,
-      //   //     0,
-      //   //     computeArcSweep(innerEndBorderRadiusStartAngle, innerEndBorderRadiusEndAngle),
-      //   //     1,
-      //   //     x + ct1.cx + ct1.x0,
-      //   //     y + ct1.cy + ct1.y0,
-      //   //   ]);
-      //   // }
-      //   // // eslint-disable-next-line max-len
-      //   // crStart > 0 &&
-      //   //   ctx.arc(
-      //   //     cx + ct1.cx,
-      //   //     cy + ct1.cy,
-      //   //     crStart,
-      //   //     mathATan2(ct1.y1, ct1.x1),
-      //   //     mathATan2(ct1.y0, ct1.x0),
-      //   //     !clockwise
-      //   //   );
-      // }
-    }
+    //   // Have the corners merged?
+    //   if (limitedInnerBorderRadiusMax < innerBorderRadiusMax && crStart === crEnd) {
+    //     sectorPathCommands.push([
+    //       'A',
+    //       limitedOutBorderRadiusMax,
+    //       limitedOutBorderRadiusMax,
+    //       0,
+    //       0,
+    //       1,
+    //       x + ct0.cx + ct0.x1,
+    //       y + ct0.cy + ct0.y1,
+    //     ]);
+    //   }
+    //   // draw the two corners and the ring
+    //   else {
+    //     if (crEnd > 0) {
+    //       sectorPathCommands.push([
+    //         'A',
+    //         crEnd,
+    //         crEnd,
+    //         0,
+    //         0,
+    //         1,
+    //         x + ct0.cx + ct0.x1,
+    //         y + ct0.cy + ct0.y1,
+    //       ]);
+    //     }
+    //     // sectorPathCommands.push(['A', r0, r0, 0, arcSweep, 0, innerStart.x, innerStart.y]);
+    //     const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
+    //     const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y0, ct1.cx + ct1.x0);
+    //     const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
+    //     sectorPathCommands.push([
+    //       'A',
+    //       r0,
+    //       r0,
+    //       0,
+    //       computeArcSweep(innerRadiusStartAngle, innerRadiusEndAngle),
+    //       0,
+    //       x + ct1.cx + ct1.x0,
+    //       y + ct1.cy + ct1.y0,
+    //     ]);
+    //     if (crStart > 0) {
+    //       const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
+    //       const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
+    //       sectorPathCommands.push([
+    //         'A',
+    //         crStart,
+    //         crStart,
+    //         0,
+    //         0,
+    //         1,
+    //         x + ct1.cx + ct1.x0,
+    //         y + ct1.cy + ct1.y0,
+    //       ]);
+    //     }
+    //     // // eslint-disable-next-line max-len
+    //     // crStart > 0 &&
+    //     //   ctx.arc(
+    //     //     cx + ct1.cx,
+    //     //     cy + ct1.cy,
+    //     //     crStart,
+    //     //     mathATan2(ct1.y1, ct1.x1),
+    //     //     mathATan2(ct1.y0, ct1.x0),
+    //     //     !clockwise
+    //     //   );
+    //     // sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
+    //   }
+    // }
     // the inner ring is just a circular arc
     else {
+      // TODO 内圆角
+      sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
       sectorPathCommands.push(['A', r0, r0, 0, arcSweep, 0, innerStart.x, innerStart.y]);
     }
 
