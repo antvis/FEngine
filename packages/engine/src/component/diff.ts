@@ -77,7 +77,6 @@ function createComponent(parent: Component, element: JSX.Element): Component {
   const { transformFrom: transformFromRef, ...receiveProps } = props;
 
   let component: Component;
-
   // @ts-ignore
   if (type.prototype && type.prototype.isF2Component) {
     // @ts-ignore
@@ -92,13 +91,7 @@ function createComponent(parent: Component, element: JSX.Element): Component {
 
   // 设置ref
   if (ref) {
-    element.ref.current = component;
-  }
-
-  // 因为view 可能在子组件，所以这里要透传到子组件
-  if (transformFrom) {
-    // @ts-ignore
-    component.transformFrom = transformFrom;
+    ref.current = component;
   }
 
   if (transformFromRef) {
@@ -107,6 +100,10 @@ function createComponent(parent: Component, element: JSX.Element): Component {
       : null;
     // @ts-ignore
     component.transformFrom = transformFromComponent;
+  } else if (transformFrom) {
+    // 因为view 可能在子组件，所以这里要透传到子组件
+    // @ts-ignore
+    component.transformFrom = transformFrom;
   }
 
   component.context = context;
@@ -117,6 +114,31 @@ function createComponent(parent: Component, element: JSX.Element): Component {
   container.appendChild(group);
   component.container = group;
   return component;
+}
+
+function updateComponent(component: Component, nextElement: JSX.Element, parent: Component) {
+  const { props, ref } = nextElement;
+  const { transformFrom: transformFromRef } = props;
+
+  // 更新 ref 引用
+  if (ref) {
+    ref.current = component;
+  }
+
+  // @ts-ignore
+  const { transformFrom } = parent;
+
+  if (transformFromRef) {
+    const transformFromComponent = transformFromRef
+      ? getTransformFromComponentRef(transformFromRef)
+      : null;
+    // @ts-ignore
+    component.transformFrom = transformFromComponent;
+  } else if (transformFrom) {
+    // 因为view 可能在子组件，所以这里要透传到子组件
+    // @ts-ignore
+    component.transformFrom = transformFrom;
+  }
 }
 
 function renderComponent(component: Component | Component[]) {
@@ -186,25 +208,29 @@ function diffElement(nextElement: JSX.Element, lastElement: JSX.Element, parent:
   if (nextType !== lastType) {
     if (
       // @ts-ignore
-      !nextType.prototype?.isF2Component &&
+      nextType.prototype?.isF2Component ||
       // @ts-ignore
-      !lastType.prototype?.isF2Component
+      lastType.prototype?.isF2Component
     ) {
+      destroyElement(parent, lastElement);
+    } else {
       const { type } = nextElement;
       const { context, updater } = parent;
-      nextElement.component = lastComponent;
-      nextElement.component.render = function() {
+      // 替换成新的 render 函数
+      lastComponent.render = function() {
         // @ts-ignore
         return type(this.props, context, updater);
       };
-    } else {
-      destroyElement(parent, lastElement);
+      // 保留component， 等下一阶段处理
+      updateComponent(lastComponent, nextElement, parent);
+      nextElement.component = lastComponent;
     }
 
     return nextElement;
   }
 
   // 保留component， 等下一阶段处理
+  updateComponent(lastComponent, nextElement, parent);
   nextElement.component = lastComponent;
   if (equal(nextProps, lastProps)) {
     return null;
