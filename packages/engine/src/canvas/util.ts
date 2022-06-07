@@ -146,11 +146,27 @@ function checkCSSRule(type, style, func = (value)=>!isNil(value)) {
   for(const key in style) {
     // 过滤undefine NAN
     if(!style.hasOwnProperty(key) || !func(style[key]) ) continue
+
     // 类型校验
-    if(DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key] && Object.prototype.toString.call(style[key]) !== `[object ${DEFAULT_CSS_RULE[type][key]}]`) continue
+    if(DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key]){
+
+      if(isArray(DEFAULT_CSS_RULE[type][key])) {
+        let isType = false
+        DEFAULT_CSS_RULE[type][key].forEach( d => {
+          if (Object.prototype.toString.call(style[key]) === `[object ${d}]`) {
+            isType = true
+          }
+        })
+
+        if(!isType)  continue
+      }
+        else if( Object.prototype.toString.call(style[key]) !== `[object ${DEFAULT_CSS_RULE[type][key]}]`) continue
+      
+    } 
 
     cssStyle[key] = style[key]
   }
+
   return cssStyle
 }
 export {
