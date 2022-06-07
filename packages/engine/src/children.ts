@@ -43,26 +43,40 @@ function compareArray(
   const result = [];
 
   // 比较元素
-  for (let i = 0, len = Math.max(nextLength, lastLength); i < len; i++) {
+  for (let i = 0, len = nextLength; i < len; i++) {
     const element = nextElements[i];
     if (!element) {
-      result.push(compare(element, lastElements[i], callback));
       continue;
     }
     const { key } = element;
+    let lastElement;
     // 有key值定义
     if (!isNil(element.key)) {
-      const lastElement = keyed[key];
+      lastElement = keyed[key];
       if (lastElement) delete keyed[key];
-      result.push(compare(element, lastElement, callback));
+    } else {
+      // 取相同位置的元素
+      lastElement = lastElements[i];
+    }
+
+    // 如果 lastElement 已经被处理过, next 处理成新增
+    if (lastElement.__processed) {
+      result.push(compare(element, null, callback));
       continue;
     }
-    result.push(compare(element, lastElements[i], callback));
+    // 标记 element 已经被处理过
+    lastElement.__processed = true;
+    result.push(compare(element, lastElement, callback));
   }
-  // 说明是删除的元素
-  Object.keys(keyed).forEach((key) => {
-    result.push(compare(null, keyed[key], callback));
-  });
+  // 处理 lastElements 里面还未被处理的元素
+  for (let i = 0, len = lastLength; i < len; i++) {
+    const lastElement = lastElements[i];
+    if (!lastElement.__processed) {
+      result.push(compare(null, lastElement, callback));
+    } else {
+      delete lastElement.__processed;
+    }
+  }
   return result;
 }
 
