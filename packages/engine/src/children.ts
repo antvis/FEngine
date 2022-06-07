@@ -59,6 +59,12 @@ function compareArray(
       lastElement = lastElements[i];
     }
 
+    // 没有直接返回
+    if (!lastElement) {
+      result.push(compare(element, null, callback));
+      continue;
+    }
+
     // 如果 lastElement 已经被处理过, next 处理成新增
     if (lastElement.__processed) {
       result.push(compare(element, null, callback));
@@ -71,6 +77,9 @@ function compareArray(
   // 处理 lastElements 里面还未被处理的元素
   for (let i = 0, len = lastLength; i < len; i++) {
     const lastElement = lastElements[i];
+    if (!lastElement) {
+      continue;
+    }
     if (!lastElement.__processed) {
       result.push(compare(null, lastElement, callback));
     } else {
