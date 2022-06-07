@@ -6,12 +6,14 @@ describe('compare', () => {
       <group>
         <rect id={1} />
         <rect key="a" id={2} />
+        {undefined}
       </group>
     );
     const nextElement = (
       <group>
         <rect key="a" id={3} />
         <rect id={4} />
+        {undefined}
       </group>
     );
 
