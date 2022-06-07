@@ -88,4 +88,12 @@ const clearWapperStyle = (shape: DisplayObject) => {
   shape.setAttribute('y', 0);
 };
 
-export { arcToPath, polarToCartesian, arc, getRadAngle, cssRegister, clearWapperStyle };
+export {
+  arcToPath,
+  polarToCartesian,
+  arc,
+  getRadAngle,
+  cssRegister,
+  clearWapperStyle,
+  getStartEnd,
+};
