@@ -181,6 +181,7 @@ function destroyElement(parent: Component, elements: JSX.Element) {
     component.willUnmount();
     destroyElement(component, component.children);
     component.didUnmount();
+    component.destroy();
   });
 }
 

@@ -25,6 +25,7 @@ class Component<P = any, S = any> {
   // render 返回的节点
   children: JSX.Element;
   animate: boolean;
+  destroyed = false;
   constructor(props: P, context?: ComponentContext, updater?: Updater<S>) {
     this.props = props;
     this.state = {} as S;
@@ -43,13 +44,23 @@ class Component<P = any, S = any> {
   willUnmount() {}
   didUnmount() {}
   setState(partialState: S, callback?: () => void) {
+    if (this.destroyed) {
+      return;
+    }
     this.updater.enqueueSetState(this, partialState, callback);
   }
   forceUpdate(callback?: () => void) {
+    if (this.destroyed) {
+      return;
+    }
     this.updater.enqueueForceUpdate(this, {} as S, callback);
   }
   setAnimate(animate: boolean) {
     this.animate = animate;
+  }
+  destroy() {
+    this.destroyed = true;
+    this.children = null;
   }
 }
 
