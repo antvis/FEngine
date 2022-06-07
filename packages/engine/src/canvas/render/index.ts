@@ -211,7 +211,7 @@ function morphElement(nextElement, lastElement, container, component) {
     {},
     {
       ...nextStyle,
-      path: lastPath,
+      path: '',
     }
   );
   lastShape.remove();
