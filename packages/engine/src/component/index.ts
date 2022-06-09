@@ -60,7 +60,6 @@ class Component<P = any, S = any> {
   }
   destroy() {
     this.destroyed = true;
-    this.children = null;
   }
 }
 

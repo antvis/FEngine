@@ -66,7 +66,7 @@ function compareArray(
     }
 
     // 如果 lastElement 已经被处理过, next 处理成新增
-    if (lastElement.__processed) {
+    if (lastElement?.__processed) {
       result.push(compare(element, null, callback));
       continue;
     }
@@ -80,7 +80,7 @@ function compareArray(
     if (!lastElement) {
       continue;
     }
-    if (!lastElement.__processed) {
+    if (!lastElement?.__processed) {
       result.push(compare(null, lastElement, callback));
     } else {
       delete lastElement.__processed;
