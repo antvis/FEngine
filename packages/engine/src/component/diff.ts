@@ -320,6 +320,8 @@ function renderChildren(parent: Component, nextChildren, lastChildren) {
     // @ts-ignore
     parent.childrenIsShape = true;
   } else {
+    // @ts-ignore
+    parent.childrenIsShape = false;
     parent.children = nextChildren;
     diff(parent, nextChildren, lastChildren);
   }

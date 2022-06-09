@@ -403,6 +403,8 @@ export class Sector extends Path {
     }
     // the inner ring is just a circular arc
     else {
+      // TODO 内圆角
+      sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
       sectorPathCommands.push(['A', r0, r0, 0, arcSweep, 0, innerStart.x, innerStart.y]);
     }
 

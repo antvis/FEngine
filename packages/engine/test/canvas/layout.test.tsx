@@ -94,8 +94,6 @@ describe('Canvas', () => {
     const canvas = new Canvas(props);
     canvas.render();
 
-    ref.current.container.getChildren()[0].get('style');
-
     await delay(200);
     expect(context).toMatchImageSnapshot();
 

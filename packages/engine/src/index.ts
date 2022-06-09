@@ -16,4 +16,3 @@ export { default as Timeline } from './timeline';
 export { default as Hammer } from './canvas/event';
 
 export { CanvasRenderer, WebglRenderer, SvgRenderer, renderShape, DisplayObject };
-export * from './adapter';
