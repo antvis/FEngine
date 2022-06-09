@@ -144,14 +144,16 @@ class Canvas extends Component<CanvasProps> {
   }
 
   render() {
-    const { children: lastChildren, props, timeline } = this;
+    const { children: lastChildren, props, timeline, canvas } = this;
     const { children: nextChildren } = props;
 
-    timeline.reset();
+    canvas.ready.then(() => {
+      timeline.reset();
 
-    renderChildren(this, nextChildren, lastChildren);
-    timeline.onEnd(() => {
-      this._animationEnd();
+      renderChildren(this, nextChildren, lastChildren);
+      timeline.onEnd(() => {
+        this._animationEnd();
+      });
     });
     return null;
   }
