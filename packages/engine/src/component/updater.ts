@@ -30,15 +30,18 @@ function createUpdater(canvas) {
         callbackQueue.push({ callback, component });
       }
     }
+
     const renderComponents = [].concat(renderQueue);
+    const renderCallbackQueue = [].concat(callbackQueue);
+
+    // 先清空，renderComponents 里面有可能会继续 setState
+    renderQueue.length = 0;
+    callbackQueue.length = 0;
+
     canvas.renderComponents(renderComponents);
 
     // callback queue
-    commitRenderQueue();
-
-    // 清空
-    renderQueue.length = 0;
-    callbackQueue.length = 0;
+    commitRenderQueue(renderCallbackQueue);
   }
 
   function enqueueSetState(component, state, callback?: () => void) {
@@ -55,7 +58,7 @@ function createUpdater(canvas) {
     }
   }
 
-  function commitRenderQueue() {
+  function commitRenderQueue(callbackQueue) {
     for (let i = 0; i < callbackQueue.length; i++) {
       const { callback, component } = callbackQueue[i];
       callback.call(component);
