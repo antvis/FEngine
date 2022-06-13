@@ -45,7 +45,21 @@ class Hammer extends EE {
     this.shape.addEventListener('touchmove', this._move);
     this.shape.addEventListener('touchend', this._touchend);
     this.shape.addEventListener('touchendoutside', this._touchendoutside);
+    this.shape.addEventListener('dragenter', this._passThrough('dragenter'));
+    this.shape.addEventListener('dragleave', this._passThrough('dragleave'));
+    this.shape.addEventListener('dragover', this._passThrough('dragover'));
+    this.shape.addEventListener('drop', this._passThrough('drop'));
+    this.shape.addEventListener('dragstart', this._passThrough('dragstart'));
+    this.shape.addEventListener('drag', this._passThrough('drag'));
+    this.shape.addEventListener('dragend', this._passThrough('dragend'));
   }
+
+  _passThrough(type) {
+    return (ev) => {
+      this.emit(type, ev);
+    };
+  }
+
   _click = (ev) => {
     convertPoints(ev);
     if (ev.detail === 2) {
