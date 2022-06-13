@@ -15,7 +15,24 @@ function createNodeTree(element, context) {
   };
   // 文本需要计算文本的宽高来进行flex布局
   if (type === 'text') {
-    const { width, height } = measureText(style?.text || attrs?.text);
+    const {
+      fontSize,
+      fontFamily,
+      fontWeight,
+      fontVariant,
+      fontStyle,
+      textAlign,
+      textBaseline,
+    } = mergeStyle;
+    const { width, height } = measureText(style?.text || attrs?.text, {
+      fontSize,
+      fontFamily,
+      fontWeight,
+      fontVariant,
+      fontStyle,
+      textAlign,
+      textBaseline,
+    });
     mergeStyle = {
       width,
       height,

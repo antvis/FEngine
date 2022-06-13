@@ -151,28 +151,28 @@ class Canvas extends Component<CanvasProps> {
     });
   }
 
-  update(nextProps: CanvasProps) {
+  async update(nextProps: CanvasProps) {
     const { props } = this;
     if (equal(nextProps, props)) {
       return;
     }
 
     this.props = nextProps;
-    this.render();
+    await this.render();
   }
-
-  render() {
+  //@ts-ignore
+  async render() {
     const { children: lastChildren, props, timeline, canvas } = this;
     const { children: nextChildren } = props;
 
-    canvas.ready.then(() => {
-      timeline.reset();
-
-      renderChildren(this, nextChildren, lastChildren);
-      timeline.onEnd(() => {
-        this._animationEnd();
-      });
+    await canvas.ready;
+    timeline.reset();
+    //@ts-ignore
+    renderChildren(this, nextChildren, lastChildren);
+    timeline.onEnd(() => {
+      this._animationEnd();
     });
+
     return null;
   }
 
