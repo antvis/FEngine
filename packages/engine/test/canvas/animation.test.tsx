@@ -123,7 +123,7 @@ class View extends Component {
 }
 
 describe('Canvas', () => {
-  it('morph animate', async () => {
+  it.skip('morph animate', async () => {
     const renderer = new Renderer();
     await delay(100);
 

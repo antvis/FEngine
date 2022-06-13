@@ -5,7 +5,6 @@ const Theme = {
   fontStyle: 'normal',
   fontVariant: 'normal',
   fontWeight: 'normal',
-  // textAlign: 'center',
 };
 
 export default Theme;
