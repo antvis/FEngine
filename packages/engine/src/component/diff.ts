@@ -91,8 +91,8 @@ function createComponent(parent: Component, element: JSX.Element): Component {
 
   // 设置ref
   if (ref) {
-    ref.current = component;
-  }
+      ref.current = component;
+    }
 
   if (transformFromRef) {
     const transformFromComponent = transformFromRef
@@ -122,7 +122,7 @@ function updateComponent(component: Component, nextElement: JSX.Element, parent:
 
   // 更新 ref 引用
   if (ref) {
-    ref.current = component;
+      ref.current = component;
   }
 
   // @ts-ignore
