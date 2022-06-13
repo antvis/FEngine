@@ -3,7 +3,7 @@ const elementStyle = {
   font: 'String',
   globalAlpha: 'Number',
   lineCap: 'String',
-  lineWidth: 'Number',
+  lineWidth: ['Number', 'String'],
   lineJoin: 'String',
 
   miterLimit: 'Number',
@@ -15,10 +15,10 @@ const elementStyle = {
   strokeStyle: 'String',
   textAlign: 'String',
   textBaseline: 'String',
-  lineDash: ['Arrary', 'Number'],
+  lineDash: ['Array', 'Number'],
 
   shadow: 'String',
-  matrix: 'Arrary',
+  matrix: 'Array',
   stroke: 'String',
   fill: 'String',
   opacity: 'Number',
@@ -39,10 +39,10 @@ export const DEFAULT_CSS_RULE = {
     width: 'Number',
     height: 'Number',
 
-    fontSize: 'Number',
+    fontSize: ['Number', 'String'],
     fontFamily: 'String',
     fontStyle: 'String',
-    fontWeight: 'Number',
+    fontWeight: ['Number', 'String'],
     fontVariant: 'String',
   },
   circle: {

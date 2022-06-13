@@ -22,7 +22,7 @@ export class Arc extends Path {
       x.value,
       y.value,
       startAngle ? deg2rad(startAngle.value) : 0,
-      endAngle ? deg2rad(endAngle.value) : 360,
+      endAngle ? deg2rad(endAngle.value) : Math.PI * 2,
       r ? r.value : 0,
       anticlockwise
     );
@@ -37,9 +37,13 @@ export class Arc extends Path {
     r: number,
     anticlockwise: boolean
   ): PathCommand[] {
+    if (endAngle < startAngle) {
+      endAngle = endAngle + Math.PI * 2;
+    }
+
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
-
+    if (r === 0) return [];
     if (isNumberEqual(endAngle - startAngle, Math.PI * 2)) {
       const middlePoint = polarToCartesian(x, y, r, startAngle + Math.PI);
       return [

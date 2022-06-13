@@ -30,7 +30,17 @@ interface CanvasProps {
 
 function measureText(container: Group, px2hd) {
   return (text: string, font?) => {
-    const { fontSize, fontFamily, fontStyle, fontWeight, fontVariant } = font || {};
+    // todo:canvas为异步，想要立刻拿到宽高只能把默认值补全
+    const {
+      fontSize = 12,
+      fontFamily = '"Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif',
+      fontWeight = 'normal',
+      fontVariant = 'normal',
+      fontStyle = 'normal',
+      textAlign = 'start',
+      textBaseline = 'bottom',
+      lineWidth = 1,
+    } = font || {};
 
     const style = {
       x: 0,
@@ -41,11 +51,15 @@ function measureText(container: Group, px2hd) {
       fontWeight,
       fontVariant,
       text: text,
+      textAlign,
+      textBaseline,
+      lineWidth,
     };
 
     const result = checkCSSRule('text', style);
     // @ts-ignore
     const shape = new Text({ style: result });
+
     container.appendChild(shape);
     const { width, height } = shape.getBBox();
 
@@ -94,11 +108,13 @@ class Canvas extends Component<CanvasProps> {
       width,
       height,
       supportTouchEvent: true,
+      supportsPointerEvents: true,
       createImage,
     });
     const container = canvas.getRoot();
     // 设置全局样式
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
+
     mix(container.style, defalutStyle);
     this._ee = new Hammer(canvas);
 
