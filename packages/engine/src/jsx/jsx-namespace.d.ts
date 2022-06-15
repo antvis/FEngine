@@ -28,7 +28,7 @@ export namespace JSX {
   export interface ElementClass {
     refs: {};
     props: Props;
-    render(): Element | null;
+    render(): Element | null | Promise<void>;
   }
 
   export interface IntrinsicElements {
