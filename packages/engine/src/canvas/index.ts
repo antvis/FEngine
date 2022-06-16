@@ -1,4 +1,4 @@
-import { mix, deepMix, omit, pick } from '@antv/util';
+import { mix, deepMix, pick } from '@antv/util';
 import Component from '../component';
 import equal from '../component/equal';
 import { Group, Text, Canvas as GCanvas } from '@antv/g';
@@ -9,7 +9,6 @@ import EE from '@antv/event-emitter';
 import Timeline from './timeline';
 import defaultTheme from './theme';
 import { px2hd as defaultPx2hd, checkCSSRule } from './util';
-import Hammer from './event';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -74,7 +73,7 @@ function measureText(container: Group, px2hd) {
 // 顶层Canvas标签
 class Canvas extends Component<CanvasProps> {
   canvas: GCanvas;
-  private _ee: any;
+  private _ee: EE;
   private timeline: Timeline;
   theme: any;
   landscape: boolean;
@@ -116,7 +115,7 @@ class Canvas extends Component<CanvasProps> {
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
 
     mix(container.style, defalutStyle);
-    this._ee = new Hammer(canvas);
+    this._ee = new EE();
 
     // 供全局使用的一些变量
     const componentContext = {

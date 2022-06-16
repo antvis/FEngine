@@ -1,5 +1,3 @@
-import { mix } from '@antv/util';
-
 function createUpdater(canvas) {
   const setStateQueue = [];
   const renderQueue = [];
