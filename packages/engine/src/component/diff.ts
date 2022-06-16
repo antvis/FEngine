@@ -4,7 +4,7 @@ import Component from './index';
 import equal from './equal';
 import Children from '../children';
 import { renderShapeGroup, deleteElement } from '../canvas/render';
-import { Group } from '@antv/g';
+import { DisplayObject, Group } from '@antv/g';
 
 interface Element extends JSX.Element {
   component: Component;
@@ -62,7 +62,18 @@ function getTransformFromComponentRef(transformFromRef) {
   return getTransformComponent(transformFromComponent);
 }
 
-function createComponent(parent: Component, element: JSX.Element): Component {
+function findNextSibling(parent: DisplayObject, previousSibling: DisplayObject) {
+  if (previousSibling) {
+    return previousSibling.nextSibling;
+  }
+  return parent.firstChild;
+}
+
+function createComponent(
+  parent: Component,
+  element: JSX.Element,
+  prevElement: JSX.Element | null
+): Component {
   const { type, props, ref } = element;
   const {
     container,
@@ -110,9 +121,17 @@ function createComponent(parent: Component, element: JSX.Element): Component {
   component.updater = updater;
   // @ts-ignore
   component.timeline = timeline;
+
   const group = new Group();
-  container.appendChild(group);
   component.container = group;
+
+  const previousSibling = prevElement?.component?.container;
+  const nextSibling = findNextSibling(container, previousSibling);
+  if (nextSibling) {
+    container.insertBefore(group, nextSibling);
+  } else {
+    container.appendChild(group);
+  }
   return component;
 }
 
@@ -268,10 +287,10 @@ function diff(parent: Component, nextChildren, lastChildren) {
     return true;
   });
   // 3. 处理 create 和 Receive props
-  const shouldRenderComponent = shouldProcessChildren.map((element: JSX.Element) => {
+  const shouldRenderComponent = shouldProcessChildren.map((element: JSX.Element, index: number) => {
     let { component } = element;
     if (!component) {
-      component = createComponent(parent, element);
+      component = createComponent(parent, element, shouldProcessChildren[index - 1]);
     } else {
       const { props } = element;
       component.willReceiveProps(props);
@@ -285,13 +304,6 @@ function diff(parent: Component, nextChildren, lastChildren) {
 
   // 4. 处理 render
   renderComponent(shouldRenderComponent);
-
-  // 按子组件顺序渲染内容
-  childrenArray.forEach((element: JSX.Element) => {
-    const { component } = element;
-    const { container: parentGroup } = parent;
-    parentGroup.appendChild(component.container);
-  });
 
   return nextChildren;
 }
