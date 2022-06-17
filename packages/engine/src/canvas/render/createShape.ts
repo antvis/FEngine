@@ -1,7 +1,37 @@
-import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polyline, Polygon } from '@antv/g';
+import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polygon } from '@antv/g';
 import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
-import Hammer from '../event/index';
+import Gesture from '../../gesture';
 import { checkCSSRule } from '../util';
+
+const EVENT_LIST = [
+  ['click', 'onClick'],
+  ['touchstart', 'onTouchStart'],
+  ['touchmove', 'onTouchMove'],
+  ['touchend', 'onTouchEnd'],
+  ['touchendoutside', 'onTouchEndOutside'],
+  // drage 相关
+  ['dragenter', 'onDragEnter'],
+  ['dragleave', 'onDragLeave'],
+  ['dragover', 'onDragOver'],
+  ['drop', 'onDrop'],
+  ['dragstart', 'onDragStart'],
+  ['drag', 'onDrag'],
+  ['dragend', 'onDragEnd'],
+  // pan
+  ['panstart', 'onPanStart'],
+  ['pan', 'onPan'],
+  ['panend', 'onPanEnd'],
+  // press
+  ['pressstart', 'onPressStart'],
+  ['press', 'onPress'],
+  ['pressend', 'onPressEnd'],
+  // swipe
+  ['swipe', 'onSwipe'],
+  // pinch
+  ['pinchstart', 'onPinchStart'],
+  ['pinch', 'onPinch'],
+  ['pinchend', 'onPinchEnd'],
+];
 
 const classMap = {
   group: Group,
@@ -33,53 +63,12 @@ function createShape(type: string, props, originStyle) {
 }
 
 function addEvent(shape, props) {
-  //  支持的事件列表
-  const {
-    onClick,
-    onDbClick,
-    onTouchStart,
-    onTouchMove,
-    onTouchEnd,
-    onTouchEndOutside,
-    onPanStart,
-    onPan,
-    onPanEnd,
-    onPress,
-    onSwipe,
-  } = props;
+  const gesture = new Gesture(shape);
 
-  if (
-    !(
-      onClick ||
-      onDbClick ||
-      onTouchStart ||
-      onTouchMove ||
-      onTouchEnd ||
-      onTouchEndOutside ||
-      onPanStart ||
-      onPan ||
-      onPanEnd ||
-      onPress ||
-      onSwipe
-    )
-  ) {
-    return;
-  }
-
-  const hammer = new Hammer(shape);
-
-  onClick && hammer.on('click', onClick);
-  onDbClick && hammer.on('dbclick', onDbClick);
-
-  onTouchStart && hammer.on('touchstart', onTouchStart);
-  onTouchMove && hammer.on('touchmove', onTouchMove);
-  onTouchEnd && hammer.on('touchend', onTouchEnd);
-  onTouchEndOutside && hammer.on('touchendoutside', onTouchEndOutside);
-
-  onPanStart && hammer.on('panstart', onPanStart);
-  onPan && hammer.on('pan', onPan);
-  onPanEnd && hammer.on('panend', onPanEnd);
-  onPress && hammer.on('press', onPress);
-  onSwipe && hammer.on('swipe', onSwipe);
+  EVENT_LIST.forEach(([eventName, handlerName]) => {
+    if (!props[handlerName]) return;
+    gesture.on(eventName, props[handlerName]);
+  });
 }
+
 export { createShape, addEvent };
