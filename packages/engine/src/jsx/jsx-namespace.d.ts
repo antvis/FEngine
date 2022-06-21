@@ -45,5 +45,6 @@ export namespace JSX {
     marker: MarkerProps;
     image: ImageProps;
     path: any;
+    [key: string]: any;
   }
 }

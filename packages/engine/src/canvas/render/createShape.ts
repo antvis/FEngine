@@ -1,7 +1,19 @@
-import { Group, Text, Circle, Ellipse, Rect, Path, Image, Line, Polygon } from '@antv/g';
+import {
+  Group,
+  Text,
+  Circle,
+  Ellipse,
+  Rect,
+  Path,
+  Image,
+  Line,
+  Polygon,
+  DisplayObject,
+} from '@antv/g';
 import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
 import Gesture from '../../gesture';
 import { checkCSSRule } from '../util';
+import { getTag, registerTag } from '../../jsx/tag';
 
 const EVENT_LIST = [
   ['click', 'onClick'],
@@ -33,29 +45,34 @@ const EVENT_LIST = [
   ['pinchend', 'onPinchEnd'],
 ];
 
-const classMap = {
-  group: Group,
-  text: Text,
-  circle: Circle,
-  path: Path,
-  ellipse: Ellipse,
-  rect: Rect,
-  image: Image,
-  line: Line,
-  polyline: SmoothPolyline,
-  polygon: Polygon,
-  arc: Arc,
-  marker: Marker,
-  sector: Sector,
-};
+// 默认标签
+const TagElements = [
+  ['group', Group],
+  ['text', Text],
+  ['circle', Circle],
+  ['path', Path],
+  ['ellipse', Ellipse],
+  ['rect', Rect],
+  ['image', Image],
+  ['line', Line],
+  ['polyline', SmoothPolyline],
+  ['polygon', Polygon],
+  ['arc', Arc],
+  ['marker', Marker],
+  ['sector', Sector],
+];
+
+TagElements.map(([type, ShapeClass]) => {
+  registerTag(type as string, ShapeClass as typeof DisplayObject);
+});
 
 function createShape(type: string, props, originStyle) {
   if (!type) return null;
   const { style, attrs, ...other } = props;
-  const ShapeClass = classMap[type];
+  const ShapeClass = getTag(type);
+  if (!type) return null;
 
   const result = checkCSSRule(type, originStyle);
-
   const shape = new ShapeClass({ ...other, style: result });
   addEvent(shape, props);
 
