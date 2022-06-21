@@ -93,6 +93,7 @@ class Canvas extends Component<CanvasProps> {
       theme: customTheme = {},
       createImage,
       landscape,
+      container: rendererContainer,
     } = props;
 
     // 组件更新器
@@ -103,6 +104,7 @@ class Canvas extends Component<CanvasProps> {
     const canvasElement = createMobileCanvasElement(context);
 
     const canvas = new GCanvas({
+      container: rendererContainer,
       canvas: canvasElement,
       devicePixelRatio: pixelRatio,
       renderer,
