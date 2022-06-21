@@ -9,6 +9,7 @@ import EE from '@antv/event-emitter';
 import Timeline from './timeline';
 import defaultTheme from './theme';
 import { px2hd as defaultPx2hd, checkCSSRule } from './util';
+import Gesture from '../gesture';
 
 interface CanvasProps {
   context?: CanvasRenderingContext2D;
@@ -76,6 +77,7 @@ class Canvas extends Component<CanvasProps> {
   private _ee: EE;
   private timeline: Timeline;
   theme: any;
+  gesture: Gesture;
   landscape: boolean;
 
   constructor(props: CanvasProps) {
@@ -115,7 +117,7 @@ class Canvas extends Component<CanvasProps> {
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
 
     mix(container.style, defalutStyle);
-    this._ee = new EE();
+    this.gesture = new Gesture(canvas);
 
     // 供全局使用的一些变量
     const componentContext = {
@@ -123,10 +125,11 @@ class Canvas extends Component<CanvasProps> {
       canvas,
       px2hd,
       theme,
+      gesture: this.gesture,
       measureText: measureText(container, px2hd),
     };
 
-    // this._ee = new EE();
+    this._ee = new EE();
     this.context = componentContext;
     this.updater = updater;
     this.theme = theme;
