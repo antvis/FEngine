@@ -304,8 +304,8 @@ export class Sector extends Path {
     else if (limitedInnerBorderRadiusMax > e) {
       const crStart = mathMin(innerStartRadius, limitedInnerBorderRadiusMax);
       const crEnd = mathMin(innerEndRadius, limitedInnerBorderRadiusMax);
-      const ct0 = computeCornerTangents(xire, yire, xre, yre, r0, -crEnd, clockwise);
-      const ct1 = computeCornerTangents(xrs, yrs, xirs, yirs, r0, -crStart, clockwise);
+      const ct0 = computeCornerTangents(xire, yire, 0, 0, r0 - r, crEnd, clockwise);
+      const ct1 = computeCornerTangents(0, 0, xirs, yirs, r0 - r, crStart, clockwise);
 
       sectorPathCommands.push(['L', x + ct0.cx + ct0.x0, y + ct0.cy + ct0.y0]);
 
@@ -332,81 +332,61 @@ export class Sector extends Path {
       }
       // draw the two corners and the ring
       else {
-        //   if (crEnd > 0) {
-        //     const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
-        //     const innerStartBorderRadiusEndAngle = mathATan2(ct0.y1, ct0.x1);
-        //     const innerStartBorderRadiusEndPoint = polarToCartesian(
-        //       x,
-        //       y,
-        //       r0,
-        //       innerStartBorderRadiusEndAngle
-        //     );
-        // sectorPathCommands.push([
-        //   'A',
-        //   crEnd,
-        //   crEnd,
-        //   0,
-        //   computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
-        //   0,
-        //   innerStartBorderRadiusEndPoint.x,
-        //   innerStartBorderRadiusEndPoint.y,
-        // ]);
-        // }
-        //   const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
-        //   const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
-        //   const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
-        //   // sectorPathCommands.push([
-        //   //   'A',
-        //   //   r0,
-        //   //   r0,
-        //   //   0,
-        //   //   computeArcSweep(innerRadiusStartAngle, innerRadiusEndAngle),
-        //   //   1,
-        //   //   innerRadiusEndPoint.x,
-        //   //   innerRadiusEndPoint.y,
-        //   // ]);
-        //   sectorPathCommands.push(['L', innerRadiusEndPoint.x, innerRadiusEndPoint.y]);
-        //   // ctx.arc(
-        //   //   cx,
-        //   //   cy,
-        //   //   innerRadius,
-        //   //   mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1),
-        //   //   mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1),
-        //   //   clockwise
-        //   // );
-        //   // if (crStart > 0) {
-        //   //   const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
-        //   //   const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-        //   //   sectorPathCommands.push([
-        //   //     'A',
-        //   //     crStart,
-        //   //     crStart,
-        //   //     0,
-        //   //     computeArcSweep(innerEndBorderRadiusStartAngle, innerEndBorderRadiusEndAngle),
-        //   //     1,
-        //   //     x + ct1.cx + ct1.x0,
-        //   //     y + ct1.cy + ct1.y0,
-        //   //   ]);
-        //   // }
-        //   // // eslint-disable-next-line max-len
-        //   // crStart > 0 &&
-        //   //   ctx.arc(
-        //   //     cx + ct1.cx,
-        //   //     cy + ct1.cy,
-        //   //     crStart,
-        //   //     mathATan2(ct1.y1, ct1.x1),
-        //   //     mathATan2(ct1.y0, ct1.x0),
-        //   //     !clockwise
-        //   //   );
+        if (crEnd > 0) {
+          const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
+          const innerStartBorderRadiusEndAngle = mathATan2(ct0.y1, ct0.x1);
+          const innerStartBorderRadiusEndPoint = polarToCartesian(
+            x,
+            y,
+            r0 - r,
+            innerStartBorderRadiusEndAngle
+          );
+          sectorPathCommands.push([
+            'A',
+            crEnd,
+            crEnd,
+            0,
+            computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
+            1,
+            innerStartBorderRadiusEndPoint.x,
+            innerStartBorderRadiusEndPoint.y,
+          ]);
+        }
+        const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
+        const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
+        const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
+        sectorPathCommands.push([
+          'A',
+          r0,
+          r0,
+          0,
+          computeArcSweep(innerRadiusEndAngle, innerRadiusStartAngle),
+          0,
+          innerRadiusEndPoint.x,
+          innerRadiusEndPoint.y,
+        ]);
+        sectorPathCommands.push(['L', innerRadiusEndPoint.x, innerRadiusEndPoint.y]);
+        if (crStart > 0) {
+          const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
+          const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
+          sectorPathCommands.push([
+            'A',
+            crStart,
+            crStart,
+            0,
+            computeArcSweep(innerEndBorderRadiusStartAngle, innerEndBorderRadiusEndAngle),
+            1,
+            x + ct1.cx + ct1.x0,
+            y + ct1.cy + ct1.y0,
+          ]);
+        }
       }
     }
     // the inner ring is just a circular arc
     else {
-      // TODO 内圆角
       sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
       sectorPathCommands.push(['A', r0, r0, 0, arcSweep, 0, innerStart.x, innerStart.y]);
     }
-
     sectorPathCommands.push(['Z']);
 
     return sectorPathCommands as PathCommand[];
