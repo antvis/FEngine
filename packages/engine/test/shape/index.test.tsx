@@ -55,6 +55,21 @@ class View extends Component {
             anticlockwise: false,
           }}
         />
+        <sector
+          style={{
+            stroke: 'black',
+            fill: 'yellow',
+            x: 218,
+            y: 97,
+            lineWidth: 1,
+            r: 20,
+            r0: 0,
+            radius: [8, 8, 8, 8],
+            startAngle: '2.57 rad',
+            endAngle: '3.58 rad',
+            anticlockwise: false,
+          }}
+        />
       </group>
     );
   }
