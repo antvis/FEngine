@@ -237,8 +237,8 @@ export class Sector extends Path {
           0,
           computeArcSweep(outStartBorderRadiusStartAngle, outStartBorderRadiusEndAngle),
           1,
-          outStartBorderRadiusEndPoint.x,
-          outStartBorderRadiusEndPoint.y,
+          x + ct1.cx + ct1.x0,
+          y + ct1.cy + ct1.y0,
         ]);
       } else {
         // draw the two corners and the ring
