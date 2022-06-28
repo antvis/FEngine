@@ -1,4 +1,5 @@
 import { Path } from '@antv/g';
+import { PathArray } from '@antv/util';
 import * as Smooth from './util/smooth';
 
 export class SmoothPolyline extends Path {
@@ -21,7 +22,7 @@ export class SmoothPolyline extends Path {
     const { smooth, points } = this.parsedStyle;
     const { points: pos } = points;
 
-    const d = [['M', pos[0][0], pos[0][1]]];
+    const d: PathArray = [['M', pos[0][0], pos[0][1]]];
 
     if (smooth) {
       const constaint = [
@@ -51,6 +52,6 @@ export class SmoothPolyline extends Path {
       }
       d.push(['L', pos[l][0], pos[l][1]]);
     }
-    super.setAttribute('path', d.join(' '));
+    super.setAttribute('path', d);
   }
 }

@@ -1,6 +1,6 @@
 import type { DisplayObjectConfig } from '@antv/g';
 import { CustomElement, Path } from '@antv/g';
-import { deepMix } from '@antv/util'
+import { deepMix, PathArray } from '@antv/util'
 import { MarkerStyleProps } from './types'
 
 const defaultStyle = {
@@ -11,22 +11,22 @@ const defaultStyle = {
 }
 
 const SYMBOLS = {
-  circle(x, y, r) {
+  circle(x, y, r): PathArray {
     return [
       ['M', x - r, y],
       ['A', r, r, 0, 1, 0, x + r, y],
       ['A', r, r, 0, 1, 0, x - r, y],
-    ].join(" ");
+    ];
   },
 
-  square(x, y, r) {
+  square(x, y, r): PathArray {
     return [
       ['M', x - r, y - r],
       ['L', x + r, y - r],
       ['L', x + r, y + r],
       ['L', x - r, y + r],
       ['Z'],
-    ].join(" ");
+    ];
   },
 };
 
