@@ -1,4 +1,4 @@
-import { jsx, Canvas, Column } from '../../../src';
+import { jsx, Canvas, Pie } from '../../../src';
 import { createContext, delay } from '../../util';
 const context = createContext();
 
@@ -10,11 +10,11 @@ const data = [
   { key: 'Other', type: 'a', genre: 'Other', sold: 40 },
 ];
 
-describe('Column Chart', () => {
-  it('默认柱状', async () => {
+describe('Pie Chart', () => {
+  it('默认饼图', async () => {
     const { type, props } = (
       <Canvas context={context} pixelRatio={1}>
-        <Column data={data} xField="genre" yField="sold" color="genre" />
+        <Pie data={data} xField="type" yField="sold" color="genre" />
       </Canvas>
     );
 
