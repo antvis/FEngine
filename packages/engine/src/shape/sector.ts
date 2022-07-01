@@ -131,6 +131,9 @@ export class Sector extends Path {
     r0: number,
     borderRadius: number[]
   ): PathArray {
+    if (r <= 0) {
+      return null;
+    }
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
 
