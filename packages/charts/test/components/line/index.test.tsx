@@ -209,7 +209,7 @@ describe('Line Chart', () => {
   it('默认折线图', async () => {
     const { type, props } = (
       <Canvas context={context} pixelRatio={1}>
-        <Line data={data} xField="date" yField="value" />
+        <Line data={data} xField="date" yField="value" xTickCount={3} />
       </Canvas>
     );
 
@@ -218,6 +218,6 @@ describe('Line Chart', () => {
 
     await delay(1000);
 
-    // expect(context).toMatchImageSnapshot();
+    expect(context).toMatchImageSnapshot();
   });
 });

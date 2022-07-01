@@ -1,27 +1,29 @@
 import { jsx } from '@antv/f-engine';
-import { Chart, Sunburst, Legend, Tooltip } from '@antv/f2';
+import { Sunburst } from '@antv/f2';
 
 export interface SunburstProps {
+  // chart
   data: any;
+  coord?: object;
+  //Axis
   yField: string;
-  color?: string;
+  // componet
+  color?: string | Array<string> | object;
+  size?: string | Array<string> | object;
+  animation?: object;
+  space?: number;
 }
 
 export default (props: SunburstProps) => {
-  const { data, yField, color } = props;
+  const { data, yField, color, coord, animation, space } = props;
   return (
-    <Chart data={data}>
-      <Legend />
-      <Sunburst
-        data={data}
-        coord={{
-          type: 'polar',
-        }}
-        color={color}
-        value={yField}
-        space={4}
-      />
-      <Tooltip />
-    </Chart>
+    <Sunburst
+      data={data}
+      coord={coord}
+      color={color}
+      value={yField}
+      space={space}
+      animation={animation}
+    />
   );
 };
