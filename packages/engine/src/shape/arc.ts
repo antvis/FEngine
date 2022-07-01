@@ -1,6 +1,6 @@
-import { Path, deg2rad, PathCommand } from '@antv/g';
-import { isNumberEqual } from '@antv/util';
-import { polarToCartesian, getStartEnd } from './util/util';
+import { Path, deg2rad } from '@antv/g';
+import { isNumberEqual, PathArray } from '@antv/util';
+import { polarToCartesian } from './util/util';
 
 export class Arc extends Path {
   parsedStyle: any;
@@ -36,14 +36,17 @@ export class Arc extends Path {
     endAngle: number,
     r: number,
     anticlockwise: boolean
-  ): PathCommand[] {
+  ): PathArray {
     if (endAngle < startAngle) {
       endAngle = endAngle + Math.PI * 2;
+    }
+    if (r <= 0) {
+      return null;
     }
 
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
-    if (r === 0) return [];
+
     if (isNumberEqual(endAngle - startAngle, Math.PI * 2)) {
       const middlePoint = polarToCartesian(x, y, r, startAngle + Math.PI);
       return [

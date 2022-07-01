@@ -20,7 +20,7 @@ const elementStyle = {
   shadow: 'String',
   matrix: 'Array',
   stroke: 'String',
-  fill: 'String',
+  fill: ['String', 'Object'],
   opacity: 'Number',
   fillOpacity: 'Number',
   strokeOpacity: 'Number',

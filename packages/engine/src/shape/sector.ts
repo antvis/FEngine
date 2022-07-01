@@ -1,6 +1,6 @@
-import { Path, deg2rad, PathCommand } from '@antv/g';
+import { Path, deg2rad } from '@antv/g';
 import { polarToCartesian } from './util/util';
-import { isNumberEqual } from '@antv/util';
+import { isNumberEqual, PathArray } from '@antv/util';
 
 const PI = Math.PI;
 const PI2 = PI * 2;
@@ -130,7 +130,10 @@ export class Sector extends Path {
     r: number,
     r0: number,
     borderRadius: number[]
-  ): PathCommand[] {
+  ): PathArray {
+    if (r <= 0) {
+      return null;
+    }
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
 
@@ -156,7 +159,7 @@ export class Sector extends Path {
       circlePathCommands.push(['M', start.x, start.y]);
       circlePathCommands.push(['Z']);
 
-      return circlePathCommands as PathCommand[];
+      return circlePathCommands as PathArray;
     }
 
     const angle = endAngle - startAngle;
@@ -389,6 +392,6 @@ export class Sector extends Path {
     }
     sectorPathCommands.push(['Z']);
 
-    return sectorPathCommands as PathCommand[];
+    return sectorPathCommands as PathArray;
   }
 }

@@ -32,6 +32,16 @@ class View extends Component {
             anticlockwise: true,
           }}
         />
+        <arc
+          style={{
+            stroke: '#F04864',
+            r: 0,
+            x: 10,
+            y: 10,
+            endAngle: `${(Math.PI * 4) / 3} rad`,
+            anticlockwise: true,
+          }}
+        />
         <marker
           style={{
             fill: '#F04864',
