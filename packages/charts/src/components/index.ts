@@ -9,3 +9,4 @@ export { default as Funnel, FunnelProps } from './funnel';
 export { default as Gauge, GaugeProps } from './gauge';
 export { default as Treemap, TreemapProps } from './treemap';
 export { default as Sunburst, SunburstProps } from './sunburst';
+export { default as ForceGraph, ForceGraphProps } from './forceGraph';
