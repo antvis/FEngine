@@ -1,40 +1,67 @@
 import { jsx } from '@antv/f-engine';
-import { Chart, Axis, Interval, Legend, Tooltip } from '@antv/f2';
+import { Chart, Interval, Legend, Tooltip, LegendProps, TooltipProps } from '@antv/f2';
 
 export interface FunnelProps {
+  // chart
   data: any;
+  scale?: object;
+  coord?: object;
+  //Axis
   xField: string;
   yField: string;
-  color?: string;
+  // componet
+  color?: string | Array<string> | object;
+  animation?: object;
   labelCfg?: object;
+  showLabel?: boolean;
+  style?: object;
+  //legend
+  legend?: LegendProps;
+  // tooltip
+  tooltip?: TooltipProps;
+  children?: JSX.Element;
 }
 
 export default (props: FunnelProps) => {
-  const { data, xField, yField, color, labelCfg } = props;
+  const {
+    data,
+    scale,
+    coord,
+    xField,
+    yField,
+    color,
+    animation,
+    labelCfg,
+    showLabel,
+    legend,
+    tooltip,
+    children,
+    style,
+  } = props;
+
   return (
-    <Chart data={data}>
-      <Legend />
-      <Axis field={xField} />
-      <Axis field={yField} />
+    <Chart
+      data={data}
+      scale={scale}
+      coord={{
+        transposed: true,
+        ...coord,
+      }}
+    >
+      <Legend {...legend} />
       <Interval
         x={xField}
         y={yField}
         adjust="symmetric"
         shape="funnel"
         color={color}
-        showLabel
-        labelCfg={{
-          offsetX: 10,
-          label: (data, color) => {
-            return {
-              text: data[yField],
-              fill: color,
-            };
-          },
-          ...labelCfg,
-        }}
+        showLabel={showLabel}
+        labelCfg={labelCfg}
+        animation={animation}
+        style={style}
       />
-      <Tooltip />
+      {children}
+      <Tooltip {...tooltip} />
     </Chart>
   );
 };

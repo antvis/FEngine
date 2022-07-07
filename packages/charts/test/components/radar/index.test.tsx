@@ -43,6 +43,6 @@ describe('Radar Chart', () => {
 
     await delay(1000);
 
-    // expect(context).toMatchImageSnapshot();
+    expect(context).toMatchImageSnapshot();
   });
 });

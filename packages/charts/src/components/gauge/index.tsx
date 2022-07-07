@@ -1,22 +1,29 @@
 import { jsx } from '@antv/f-engine';
-import { Chart, Axis, Line, Legend, Tooltip } from '@antv/f2';
+import { Gauge } from '@antv/f2';
 
 export interface GaugeProps {
-  data: any;
-  xField: string;
-  yField: string;
-  color?: string;
+  center: { x: number; y: number };
+  startAngle: number | string;
+  endAngle: number | string;
+  percent?: number | string;
+  r: number | string;
+  tickCount: number;
+  tickOffset: string;
+  tickLength: string;
 }
 
 export default (props: GaugeProps) => {
-  const { data, xField, yField, color } = props;
+  const { center, startAngle, endAngle, percent, r, tickCount, tickOffset, tickLength } = props;
   return (
-    <Chart data={data}>
-      <Legend />
-      <Axis field={xField} />
-      <Axis field={yField} />
-      <Line x={xField} y={yField} color={color} />
-      <Tooltip />
-    </Chart>
+    <Gauge
+      center={center}
+      startAngle={startAngle}
+      endAngle={endAngle}
+      percent={percent}
+      r={r}
+      tickCount={tickCount}
+      tickOffset={tickOffset}
+      tickLength={tickLength}
+    />
   );
 };
