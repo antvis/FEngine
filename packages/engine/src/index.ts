@@ -11,5 +11,11 @@ export { default as Children } from './children';
 export { default as createRef } from './createRef';
 export { default as Timeline } from './timeline';
 export { default as Gesture } from './gesture';
+import * as Smooth from './shape/util/smooth';
+import Vector2 from './shape/util/vector2';
+import Matrix from './shape/util/matrix';
 
-export { CanvasRenderer, renderShape };
+export { CanvasRenderer, renderShape, Smooth, Vector2, Matrix };
+
+import * as Types from './types';
+export { Types };

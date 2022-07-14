@@ -1,4 +1,4 @@
-
+import { ArcStyleProps, MarkerStyleProps, SectorStyleProps } from './shape/types'
 type PX_FIELD_NAME =
   'lineWidth'
 | 'lineDash'
@@ -23,7 +23,21 @@ type PX_FIELD_NAME =
 type pxstr = `${number}px`;
 export type px = number | pxstr | string;
 
-interface Point {
+interface Box {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+export interface BBox extends Box {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface Point {
   x: number;
   y: number;
 }
@@ -73,6 +87,29 @@ export interface Style {
   flexWrap?: 'wrap' | 'nowrap';
   position?: 'relative' | 'absolute';
   backgroundColor?: string;
+
+  fillStyle?: string;
+  font?: string;
+  globalAlpha?: number;
+  lineCap?: 'butt' | 'round' | 'square';
+  lineWidth?: number;
+  lineJoin?: 'round' | 'bevel' | 'miter';
+  miterLimit?: number;
+  shadowBlur?: number;
+  shadowColor?: string;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  strokeStyle?: string;
+  textAlign?: 'left' | 'right' | 'start' | 'center' | 'end';
+  textBaseline?: 'top' | 'middle' | 'bottom';
+  lineDash?: number[];
+  shadow?: string;
+  matrix?: number[];
+  // eslint-disable-next-line
+  clip?: any;
+  stroke?: string;
+  fill?: string;
+  opacity?: number;
 }
 
 interface IntrinsicElementsProps {
@@ -93,3 +130,92 @@ export type ElementType =
   | string
   | ((props: Props, context?: any) => any)
   | (new (props: Props, context?: any) => any);
+
+
+  export interface CircleStyleProps extends Style {
+    x?: number;
+    y?: number;
+    r: number;
+  }
+  
+  export interface LineStyleProps extends Style {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }
+  
+  
+  export interface RectStyleProps extends Style {
+    x?: number;
+    y?: number;
+    width: number;
+    height: number;
+    radius?:
+      | number
+      | string
+      | [string | number]
+      | [string | number, string | number]
+      | [string | number, string | number, string | number]
+      | [string | number, string | number, string | number, string | number];
+  }
+
+  export interface ShapeStyleProps extends Style {
+    fillOpacity?: number;
+    strokeOpacity?: number;
+  }
+
+  export interface PolygonStyleProps extends Style {
+    points: Point[];
+  }
+  
+  export interface PolylineStyleProps extends Style {
+    points: Point[];
+    smooth?: boolean;
+  }
+
+  export interface ImageStyleProps extends RectStyleProps {
+    src: string;
+    sx?: number;
+    sy?: number;
+    swidth?: number;
+    sheight?: number;
+  }
+  
+  export interface TextStyleProps extends Style {
+    text?: string;
+    textArr?: string[];
+    lineCount?: number;
+    lineHeight?: number;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/rotate
+     */
+    rotate?: number;
+  
+    /* 以下属性组合后形成 font 属性 */
+    fontSize?: number;
+    fontFamily?: string;
+    fontStyle?: 'normal' | 'italic' | 'oblique';
+    fontWeight?:
+      | 'normal'
+      | 'bold'
+      | 'bolder'
+      | 'lighter'
+      | 100
+      | 200
+      | 300
+      | 400
+      | 500
+      | 600
+      | 700
+      | 800
+      | 900;
+    fontVariant?: 'normal' | 'small-caps';
+  }
+
+export { ArcStyleProps, MarkerStyleProps, SectorStyleProps }
+
