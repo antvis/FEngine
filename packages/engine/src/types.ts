@@ -110,6 +110,7 @@ export interface Style {
   stroke?: string;
   fill?: string;
   opacity?: number;
+  strokeOpacity?: number;
 }
 
 interface IntrinsicElementsProps {

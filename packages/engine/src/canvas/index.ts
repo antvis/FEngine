@@ -168,11 +168,11 @@ class Canvas extends Component<CanvasProps> {
   async render() {
     const { children: lastChildren, props, timeline, canvas } = this;
     const { children: nextChildren } = props;
-
     await canvas.ready;
     timeline.reset();
     //@ts-ignore
     renderChildren(this, nextChildren, lastChildren);
+
     timeline.onEnd(() => {
       this._animationEnd();
     });
