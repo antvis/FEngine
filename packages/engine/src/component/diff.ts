@@ -323,11 +323,14 @@ function isContainer(children: Element | Element[]) {
   return false;
 }
 
-function renderChildren(parent: Component, nextChildren, lastChildren) {
+async function renderChildren(parent: Component, nextChildren, lastChildren) {
   // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
   nextChildren = pickElement(nextChildren);
 
   if (!isContainer(nextChildren)) {
+    const { context } = parent;
+    const { canvas } = context;
+    await canvas.ready;
     parent.children = renderShapeGroup(parent, nextChildren);
     // @ts-ignore
     parent.childrenIsShape = true;
