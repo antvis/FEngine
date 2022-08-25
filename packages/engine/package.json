@@ -12,6 +12,7 @@
     "@antv/g-mobile-canvas-element": "~0.5.0",
     "@antv/g-mobile-svg": "~0.6.1",
     "@antv/g-mobile-webgl": "~0.6.1",
+    "gl-matrix": "^3.1.0",
     "@antv/matrix-util": "^3.0.4",
     "@antv/util": "^3.0.6",
     "@babel/runtime": "^7.12.5"

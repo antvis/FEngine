@@ -12,10 +12,8 @@ export { default as createRef } from './createRef';
 export { default as Timeline } from './timeline';
 export { default as Gesture } from './gesture';
 import * as Smooth from './shape/util/smooth';
-import Vector2 from './shape/util/vector2';
-import Matrix from './shape/util/matrix';
 
-export { CanvasRenderer, renderShape, Smooth, Vector2, Matrix };
+export { CanvasRenderer, renderShape, Smooth };
 
 import * as Types from './types';
 export { Types };
