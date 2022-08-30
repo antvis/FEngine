@@ -140,7 +140,7 @@ function updateElement(nextElement, lastElement, container, component) {
 // 执行元素变化
 function changeElement(nextElement, lastElement, container, component) {
   const { type: nextType, props: nextProps, style: nextStyle } = nextElement;
-  const { props: lastProps, style: lastStyle, shape: lastShape } = lastElement;
+  const { props: lastProps, style: lastStyle, shape } = lastElement;
   const { animation: nextAnimationEffect, children: nextChildren } = nextProps;
   const { children: lastChildren } = lastProps;
   const { animate, timeline } = component;
@@ -148,15 +148,10 @@ function changeElement(nextElement, lastElement, container, component) {
   const updateEffectProperty = updateEffect?.property;
 
   // 因为其他样式可能有变化，这里要重新创建
-  const resetStyle = Object.keys(lastElement.style).reduce((prev, cur) => {
-    prev[cur] = '';
-    return prev;
-  }, {});
-
-  const mergedStyle = Object.assign(resetStyle, nextStyle);
-  Object.assign(lastShape.style, mergedStyle);
-
-  nextElement.shape = lastShape;
+  const nextShape = createShape(nextType, nextProps, nextStyle);
+  shape && shape.remove();
+  container.appendChild(nextShape);
+  nextElement.shape = nextShape;
 
   if (animate && updateEffect) {
     // 需要构造动画起始和结束的属性
@@ -164,7 +159,7 @@ function changeElement(nextElement, lastElement, container, component) {
     const endStyle = pick(nextStyle, updateEffectProperty || []);
 
     // 执行动画
-    const animation = doAnimate(lastShape, {
+    const animation = doAnimate(nextShape, {
       ...updateEffect,
       start: {
         ...startStyle,
@@ -179,7 +174,7 @@ function changeElement(nextElement, lastElement, container, component) {
   }
 
   // 继续比较子元素
-  renderElement(nextChildren, lastChildren, lastShape, component);
+  renderElement(nextChildren, lastChildren, nextShape, component);
 }
 
 function changeElementType(nextElement, lastElement, container, component) {
