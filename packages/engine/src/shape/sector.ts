@@ -111,13 +111,13 @@ export class Sector extends Path {
     const { x, y, startAngle, endAngle, r, r0, radius } = this.parsedStyle;
 
     const path = this.createPath(
-      x.value,
-      y.value,
-      startAngle ? deg2rad(startAngle.value) : 0,
-      endAngle ? deg2rad(endAngle.value) : Math.PI * 2,
-      r ? r.value : 0,
-      r0 ? r0.value : 0,
-      radius ? radius.map((r) => r.value) : [0, 0, 0, 0]
+      x,
+      y,
+      startAngle ? deg2rad(startAngle) : 0,
+      endAngle ? deg2rad(endAngle) : Math.PI * 2,
+      r ? r : 0,
+      r0 ? r0 : 0,
+      radius ? radius : [0, 0, 0, 0]
     );
     super.setAttribute('path', path);
   }

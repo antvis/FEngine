@@ -19,11 +19,11 @@ export class Arc extends Path {
     const { x, y, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
 
     const path = this.createPath(
-      x.value,
-      y.value,
-      startAngle ? deg2rad(startAngle.value) : 0,
-      endAngle ? deg2rad(endAngle.value) : Math.PI * 2,
-      r ? r.value : 0,
+      x,
+      y,
+      startAngle ? deg2rad(startAngle) : 0,
+      endAngle ? deg2rad(endAngle) : Math.PI * 2,
+      r ? r : 0,
       anticlockwise
     );
     super.setAttribute('path', path);
