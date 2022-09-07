@@ -3,11 +3,13 @@ import Component from '../component';
 import equal from '../component/equal';
 import { Group, Text, Canvas as GCanvas } from '@antv/g';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
+import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater } from '../component/updater';
 import { renderChildren, renderComponent } from '../component/diff';
 import EE from '@antv/event-emitter';
 import Timeline from './timeline';
 import defaultTheme from './theme';
+import Layout from './layout';
 import { px2hd as defaultPx2hd, checkCSSRule } from './util';
 import Gesture from '../gesture';
 
@@ -78,13 +80,14 @@ class Canvas extends Component<CanvasProps> {
   private timeline: Timeline;
   theme: any;
   gesture: Gesture;
+  layout: Layout;
   landscape: boolean;
 
   constructor(props: CanvasProps) {
     super(props);
     const {
       context,
-      renderer,
+      renderer = new CanvasRenderer(),
       width,
       height,
       animate = true,
@@ -94,6 +97,7 @@ class Canvas extends Component<CanvasProps> {
       createImage,
       landscape,
       container: rendererContainer,
+      style: customStyle,
     } = props;
 
     // 组件更新器
@@ -119,12 +123,31 @@ class Canvas extends Component<CanvasProps> {
     const defalutStyle = mix(defaultTheme, pick(customTheme, Object.keys(defaultTheme)));
 
     mix(container.style, defalutStyle);
+
+    const { width: canvasWidth, height: canvasHeight } = canvas.getConfig();
+
+    const style = px2hd({
+      left: 0,
+      top: 0,
+      width: canvasWidth,
+      height: canvasHeight,
+      padding: theme.padding,
+      ...customStyle,
+    });
+
+    const layout = Layout.fromStyle(style);
+    this.layout = layout;
+
     this.gesture = new Gesture(canvas);
 
     // 供全局使用的一些变量
     const componentContext = {
       root: this,
       canvas,
+      left: layout.left,
+      top: layout.top,
+      width: layout.width,
+      height: layout.height,
       px2hd,
       theme,
       gesture: this.gesture,
@@ -195,17 +218,6 @@ class Canvas extends Component<CanvasProps> {
 
   off(type: string, listener?) {
     this._ee.off(type, listener);
-  }
-
-  setContext(obj: object) {
-    this.context = {
-      ...this.context,
-      ...obj,
-    };
-  }
-
-  getCanvasConfig() {
-    return this.canvas.getConfig();
   }
 }
 
