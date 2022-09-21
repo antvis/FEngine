@@ -1,4 +1,4 @@
-import { jsx, Canvas, Component } from '../../src';
+import { jsx, Canvas, Component, JSX } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
 import { Renderer } from '@antv/g-mobile-canvas';
@@ -80,6 +80,33 @@ class View2 extends Component {
     );
   }
 }
+
+class View3 extends Component {
+  render() {
+    return (
+      <group
+        style={{
+          display: 'flex',
+          top: 100,
+          left: 100,
+        }}
+      >
+        <line
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 100,
+            stroke: 'rgba(202, 215, 239, .2)',
+            lineCap: 'round',
+            lineWidth: '8px',
+          }}
+        />
+      </group>
+    );
+  }
+}
 describe('Canvas', () => {
   it('layout', async () => {
     const renderer = new Renderer();
@@ -114,6 +141,21 @@ describe('Canvas', () => {
     const { props } = (
       <Canvas renderer={renderer} context={context}>
         <View2 />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('line', async () => {
+    const renderer = new Renderer();
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <View3 />
       </Canvas>
     );
 
