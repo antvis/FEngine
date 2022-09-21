@@ -45,7 +45,7 @@ describe('<Canvas >', () => {
     await chartRef.current.ready;
 
     expect(wrapper.html()).toBe(
-      '<canvas class="f2-chart newClass" width="100" height="100" style="width: 100px; height: 100px; display: block; padding: 0px; margin: 0px;"></canvas>'
+      '<canvas class="f-chart newClass" width="100" height="100" style="width: 100px; height: 100px; display: block; padding: 0px; margin: 0px;"></canvas>'
     );
 
     const reactChart = chartRef.current;

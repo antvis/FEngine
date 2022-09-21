@@ -122,7 +122,8 @@ function createComponent(
   // @ts-ignore
   component.timeline = timeline;
 
-  const group = new Group();
+  const { zIndex } = props;
+  const group = new Group({ style: { zIndex } });
   component.container = group;
 
   const previousSibling = prevElement?.component?.container;
@@ -293,8 +294,10 @@ function diff(parent: Component, nextChildren, lastChildren) {
       component = createComponent(parent, element, shouldProcessChildren[index - 1]);
     } else {
       const { props } = element;
-      component.willReceiveProps(props);
+      component.willReceiveProps(props, parent.context);
       component.props = props;
+      const { zIndex } = props;
+      component.container.setAttribute('zIndex', zIndex || 0);
     }
 
     element.component = component;
