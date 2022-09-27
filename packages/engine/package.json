@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "module": "es/index.js",
   "types": "es/index.d.ts",
@@ -12,12 +12,11 @@
     "@antv/g-mobile-canvas-element": "~0.6.17",
     "@antv/g-mobile-svg": "~0.8.14",
     "@antv/g-mobile-webgl": "~0.7.20",
-    "gl-matrix": "^3.1.0",
     "@antv/matrix-util": "^3.0.4",
     "@antv/util": "^3.0.6",
-    "@babel/runtime": "^7.12.5"
+    "@babel/runtime": "^7.12.5",
+    "gl-matrix": "^3.1.0"
   },
-  "devDependencies": {},
   "homepage": "https://github.com/antvis/FEngine",
   "author": "https://github.com/orgs/antvis/people",
   "repository": {
