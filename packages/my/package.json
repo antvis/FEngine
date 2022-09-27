@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-my",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "F2 for alipay mini-program",
   "main": "lib/index.js",
   "module": "es/index.js",

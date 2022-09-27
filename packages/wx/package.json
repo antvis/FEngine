@@ -1,6 +1,6 @@
 {
   "name": "@antv/f2-wx",
-  "version": "5.0.0-alpha.1",
+  "version": "0.0.1",
   "description": "F2 for weixin mini-program",
   "main": "lib/index.js",
   "module": "es/index.js",
