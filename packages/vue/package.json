@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-vue",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "F for Vue.js",
   "main": "lib/index.js",
   "module": "es/index.js",
