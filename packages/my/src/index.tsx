@@ -1,4 +1,4 @@
-import { Canvas } from '@antv/f2';
+import { Canvas } from '@antv/f-engine';
 import { my as F2Context } from '@antv/f2-context';
 
 function wrapEvent(e) {
@@ -73,7 +73,7 @@ Component({
   methods: {
     setCanvasId() {
       const pageId = (this.$page && this.$page.$id) || 0;
-      const id = `f2-canvas-${pageId}-${this.$id}`;
+      const id = `f-canvas-${pageId}-${this.$id}`;
       this.setData({ id });
     },
     onCanvasReady() {
@@ -110,7 +110,7 @@ Component({
       });
       canvas.render();
       this.canvas = canvas;
-      this.canvasEl = canvas.canvas.get('el');
+      this.canvasEl = canvas.getCanvasEl();
     },
     click(e) {
       const canvasEl = this.canvasEl;
