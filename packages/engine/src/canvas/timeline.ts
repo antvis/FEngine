@@ -1,4 +1,4 @@
-import { Animation } from '@antv/g';
+import { IAnimation } from '@antv/g-lite';
 
 class Timeline {
   animations: Animation[];

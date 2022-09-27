@@ -4,7 +4,7 @@ import Component from './index';
 import equal from './equal';
 import Children from '../children';
 import { renderShapeGroup, deleteElement } from '../canvas/render';
-import { DisplayObject, Group } from '@antv/g';
+import { DisplayObject, Group } from '@antv/g-lite';
 
 interface Element extends JSX.Element {
   component: Component;

@@ -9,7 +9,7 @@ import {
   Line,
   Polygon,
   DisplayObject,
-} from '@antv/g';
+} from '@antv/g-lite';
 import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
 import Gesture from '../../gesture';
 import { checkCSSRule } from '../util';

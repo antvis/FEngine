@@ -1,4 +1,4 @@
-import { DisplayObject, Canvas } from '@antv/g';
+import { DisplayObject, Canvas } from '@antv/g-lite';
 import GGesture from '@antv/g-gesture';
 
 const G_SHAPE_EVENT = {

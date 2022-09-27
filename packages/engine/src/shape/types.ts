@@ -1,4 +1,4 @@
-import type { BaseStyleProps, PolylineStyleProps } from '@antv/g';
+import type { BaseStyleProps, PolylineStyleProps } from '@antv/g-lite';
 
 export interface ArcStyleProps extends BaseStyleProps {
     x?: number;

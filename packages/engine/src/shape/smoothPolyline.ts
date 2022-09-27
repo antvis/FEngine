@@ -1,4 +1,4 @@
-import { Path } from '@antv/g';
+import { Path } from '@antv/g-lite';
 import { PathArray } from '@antv/util';
 import * as Smooth from './util/smooth';
 

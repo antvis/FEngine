@@ -2,7 +2,7 @@ import { jsx, Canvas, registerTag } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
 import { Renderer } from '@antv/g-mobile-canvas';
-import { Path } from '@antv/g';
+import { Path } from '@antv/g-lite';
 
 class CustomTag extends Path {}
 

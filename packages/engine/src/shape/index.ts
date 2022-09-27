@@ -1,4 +1,4 @@
-import { CSS, PropertySyntax } from '@antv/g';
+import { CSS, PropertySyntax } from '@antv/g-lite';
 
 // 注册 css 属性
 const SECTOR_CSS_PROPERTY = [

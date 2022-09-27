@@ -1,5 +1,5 @@
-import type { DisplayObjectConfig } from '@antv/g';
-import { CustomElement, Path } from '@antv/g';
+import type { DisplayObjectConfig } from '@antv/g-lite';
+import { CustomElement, Path } from '@antv/g-lite';
 import { deepMix, PathArray } from '@antv/util'
 import { MarkerStyleProps } from './types'
 
