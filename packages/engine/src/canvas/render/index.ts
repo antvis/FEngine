@@ -1,48 +1,51 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, isNil, pick } from '@antv/util';
+import { isBoolean, isNil, pick, isFunction } from '@antv/util';
 import { convertToPath, DisplayObject } from '@antv/g';
 import Children from '../../children';
 import Component from '../../component';
 import renderJSXElement from './renderJSXElement';
 import { createShape } from './createShape';
 import { createNodeTree, fillElementLayout } from './renderLayout';
+import { getTag } from '../../jsx/tag';
 import computeLayout from '../css-layout';
 import Timeline from '../timeline';
 
 function doAnimate(shape: DisplayObject, effect) {
   if (!effect) return null;
   const { start, end, easing, duration, delay, iterations, onFrame, onEnd, clip } = effect;
+  let animation;
+  const clipConfig = isFunction(clip) ? clip(shape.attributes) : clip;
+  // 裁剪动画
+  if (clipConfig) {
+    const { type, attrs, style, start: clipStart, end: clipEnd } = clipConfig;
+    const ShapeClass = getTag(type);
+    const clipElement = new ShapeClass({
+      type,
+      style: {
+        ...style,
+        ...attrs,
+        ...clipStart,
+      },
+    });
+    shape.style.clipPath = clipElement;
 
-  // 裁剪动画 TODO:未测试
-  // if (clip) {
-  //   const { type, attrs, style, start: clipStart, end: clipEnd } = clip;
-  //   const clipElement = createShape(
-  //     type,
-  //     {},
-  //     {
-  //       ...attrs,
-  //       ...style,
-  //       ...clipStart,
-  //     }
-  //   );
-  //   shape.style.clipPath = clipElement;
-  //   clipElement.animate([clipStart, clipEnd], {
-  //     fill: 'both',
-  //     easing,
-  //     duration,
-  //     delay,
-  //     iterations,
-  //   });
-  // }
-  // TODO: JSON render 不执行动画
-  const animation = shape.animate([start, end], {
-    fill: 'both',
-    easing,
-    duration,
-    delay,
-    iterations,
-  });
-
+    animation = clipElement.animate([clipStart, clipEnd], {
+      duration: clipConfig?.duration || duration,
+      fill: 'both',
+      easing: clipConfig?.easing || easing,
+      delay: clipConfig?.delay || delay,
+      iterations: clipConfig?.iterations || iterations,
+    });
+  } else {
+    // TODO: JSON render 不执行动画
+    animation = shape.animate([start, end], {
+      fill: 'both',
+      easing,
+      duration,
+      delay,
+      iterations,
+    });
+  }
   if (!animation) return null;
 
   animation.onfinish = onEnd;
