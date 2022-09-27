@@ -1,4 +1,4 @@
-import { mix, deepMix, pick } from '@antv/util';
+import { mix, deepMix, pick, isFunction } from '@antv/util';
 import Component from '../component';
 import equal from '../component/equal';
 import { Group, Text, Canvas as GCanvas } from '@antv/g';
@@ -10,7 +10,7 @@ import EE from '@antv/event-emitter';
 import Timeline from './timeline';
 import defaultTheme from './theme';
 import Layout from './layout';
-import { px2hd as defaultPx2hd, checkCSSRule } from './util';
+import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';
 
 interface CanvasProps {
@@ -91,7 +91,7 @@ class Canvas extends Component<CanvasProps> {
       width,
       height,
       animate = true,
-      px2hd = defaultPx2hd,
+      px2hd: customPx2hd,
       pixelRatio = 1,
       theme: customTheme = {},
       createImage,
@@ -103,6 +103,7 @@ class Canvas extends Component<CanvasProps> {
     // 组件更新器
     const updater = createUpdater(this);
 
+    const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
     const theme = px2hd(deepMix({}, defaultTheme, customTheme));
 
     const canvasElement = createMobileCanvasElement(context);
