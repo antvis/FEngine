@@ -82,6 +82,7 @@ class Canvas extends Component<CanvasProps> {
   gesture: Gesture;
   layout: Layout;
   landscape: boolean;
+  canvasElement: any;
 
   constructor(props: CanvasProps) {
     super(props);
@@ -163,6 +164,7 @@ class Canvas extends Component<CanvasProps> {
     this.canvas = canvas;
     this.container = container;
     this.timeline = new Timeline();
+    this.canvasElement = canvasElement;
     // todo: 横屏事件逻辑
     this.landscape = landscape;
   }
@@ -219,6 +221,10 @@ class Canvas extends Component<CanvasProps> {
 
   off(type: string, listener?) {
     this._ee.off(type, listener);
+  }
+
+  getCanvasEl() {
+    return this.canvasElement;
   }
 }
 

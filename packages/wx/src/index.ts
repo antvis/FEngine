@@ -1,4 +1,4 @@
-import { Canvas } from '@antv/f2';
+import { Canvas } from '@antv/f-engine';
 
 function wrapEvent(e) {
   if (!e) return;
@@ -27,7 +27,7 @@ Component({
   ready() {
     const query = wx.createSelectorQuery().in(this);
     query
-      .select('.f2-canvas')
+      .select('.f-canvas')
       .fields({
         node: true,
         size: true,
@@ -49,7 +49,7 @@ Component({
         });
         canvas.render();
         this.canvas = canvas;
-        this.canvasEl = canvas.canvas.get('el');
+        this.canvasEl = canvas.getCanvasEl();
       });
   },
 
