@@ -65,7 +65,7 @@ function measureText(container: Group, px2hd) {
     container.appendChild(shape);
     const { width, height } = shape.getBBox();
 
-    shape.remove(true);
+    shape.remove();
     return {
       width,
       height,
