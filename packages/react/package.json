@@ -1,7 +1,7 @@
 {
   "name": "@antv/f-react",
   "version": "0.0.2",
-  "description": "F for React",
+  "description": "FEngine for React",
   "main": "lib/index.js",
   "module": "es/index.js",
   "types": "es/index.d.ts",
