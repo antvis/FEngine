@@ -1,7 +1,7 @@
 import { mix, deepMix, pick, isFunction } from '@antv/util';
 import Component from '../component';
 import equal from '../component/equal';
-import { Group, Text, Canvas as GCanvas } from '@antv/g';
+import { Group, Text, Canvas as GCanvas } from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater } from '../component/updater';

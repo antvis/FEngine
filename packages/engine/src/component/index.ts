@@ -1,5 +1,5 @@
 import { JSX } from '../jsx/jsx-namespace';
-import { Group } from '@antv/g';
+import { Group } from '@antv/g-lite';
 
 export interface ComponentContext {
   // px2hd: typeof px2hd;

@@ -1,4 +1,4 @@
-import { Path, deg2rad } from '@antv/g';
+import { Path, deg2rad } from '@antv/g-lite';
 import { polarToCartesian } from './util/util';
 import { isNumberEqual, PathArray } from '@antv/util';
 

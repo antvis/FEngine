@@ -1,5 +1,7 @@
 import { renderShape } from './canvas/render/index';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
+import '@antv/g-web-animations-api';
+
 export { JSX } from './jsx/jsx-namespace';
 // export createElement 别名
 export { jsx as createElement, Fragment, jsx } from './jsx';

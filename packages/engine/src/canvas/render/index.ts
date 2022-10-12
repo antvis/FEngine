@@ -1,6 +1,6 @@
 import { JSX } from '../../jsx/jsx-namespace';
 import { isBoolean, isNil, pick, isFunction } from '@antv/util';
-import { convertToPath, DisplayObject } from '@antv/g';
+import { convertToPath, DisplayObject } from '@antv/g-lite';
 import Children from '../../children';
 import Component from '../../component';
 import renderJSXElement from './renderJSXElement';
