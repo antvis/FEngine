@@ -11,8 +11,8 @@ describe('clip', () => {
       attrs: {
         height: 100,
         width: 100,
-        x: 20,
-        y: 20,
+        x: 120,
+        y: 120,
       },
       type: 'rect',
     };
@@ -91,9 +91,8 @@ describe('clip', () => {
                     property: ['width'],
                     duration: 1000,
                     attrs: {
-                      // 目前clip坐标为被裁剪图形的局部坐标系下
-                      x: 0,
-                      y: 0,
+                      x: 60,
+                      y: 60,
                       height: attrs.height,
                     },
                     start: {

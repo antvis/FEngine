@@ -74,7 +74,8 @@ function createShape(type: string, props, originStyle) {
   if (!type) return null;
 
   if (clip) {
-    const clipPath = new ShapeClass({
+    const ClipShapeClass = getTag(clip?.type);
+    const clipPath = new ClipShapeClass({
       ...clip,
       style: {
         ...clip?.attrs,

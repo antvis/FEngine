@@ -28,7 +28,7 @@ function doAnimate(shape: DisplayObject, effect) {
       },
     });
     shape.style.clipPath = clipElement;
-
+    shape.ownerDocument.documentElement.appendChild(clipElement);
     animation = clipElement.animate([clipStart, clipEnd], {
       duration: clipConfig?.duration || duration,
       fill: 'both',
