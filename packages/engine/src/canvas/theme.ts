@@ -1,3 +1,8 @@
+// 全局默认主题
+export interface Theme {
+  [key: string]: any;
+}
+
 const axis = {
   labelOffset: '15px',
   line: {
@@ -81,12 +86,8 @@ const chart = {
   padding: ['30px', '30px', '30px', '30px'],
 };
 
-const Theme = {
-  fontSize: '12px',
-  textBaseline: 'bottom',
-  fontStyle: 'normal',
-  fontVariant: 'normal',
-  fontWeight: 'normal',
+const defaultTheme = {
+  fontSize: '24px',
   fontFamily:
     '"Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif',
   pixelRatio: 1,
@@ -133,6 +134,6 @@ const Theme = {
   },
   axis,
   guide,
-};
+} as Theme;
 
-export default Theme;
+export default defaultTheme;

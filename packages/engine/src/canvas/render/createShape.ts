@@ -12,7 +12,6 @@ import {
 } from '@antv/g-lite';
 import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
 import Gesture from '../../gesture';
-import { checkCSSRule } from '../util';
 import { getTag, registerTag } from '../../jsx/tag';
 
 const EVENT_LIST = [
@@ -66,26 +65,13 @@ TagElements.map(([type, ShapeClass]) => {
   registerTag(type as string, ShapeClass as typeof DisplayObject);
 });
 
-function createShape(type: string, props, originStyle) {
+function createShape(type: string, props) {
   if (!type) return null;
-  const { style, attrs, ...other } = props;
-  const { clip } = originStyle;
   const ShapeClass = getTag(type);
   if (!type) return null;
 
-  if (clip) {
-    const clipPath = new ShapeClass({
-      ...clip,
-      style: {
-        ...clip?.attrs,
-        ...clip?.style,
-      },
-    });
-    originStyle.clipPath = clipPath;
-  }
-
-  const result = checkCSSRule(type, originStyle);
-  const shape = new ShapeClass({ ...other, style: result });
+  // const result = checkCSSRule(type, originStyle);
+  const shape = new ShapeClass(props);
   addEvent(shape, props);
 
   return shape;

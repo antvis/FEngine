@@ -62,6 +62,7 @@ class View2 extends Component {
           >
             <circle
               style={{
+                r: 12.5,
                 width: 25,
                 height: 25,
                 marginRight: '10px',
@@ -70,6 +71,7 @@ class View2 extends Component {
             />
             <text
               style={{
+                fontSize: '24px',
                 fill: '#808080',
                 text: 'a',
               }}
@@ -107,6 +109,7 @@ class View3 extends Component {
     );
   }
 }
+
 describe('Canvas', () => {
   it('layout', async () => {
     const renderer = new Renderer();
@@ -119,7 +122,7 @@ describe('Canvas', () => {
     );
 
     const canvas = new Canvas(props);
-    canvas.render();
+    await canvas.render();
 
     await delay(200);
     expect(context).toMatchImageSnapshot();
@@ -130,22 +133,21 @@ describe('Canvas', () => {
       </Canvas>
     );
 
-    canvas.update(update.props);
+    await canvas.update(update.props);
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });
 
   it('text', async () => {
-    const renderer = new Renderer();
-
     const { props } = (
-      <Canvas renderer={renderer} context={context}>
+      <Canvas context={context}>
         <View2 />
       </Canvas>
     );
 
     const canvas = new Canvas(props);
     canvas.render();
+
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });
@@ -161,6 +163,103 @@ describe('Canvas', () => {
 
     const canvas = new Canvas(props);
     canvas.render();
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('text', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <group
+          style={{
+            display: 'flex',
+            width: '130px',
+          }}
+        >
+          <rect
+            style={{
+              fill: '#000',
+              height: '30px',
+            }}
+          />
+          <group
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}
+          >
+            {['red', 'blue', '#333333'].map((color) => {
+              return (
+                <group>
+                  <rect
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      fill: color,
+                    }}
+                  />
+                  <text
+                    style={{
+                      fill: '#000',
+                      text: color,
+                    }}
+                  />
+                </group>
+              );
+            })}
+          </group>
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('component layout', async () => {
+    class View extends Component {
+      render() {
+        const { props } = this;
+        return props.children;
+      }
+    }
+
+    class ViewChild extends Component {
+      render() {
+        const { style, props } = this;
+        const { fill } = props;
+        const { width, height } = style;
+        return <rect style={{ fill, width, height }} />;
+      }
+    }
+
+    const { props } = (
+      <Canvas context={context}>
+        <group
+          style={{
+            display: 'flex',
+            width: '130px',
+            flexDirection: 'row',
+          }}
+        >
+          <group style={{ flex: 1, height: '100px' }}>
+            <View>
+              <ViewChild fill="red" />
+            </View>
+          </group>
+          <group style={{ flex: 1, height: '100px' }}>
+            <ViewChild fill="blue" />
+          </group>
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });

@@ -1,7 +1,6 @@
 import { jsx, Canvas, Component } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
-import { Renderer } from '@antv/g-mobile-canvas';
 
 class Circle extends Component {
   render() {
@@ -34,9 +33,8 @@ function Rect() {
 
 describe('Canvas', () => {
   it('渲染顺序', async () => {
-    const renderer = new Renderer();
     const { props } = (
-      <Canvas renderer={renderer} context={context} animate={false}>
+      <Canvas context={context} animate={false}>
         <Rect id={1} />
         {null}
         <Circle />
@@ -50,7 +48,7 @@ describe('Canvas', () => {
     expect(context).toMatchImageSnapshot();
 
     const update = (
-      <Canvas renderer={renderer} context={context}>
+      <Canvas context={context}>
         {null}
         <Rect id={2} />
         <Circle id={3} />
@@ -60,6 +58,7 @@ describe('Canvas', () => {
     await canvas.update(update.props);
 
     await delay(100);
+
     expect(context).toMatchImageSnapshot();
   });
 });

@@ -1,4 +1,12 @@
-function createUpdater(canvas) {
+import Canvas from '../canvas';
+import Component from '../component';
+
+export interface Updater<S = any> {
+  enqueueSetState: (component: Component, partialState: S, callback?: () => void) => void;
+  enqueueForceUpdate: (component: Component, partialState: S, callback?: () => void) => void;
+}
+
+function createUpdater(canvas: Canvas) {
   const setStateQueue = [];
   const renderQueue = [];
   const callbackQueue = [];
@@ -9,6 +17,7 @@ function createUpdater(canvas) {
     while ((item = setStateQueue.shift())) {
       const { state, component, callback } = item;
 
+      // 组件已销毁，不再触发 setState
       if (component.destroyed) {
         continue;
       }
@@ -40,13 +49,13 @@ function createUpdater(canvas) {
     renderQueue.length = 0;
     callbackQueue.length = 0;
 
-    canvas.renderComponents(renderComponents);
+    canvas.updateComponents(renderComponents);
 
     // callback queue
     commitRenderQueue(renderCallbackQueue);
   }
 
-  function enqueueSetState(component, state, callback?: () => void) {
+  function enqueueSetState(component: Component, state, callback?: () => void) {
     if (setStateQueue.length === 0) {
       setTimeout(process, 0);
     }

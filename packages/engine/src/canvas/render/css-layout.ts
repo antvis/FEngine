@@ -1,6 +1,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
+import { isNumber } from '@antv/util';
+
 // from css-layout
 var CSS_UNDEFINED;
 
@@ -1315,7 +1317,7 @@ function computeLayout(node) {
   if (!node) return node;
   const { style, children } = node;
   // 定义flex布局时再进行css布局进行
-  if (style && style?.display === 'flex') {
+  if (style && style.display === 'flex') {
     fillNodes(node);
     layoutNode(node, null, null);
     return node;
