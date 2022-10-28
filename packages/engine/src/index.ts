@@ -1,4 +1,4 @@
-import { renderShape } from './canvas/render/index';
+import { computeLayout } from './canvas/render';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import '@antv/g-web-animations-api';
 
@@ -15,7 +15,7 @@ export { default as Gesture } from './gesture';
 export { default as Layout, LayoutProps } from './canvas/layout';
 import * as Smooth from './shape/util/smooth';
 
-export { CanvasRenderer, renderShape, Smooth };
+export { CanvasRenderer, computeLayout, Smooth };
 
 import * as Types from './types';
 export { Types };

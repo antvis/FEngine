@@ -54,8 +54,8 @@ const Cirlce = (props) => {
     <group>
       <circle
         style={{
-          x: 10,
-          y: 10,
+          cx: 20,
+          cy: 20,
           r: 10,
           fill: 'red',
         }}

@@ -1,152 +1,110 @@
 import { jsx, Canvas, Component } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
-import { Renderer } from '@antv/g-mobile-canvas';
 
-class View extends Component {
-  render() {
-    const { id } = this.props;
-    if (id === 1) {
-      return (
-        <group
-          style={{
-            width: 250,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <circle
-            style={{
-              r: 0,
-              fill: '#000',
-            }}
-            animation={{
-              appear: {
-                // easing: 'linear',
-                duration: 200,
-                // delay: 0,
-                // property: ['fillOpacity'],
-                start: {
-                  r: 0,
-                },
-                end: {
-                  r: 20,
-                },
-              },
-            }}
-          />
-          <rect
-            style={{
-              width: 40,
-              height: 40,
-              fill: 'red',
-            }}
-            animation={{
-              appear: {
-                // easing: 'linear',
-                duration: 200,
-                // delay: 0,
-                // property: ['fillOpacity'],
-                start: {
-                  width: 0,
-                },
-                end: {
-                  width: 40,
-                },
-              },
-              leave: {
-                duration: 200,
-                start: {
-                  width: 40,
-                },
-                end: {
-                  width: 0,
-                },
-              },
-            }}
-            onPanEnd={() => {
-              console.log('pan end');
-            }}
-          />
-        </group>
-      );
-    }
-
-    return (
-      <group
-        style={{
-          width: 250,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-        }}
-      >
-        {[1, 2, 3].map((d) => (
-          <rect
-            style={{
-              width: 40,
-              height: 40,
-              fill: 'red',
-            }}
-            animation={{
-              update: {
-                easing: 'ease',
-                duration: 500,
-                // delay: 0,
-                property: ['fill', 'x', 'y'],
-                // iterations: Infinity,
-              },
-            }}
-            onClick={() => {
-              console.log('click rect');
-            }}
-            onDbClick={() => {
-              console.log('dbclick');
-            }}
-            onPanStart={() => {
-              console.log('pan start');
-            }}
-            onPan={() => {
-              console.log('pan');
-            }}
-            onPanEnd={() => {
-              console.log('pan end');
-            }}
-          />
-        ))}
-      </group>
-    );
-  }
-}
-
-describe('Canvas', () => {
-  it.skip('morph animate', async () => {
-    const renderer = new Renderer();
-    await delay(100);
-
+describe('动画', () => {
+  it('appear', async () => {
     const { props } = (
-      <Canvas renderer={renderer} context={context}>
-        <View id={1} />
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: 40,
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 300,
+              property: ['width'],
+            },
+            update: {
+              easing: 'ease',
+              duration: 300,
+              delay: 10,
+              property: ['width'],
+            },
+          }}
+        />
       </Canvas>
     );
+
+    await delay(500);
 
     const canvas = new Canvas(props);
-    canvas.render();
+    await canvas.render();
 
+    // 图形属性变化
     await delay(1000);
-    expect(context).toMatchImageSnapshot();
-
     const update = (
-      <Canvas renderer={renderer} context={context}>
-        <View id={2} />
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: 80,
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 300,
+              property: ['width'],
+            },
+            update: {
+              easing: 'ease',
+              duration: 300,
+              delay: 10,
+              property: ['width'],
+            },
+          }}
+        />
       </Canvas>
     );
+    await canvas.update(update.props);
 
-    canvas.update(update.props);
+    // 形变动画
     await delay(1000);
-    expect(context).toMatchImageSnapshot();
+    const update1 = (
+      <Canvas context={context}>
+        <circle
+          style={{
+            cx: 80,
+            cy: 40,
+            r: 20,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 300,
+              property: ['width'],
+            },
+            update: {
+              easing: 'ease',
+              duration: 300,
+              delay: 10,
+              // property: ['width'],
+            },
+            leave: {
+              end: {
+                opacity: 0,
+              },
+              easing: 'ease',
+              duration: 300,
+              delay: 10,
+              property: ['opacity'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+    await canvas.update(update1.props);
+
+    // 删除动画
+    await delay(1000);
+    const update2 = <Canvas context={context}></Canvas>;
+    await canvas.update(update2.props);
+
+    await delay(1000);
   });
 });

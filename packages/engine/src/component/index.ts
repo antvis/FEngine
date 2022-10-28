@@ -1,19 +1,13 @@
 import { JSX } from '../jsx/jsx-namespace';
 import { Group } from '@antv/g-lite';
-
-export interface ComponentContext {
-  // px2hd: typeof px2hd;
-  [key: string]: any;
-}
+import { ComponentContext } from '../canvas';
+import { Updater } from './updater';
+import { VNode } from '../canvas/vnode';
+import Animator from '../canvas/render/animator';
 
 export interface IProps {
   zIndex?: number;
   [key: string]: any;
-}
-
-export interface Updater<S = any> {
-  enqueueSetState: (component: Component, partialState: S, callback?: () => void) => void;
-  enqueueForceUpdate: (component: Component, partialState: S, callback?: () => void) => void;
 }
 
 class Component<P extends IProps = any, S = any> {
@@ -24,13 +18,19 @@ class Component<P extends IProps = any, S = any> {
     [key: string]: Component;
   };
   updater: Updater<S>;
-
-  // 对应 G 的group, 每个组件渲染的父接节点
+  // 对应 G 的group, 每个组件渲染的父节点
   container: Group;
+  style: any;
   // render 返回的节点
-  children: JSX.Element;
+  children: VNode | VNode[] | null;
+
   animate: boolean;
+  animator: Animator;
+
+  // State 内部私有属性
   destroyed = false;
+  _vNode: VNode;
+
   constructor(props: P, context?: ComponentContext, updater?: Updater<S>) {
     this.props = props;
     this.state = {} as S;
@@ -39,8 +39,10 @@ class Component<P extends IProps = any, S = any> {
   }
   willMount() {}
   didMount() {}
-  shouldUpdate(_nextProps: P) {}
-  willReceiveProps(_props: P, context?: P) {}
+  shouldUpdate(_nextProps: P): boolean {
+    return true;
+  }
+  willReceiveProps(_props: P, _context?: ComponentContext) {}
   willUpdate() {}
   didUpdate() {}
   render(): JSX.Element | null {
@@ -65,6 +67,8 @@ class Component<P extends IProps = any, S = any> {
   }
   destroy() {
     this.destroyed = true;
+    this._vNode = null;
+    this.animator = null;
   }
 }
 

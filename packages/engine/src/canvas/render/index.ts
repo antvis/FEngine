@@ -1,349 +1,365 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, isNil, pick, isFunction } from '@antv/util';
-import { convertToPath, DisplayObject } from '@antv/g-lite';
-import Children from '../../children';
+import { isBoolean, pick, isNumber } from '@antv/util';
 import Component from '../../component';
-import renderJSXElement from './renderJSXElement';
-import { createShape } from './createShape';
-import { createNodeTree, fillElementLayout } from './renderLayout';
-import { getTag } from '../../jsx/tag';
-import computeLayout from '../css-layout';
-import Timeline from '../timeline';
+import Children from '../../children';
+import { VNode } from '../vnode';
+import { createShape } from '../render/createShape';
+import { Group } from '@antv/g-lite';
+import equal from '../equal';
+import { createAnimation } from './animation';
+import Animator from './animator';
+import { getWorkTag, ClassComponent, Shape, FunctionComponent, WorkTag } from '../workTags';
+import {
+  computeLayout,
+  createNodeTree,
+  computeFlexLayout,
+  fillElementLayout,
+} from './computeLayout';
 
-function doAnimate(shape: DisplayObject, effect) {
-  if (!effect) return null;
-  const { start, end, easing, duration, delay, iterations, onFrame, onEnd, clip } = effect;
-  let animation;
-  const clipConfig = isFunction(clip) ? clip(shape.attributes) : clip;
-  // 裁剪动画
-  if (clipConfig) {
-    const { type, attrs, style, start: clipStart, end: clipEnd } = clipConfig;
-    const ShapeClass = getTag(type);
-    const clipElement = new ShapeClass({
-      type,
-      style: {
-        ...style,
-        ...attrs,
-        ...clipStart,
-      },
-    });
-    shape.style.clipPath = clipElement;
-
-    animation = clipElement.animate([clipStart, clipEnd], {
-      duration: clipConfig?.duration || duration,
-      fill: 'both',
-      easing: clipConfig?.easing || easing,
-      delay: clipConfig?.delay || delay,
-      iterations: clipConfig?.iterations || iterations,
-    });
-  } else {
-    // TODO: JSON render 不执行动画
-    animation = shape.animate([start, end], {
-      fill: 'both',
-      easing,
-      duration,
-      delay,
-      iterations,
-    });
-  }
-  if (!animation) return null;
-
-  animation.onfinish = onEnd;
-  animation.onframe = onFrame;
-  return animation;
-}
-
-// 创建元素
-function createElement(element, container, component) {
+function pickElement(element) {
+  if (!element) return element;
   return Children.map(element, (item) => {
     if (!item) return item;
-    const { ref, type, props, style } = item;
-    const { children, animation: animationEffect } = props;
+    // 只需要这几个元素就可以了
+    return pick(item, ['key', 'ref', 'type', 'props']);
+  });
+}
 
-    const shape = createShape(type, props, style);
+function getStyle(tagType: WorkTag, props, context) {
+  const { style: customStyle = {}, attrs, zIndex } = props;
 
-    item.shape = shape;
-    container.appendChild(shape);
+  if (tagType === Shape) {
+    return context.px2hd({
+      ...customStyle,
+      ...attrs,
+    });
+  }
 
-    const { animate, timeline } = component;
-    const appearEffect = animationEffect && animationEffect.appear;
+  if (isNumber(zIndex)) {
+    return { zIndex };
+  }
 
-    if (animate && appearEffect) {
-      const endStyle = pick(style, appearEffect.property || []);
-      // 执行动画
-      const animation = doAnimate(shape, {
-        ...appearEffect,
-        end: {
-          ...endStyle,
-          ...appearEffect.end,
-        },
-      });
-      timeline.add(animation);
-    }
+  return {};
+}
 
-    // 设置ref
+function createVNode(parent: VNode, vNode: VNode) {
+  const { context, updater, animate: parentAnimate } = parent;
+  const { ref, type, props } = vNode;
+  const { animate, transformFrom } = props;
+
+  const tag = getWorkTag(type);
+  const animator = new Animator();
+
+  vNode.tag = tag;
+  vNode.style = getStyle(tag, props, context);
+  vNode.context = context;
+  vNode.updater = updater;
+  vNode.animate = isBoolean(animate) ? animate : parentAnimate;
+  vNode.animator = animator;
+
+  // shape 标签
+  if (tag === Shape) {
+    const shape = createShape(type as string, props);
     if (ref) {
       ref.current = shape;
     }
 
-    // 继续创建自元素
-    createElement(children, shape, component);
-  });
-}
-
-// 删除元素
-function deleteElement(element, component) {
-  const { animate, timeline } = component;
-
-  const childTimeline = new Timeline();
-  Children.map(element, (item) => {
-    if (!item) return item;
-    const { props, shape, children } = item;
-    const { animation: animationEffect } = props;
-
-    const subChildTimeline = deleteElement(children, component);
-    childTimeline.concat(subChildTimeline);
-    const leaveEffect = animationEffect && animationEffect.leave;
-    if (animate && leaveEffect) {
-      const animation = doAnimate(shape, leaveEffect);
-      timeline.add(animation);
-      childTimeline.add(animation);
-
-      // 当子元素和自身动画全部都结束时，把元素从文档里删除
-      subChildTimeline.add(animation);
+    // @ts-ignore
+    shape._vNode = vNode; // shape 保留 vNode 的引用
+    vNode.shape = shape;
+  } else {
+    // 组件
+    let component: Component;
+    if (tag === ClassComponent) {
+      // @ts-ignore
+      component = new type(props, context, updater);
+    } else {
+      component = new Component(props, context, updater);
+      component.render = function() {
+        // @ts-ignore
+        return type(this.props, context, updater);
+      };
     }
-    subChildTimeline.onEnd(() => {
-      shape.remove();
-    });
-  });
-  return childTimeline;
+    const group = new Group();
+    component.container = group;
+
+    // 设置ref
+    if (ref) {
+      ref.current = component;
+    }
+
+    component.context = context;
+    component.updater = updater;
+    component.animator = animator;
+    component._vNode = vNode;
+    vNode.shape = group;
+    vNode.component = component;
+  }
+
+  if (transformFrom && transformFrom.current) {
+    const transformVNode = transformFrom.current._vNode;
+    vNode.children = transformVNode.children;
+    transformVNode.children = null;
+  }
+
+  return vNode;
 }
 
-// 更新元素
-function updateElement(nextElement, lastElement, container, component) {
-  // 普通的jsx元素, 且都非空
-  const { key: nextKey, type: nextType } = nextElement;
-  const { key: lastKey, type: lastType } = lastElement;
+function updateVNode(parent, nextNode, lastNode: VNode) {
+  const { context, updater, animate: parentAnimate } = parent;
+  const { tag, animator, component, shape, children } = lastNode;
+  const { props } = nextNode;
+  const { animate } = props;
 
-  // key 值不相等
-  if (!isNil(nextKey) && nextKey !== lastKey) {
-    deleteElement(lastElement, component);
-    createElement(nextElement, container, component);
-    return;
-  }
+  nextNode.tag = tag;
+  nextNode.context = context;
+  nextNode.updater = updater;
+  nextNode.component = component;
+  nextNode.shape = shape;
+  nextNode.parent = parent;
+  nextNode.children = children;
+  nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
+  nextNode.animator = animator;
+  nextNode.style = getStyle(tag, props, context);
+
+  return nextNode;
+}
+
+function createElement(parent: VNode, element: JSX.Element): VNode | VNode[] | null {
+  return Children.map(element, (el: VNode | null) => {
+    if (!el) return el;
+    return createVNode(parent, el);
+  });
+}
+
+function destroyElement(vNode: VNode | VNode[] | null) {
+  Children.map(vNode, (node: VNode | null) => {
+    if (!node) return;
+    const { component, children } = node;
+    if (component) {
+      component.willUnmount();
+      destroyElement(children);
+      component.didUnmount();
+      component.destroy();
+    }
+  });
+}
+
+function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNode) {
+  const { type: nextType, props: nextProps } = nextElement;
+  const { type: lastType, props: lastProps } = lastElement;
 
   if (nextType === lastType) {
-    changeElement(nextElement, lastElement, container, component);
+    const nextVNode = updateVNode(parent, nextElement, lastElement);
+    // props 无变化 和 context 都无变化
+    if (equal(nextProps, lastProps) && parent.context === lastElement.context) {
+      return null;
+    }
+    return nextVNode;
+  }
+
+  const nextVNode = createVNode(parent, nextElement as VNode);
+  destroyElement(lastElement);
+  return nextVNode;
+}
+
+function diffElement(
+  parent: VNode,
+  nextElement: JSX.Element,
+  lastElement: JSX.Element
+): VNode | VNode[] | null {
+  if (!nextElement && !lastElement) {
+    return null;
+  }
+
+  // 删除
+  if (!nextElement && lastElement) {
+    destroyElement(lastElement as VNode);
+    return null;
+  }
+
+  // 新建
+  if (nextElement && !lastElement) {
+    return createElement(parent, nextElement);
+  }
+
+  // 更新
+  // @ts-ignore
+  return updateElement(parent, nextElement, lastElement);
+}
+
+function renderComponentNodes(componentNodes: VNode[] | null) {
+  if (!componentNodes || !componentNodes.length) {
     return;
   }
-  // shape 类型的变化
-  changeElementType(nextElement, lastElement, container, component);
-}
 
-// 执行元素变化
-function changeElement(nextElement, lastElement, container, component) {
-  const { type: nextType, props: nextProps, style: nextStyle } = nextElement;
-  const { props: lastProps, style: lastStyle, shape } = lastElement;
-  const { animation: nextAnimationEffect, children: nextChildren } = nextProps;
-  const { children: lastChildren } = lastProps;
-  const { animate, timeline } = component;
-  const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
-  const updateEffectProperty = updateEffect?.property;
+  // 1. shouldUpdate & willReceiveProps
+  const shouldProcessChildren = componentNodes.filter((node: VNode) => {
+    const { component, props, context, style } = node;
 
-  // 因为其他样式可能有变化，这里要重新创建
-  const nextShape = createShape(nextType, nextProps, nextStyle);
-  shape && shape.remove();
-  container.appendChild(nextShape);
-  nextElement.shape = nextShape;
+    component.style = style;
 
-  if (animate && updateEffect) {
-    // 需要构造动画起始和结束的属性
-    const startStyle = pick(lastStyle, updateEffectProperty || []);
-    const endStyle = pick(nextStyle, updateEffectProperty || []);
+    // 新创建的 component
+    if (!component.children) return true;
+    // 不需要更新
+    if (component.shouldUpdate(props) === false) {
+      return false;
+    }
+    component.willReceiveProps(props, context);
+    component.props = props;
+    component.context = context;
+    return true;
+  });
 
-    // 执行动画
-    const animation = doAnimate(nextShape, {
-      ...updateEffect,
-      start: {
-        ...startStyle,
-        ...updateEffect.start,
-      },
-      end: {
-        ...endStyle,
-        ...updateEffect.end,
-      },
-    });
-    timeline.add(animation);
+  if (!shouldProcessChildren.length) {
+    return;
   }
 
-  // 继续比较子元素
-  renderElement(nextChildren, lastChildren, nextShape, component);
+  // 2. willMount / willUpdate
+  shouldProcessChildren.forEach((child: VNode) => {
+    const { component } = child;
+    if (!component.children) {
+      component.willMount();
+    } else {
+      component.willUpdate();
+    }
+  });
+
+  // 3. render
+  shouldProcessChildren.forEach((child: VNode) => {
+    const { component, children } = child;
+    const mount = !component.children;
+
+    const newChildren = component.render();
+    renderChildren(child, newChildren as VNode, children);
+
+    if (mount) {
+      component.didMount();
+    } else {
+      component.didUpdate();
+    }
+  });
 }
 
-function changeElementType(nextElement, lastElement, container, component) {
-  const { type: nextType } = nextElement;
-  const { type: lastType } = lastElement;
-  if (nextType === 'group') {
-    return changeTypeToGroup(nextElement, lastElement, container, component);
+function renderVNode(
+  node: VNode,
+  nextChildren: VNode | VNode[] | null,
+  lastChildren: VNode | VNode[] | null
+) {
+  const { component } = node;
+  // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
+  nextChildren = pickElement(nextChildren);
+  // 设置新的 children
+  node.children = nextChildren;
+  // 如果是组件，需要同时更新组件的 children
+  // 等同于 node.tag === ClassComponent || node.tag === FunctionComponent
+  if (component) {
+    component.children = nextChildren;
   }
 
-  if (lastType === 'group') {
-    return changeTypeFromGroup(nextElement, lastElement, container, component);
-  }
+  let componentNodeChildren: VNode[] = [];
 
-  // 都不是group, 形变动画
-  return morphElement(nextElement, lastElement, container, component);
-}
+  Children.compare(
+    // @ts-ignore
+    nextChildren,
+    // @ts-ignore
+    lastChildren,
+    (next: JSX.Element, last: JSX.Element) => {
+      const element = diffElement(node, next, last);
 
-// 类型变化
-function morphElement(nextElement, lastElement, container, component) {
-  const { type: nextType, props: nextProps, style: nextStyle } = nextElement;
-  const { shape: lastShape } = lastElement;
+      Children.map(element, (child: VNode) => {
+        if (!child) return;
+        const { tag, props: childProps, component, children: childLastChildren } = child;
 
-  const { animation: nextAnimationEffect } = nextProps;
-  const { animate, timeline } = component;
-
-  const nextShape = createShape(nextType, nextProps, nextStyle);
-  nextElement.shape = nextShape;
-
-  const lastPath = convertToPath(lastShape);
-  const nextPath = convertToPath(nextShape);
-
-  const pathShape = createShape(
-    'path',
-    {},
-    {
-      ...nextStyle,
-      path: '',
+        let childrenNode = [];
+        if (tag === Shape) {
+          childrenNode = renderVNode(child, childProps.children, childLastChildren);
+        } else if (tag === FunctionComponent) {
+          // FunctionComponent 直接更新 props
+          component.props = childProps;
+          childrenNode = renderVNode(child, component.render() as VNode, childLastChildren);
+        } else {
+          childrenNode = [child];
+        }
+        componentNodeChildren = componentNodeChildren.concat(childrenNode);
+      });
     }
   );
-  lastShape.remove();
-  container.appendChild(pathShape);
 
-  const updateEffect = nextAnimationEffect && nextAnimationEffect.update;
-
-  if (animate && updateEffect) {
-    const { start, end } = updateEffect;
-    const animation = doAnimate(pathShape, {
-      ...updateEffect,
-      start: { ...start, path: lastPath },
-      end: { ...end, path: nextPath },
-    });
-    animation.onfinish = function() {
-      pathShape.replaceWith(nextShape);
-    };
-    timeline.add(animation);
-  }
+  return componentNodeChildren;
 }
 
-function changeTypeToGroup(
-  nextElement: JSX.Element,
-  lastElement: JSX.Element,
-  container,
-  component
+function renderChildren(
+  parent: VNode,
+  nextChildren: VNode | VNode[] | null,
+  lastChildren: VNode | VNode[] | null
 ) {
-  const { props: nextProps } = nextElement;
-  const { type: lastType } = lastElement;
-  const { children: groupChildren } = nextProps;
+  // 返回的都是 classComponent 的节点
+  const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);
 
-  // 处理 group 下面子元素的变化
-  Children.map(groupChildren, (child) => {
-    if (!child) return child;
-    const { type: childType } = child;
-
-    if (childType !== lastType) {
-      return morphElement(child, lastElement, container, component);
-    }
-    changeElement(child, lastElement, container, component);
-  });
-}
-
-function changeTypeFromGroup(
-  nextElement: JSX.Element,
-  lastElement: JSX.Element,
-  container,
-  component
-) {
-  const { type: nextType } = nextElement;
-  const { props: lastProps } = lastElement;
-  const { children: groupChildren } = lastProps;
-
-  // 处理 group 下面子元素的变化
-  Children.map(groupChildren, (child) => {
-    if (!child) return child;
-    const { type: childType } = child;
-
-    if (childType !== nextType) {
-      return morphElement(nextElement, child, container, component);
-    }
-    changeElement(nextElement, child, container, component);
-  });
-}
-
-function renderElement(nextElements, lastElements, container, component: Component) {
-  Children.compare(nextElements, lastElements, (nextElement, lastElement) => {
-    // 都为空
-    if (!nextElement && !lastElement) {
-      return;
-    }
-    // 新增
-    if (!lastElement) {
-      createElement(nextElement, container, component);
-      return;
-    }
-    // 删除
-    if (!nextElement) {
-      deleteElement(lastElement, component);
-      return;
-    }
-
-    updateElement(nextElement, lastElement, container, component);
-  });
-}
-
-function renderShapeGroup(component: Component, newChildren: JSX.Element, animate?: boolean) {
-  const {
-    context,
-    updater,
-    children: _lastChildren,
-    // @ts-ignore
-    transformFrom,
-    animate: componentAnimate,
-  } = component;
-
-  animate = isBoolean(animate) ? animate : componentAnimate;
-
-  let lastChildren;
-
-  if (_lastChildren) {
-    lastChildren = _lastChildren;
-  } else if (transformFrom && transformFrom.children) {
-    lastChildren = transformFrom.children;
-    transformFrom.children = null;
-  }
-
-  // children 是 shape 的 jsx 结构, component.render() 返回的结构
-  const nextChildren = renderJSXElement(newChildren, context, updater);
-
-  if (!nextChildren) return null;
-
-  // 布局计算
-  const nodeTree = createNodeTree(nextChildren, context);
-  computeLayout(nodeTree);
+  // 计算 flex 布局
+  const nodeTree = createNodeTree(parent);
+  computeFlexLayout(nodeTree);
   fillElementLayout(nodeTree);
 
-  // 以组件维度控制是否需要动画
-  component.animate = animate;
+  const { children: newChildren } = parent;
+  if (!componentNodeChildren.length) {
+    return newChildren;
+  }
 
-  renderElement(nextChildren, lastChildren, component.container, component);
+  renderComponentNodes(componentNodeChildren);
 
-  return nextChildren;
+  return newChildren;
 }
 
-function renderShape(component: Component, newChildren: JSX.Element, animate?: boolean) {
-  const child = renderShapeGroup(component, newChildren, animate);
-  const { shape } = child;
-  return shape;
+function render(vNode: VNode) {
+  const { children: lastChildren, props } = vNode;
+  const { children: nextChildren } = props;
+
+  // render 节点
+  const children = renderChildren(vNode, nextChildren, lastChildren);
+  // vNode.children = children;
+  // 创建动画
+  const childrenAnimation = createAnimation(vNode, children, lastChildren);
+
+  // 执行动画
+  if (childrenAnimation.length) {
+    childrenAnimation.forEach((animator) => {
+      animator.play();
+    });
+  }
 }
 
-export { renderShape, renderShapeGroup, deleteElement };
+// setState 触发的更新
+function updateComponents(components: Component[]) {
+  if (!components.length) return;
+
+  components.forEach((component) => {
+    const { _vNode: node, children: lastChildren, props, animator } = component;
+
+    // 是否需要更新
+    if (component.shouldUpdate(props) === false) {
+      return false;
+    }
+    component.willUpdate();
+    const newChildren = component.render();
+    const nextChildren = renderChildren(node, newChildren as VNode, lastChildren);
+
+    // 更新 children
+    component.children = nextChildren;
+    node.children = nextChildren;
+    component.didUpdate();
+
+    // 创建动画
+    const childrenAnimation = createAnimation(node, nextChildren, lastChildren);
+
+    if (childrenAnimation.length) {
+      animator.children = childrenAnimation;
+    }
+
+    // 执行动画
+    animator.play();
+  });
+}
+
+export { render, renderChildren, updateComponents, computeLayout };

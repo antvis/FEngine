@@ -9,6 +9,7 @@ class Timeline extends Component {
     super(props);
     const { delay, start = 0, children } = props;
     const count = Children.toArray(children).length;
+
     this.state = {
       delay,
       count,
@@ -17,15 +18,11 @@ class Timeline extends Component {
   }
 
   didMount() {
-    const { context } = this;
-    const { root } = context;
-    root.on('animationEnd', this.next);
+    this.animator.on('end', this.next);
   }
 
-  didUnmount() {
-    const { context } = this;
-    const { root } = context;
-    root.off('animationEnd', this.next);
+  didUnmount(): void {
+    this.animator.off('end', this.next);
   }
 
   next = () => {

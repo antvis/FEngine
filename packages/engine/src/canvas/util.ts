@@ -84,26 +84,6 @@ function batch2hd(px2hd) {
   return batchPx2hd;
 }
 
-// 展开数组
-function extendMap(arr, fn: Function) {
-  if (!arr) {
-    return arr;
-  }
-  if (!isArray(arr)) {
-    return [fn(arr)];
-  }
-  let newArray = [];
-  for (let i = 0; i < arr.length; i++) {
-    const element = arr[i];
-    if (isArray(element)) {
-      newArray = newArray.concat(extendMap(element, fn));
-    } else if (element) {
-      newArray.push(fn(element));
-    }
-  }
-  return newArray;
-}
-
 function toTimeStamp(value) {
   if (isString(value)) {
     if (value.indexOf('T') > 0) {
@@ -177,7 +157,6 @@ const px2hd = batch2hd(defaultPx2hd);
 export {
   px2hd,
   batch2hd,
-  extendMap,
   parsePadding,
   toTimeStamp,
   isInBBox,
