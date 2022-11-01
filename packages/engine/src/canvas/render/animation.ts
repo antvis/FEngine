@@ -26,14 +26,20 @@ function applyStyle(shape: DisplayObject, style) {
 function appearAnimation(vNode: VNode | VNode[] | null) {
   return Children.map(vNode, (node) => {
     if (!node) return;
-    const { shape, style, children, props, animator } = node;
+    const { shape, style, children, animate, props, animator } = node;
+
+    // 有叶子节点，先执行叶子节点
+    const childrenAnimation = children ? createAnimation(node, children, null) : null;
+
+    // 不需要执行动画
+    if (animate === false) {
+      applyStyle(shape, style);
+      return null;
+    }
+
     const { animation } = props;
     const animationEffect = animation ? animation.appear : null;
-
     animator.reset();
-
-    // 叶子是否有动画
-    const childrenAnimation = children ? createAnimation(node, children, null) : null;
 
     if (!animationEffect) {
       // 没有动画直接应用样式
@@ -74,19 +80,12 @@ function updateAnimation(nextNode, lastNode) {
     props: nextProps,
     shape: nextShape,
     animator,
+    animate,
   } = nextNode;
   const { type: lastType, style: lastStyle, children: lastChildren, shape: lastShape } = lastNode;
 
-  const { animation } = nextProps;
-
-  animator.reset();
-
-  // 子元素动画
+  // 先处理叶子节点
   const childrenAnimation = createAnimation(nextNode, nextChildren, lastChildren);
-
-  if (childrenAnimation && childrenAnimation.length) {
-    animator.children = childrenAnimation;
-  }
 
   // 清除之前的样式
   const resetStyle = lastStyle
@@ -101,6 +100,20 @@ function updateAnimation(nextNode, lastNode) {
     ...resetStyle,
     ...nextStyle,
   };
+
+  // 没有动画直接应用样式
+  if (animate === false) {
+    applyStyle(nextShape, style);
+    return null;
+  }
+
+  const { animation } = nextProps;
+  animator.reset();
+
+  // 子元素动画
+  if (childrenAnimation && childrenAnimation.length) {
+    animator.children = childrenAnimation;
+  }
 
   const animationEffect = animation ? animation.update : null;
   // 没有动画直接应用样式
@@ -167,14 +180,9 @@ function updateAnimation(nextNode, lastNode) {
 
 function destroyAnimation(vNode: VNode) {
   if (!vNode) return null;
-  const { shape, children, style, props, animator } = vNode;
-  const { animation } = props;
-  const animationEffect = animation ? animation.leave : null;
+  const { shape, children, animate, style, props, animator } = vNode;
 
-  // 重置
-  animator.reset();
-
-  // 叶子是否有动画
+  // 先处理叶子节点
   const childrenAnimation = children
     ? // @ts-ignore
       Children.toArray(children)
@@ -183,6 +191,17 @@ function destroyAnimation(vNode: VNode) {
         })
         .filter(Boolean)
     : null;
+
+  if (animate === false) {
+    shape.remove();
+    return null;
+  }
+
+  const { animation } = props;
+  const animationEffect = animation ? animation.leave : null;
+
+  // 重置
+  animator.reset();
 
   // 没有叶子节点的动画， 直接删除
   if (!(childrenAnimation && childrenAnimation.length) && !animationEffect) {
