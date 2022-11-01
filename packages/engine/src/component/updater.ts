@@ -8,12 +8,13 @@ export interface Updater<S = any> {
 
 function createUpdater(canvas: Canvas) {
   const setStateQueue = [];
-  const renderQueue = [];
-  const callbackQueue = [];
 
   function process() {
     let item;
-    // let component;
+
+    const renderComponents = [];
+    const renderCallbackQueue = [];
+
     while ((item = setStateQueue.shift())) {
       const { state, component, callback } = item;
 
@@ -38,16 +39,13 @@ function createUpdater(canvas: Canvas) {
       component.prevState = component.state;
 
       if (typeof callback === 'function') {
-        callbackQueue.push({ callback, component });
+        renderCallbackQueue.push({ callback, component });
+      }
+
+      if (renderComponents.indexOf(component) < 0) {
+        renderComponents.push(component);
       }
     }
-
-    const renderComponents = [].concat(renderQueue);
-    const renderCallbackQueue = [].concat(callbackQueue);
-
-    // 先清空，renderComponents 里面有可能会继续 setState
-    renderQueue.length = 0;
-    callbackQueue.length = 0;
 
     canvas.updateComponents(renderComponents);
 
@@ -64,9 +62,6 @@ function createUpdater(canvas: Canvas) {
       state,
       callback,
     });
-    if (renderQueue.indexOf(component) < 0) {
-      renderQueue.push(component);
-    }
   }
 
   function commitRenderQueue(callbackQueue) {
