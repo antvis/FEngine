@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "@antv/f-engine": "*",
-    "@antv/g-lottie-player": "0.0.10",
+    "@antv/g-lottie-player": "~0.0.11",
     "@babel/runtime": "^7.12.5"
   },
   "devDependencies": {},
