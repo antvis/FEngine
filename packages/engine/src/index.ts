@@ -17,5 +17,8 @@ import * as Smooth from './shape/util/smooth';
 
 export { CanvasRenderer, computeLayout, Smooth };
 
+// TS 类型定义
 import * as Types from './types';
-export { Types };
+import { FC } from './types';
+
+export { FC, Types };
