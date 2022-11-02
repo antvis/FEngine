@@ -107,4 +107,30 @@ describe('动画', () => {
 
     await delay(1000);
   });
+
+  it('animate = false', async () => {
+    const { props } = (
+      <Canvas context={context} animate={false}>
+        <rect
+          style={{
+            width: 40,
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 3000,
+              property: ['width'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+  });
 });
