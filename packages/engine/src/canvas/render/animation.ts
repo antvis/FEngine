@@ -159,7 +159,7 @@ function updateAnimation(nextNode, lastNode) {
           path: nextPath,
         };
 
-        const pathShape = createShape('path', { style: startStyle });
+        const pathShape = createShape('path', { style: { ...startStyle, path: '' } });
 
         lastShape.replaceWith(pathShape);
 

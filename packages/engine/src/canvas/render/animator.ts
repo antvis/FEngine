@@ -27,7 +27,7 @@ class Animator extends EE {
       const { property = [], easing, duration, delay, iterations, clip } = effect;
 
       // 应用样式
-      const style = { ...omit(end, property), ...start };
+      const style = { ...omit(end, property), ...omit(start, property) };
       Object.keys(style).forEach((key) => {
         (shape as DisplayObject).setAttribute(key, style[key]);
       });
