@@ -1,3 +1,4 @@
+import { JSX } from './jsx/jsx-namespace';
 import { ArcStyleProps, MarkerStyleProps, SectorStyleProps } from './shape/types'
 type PX_FIELD_NAME =
   'lineWidth'
@@ -131,6 +132,13 @@ export type ElementType =
   | string
   | ((props: Props, context?: any) => any)
   | (new (props: Props, context?: any) => any);
+
+
+export interface FunctionComponent<P = {}> {
+    (props: P, context?: any): JSX.Element | null;
+  }
+  
+export type FC<P = {}> = FunctionComponent<P>;
 
 
   export interface CircleStyleProps extends Style {
