@@ -1,6 +1,23 @@
-import { Path, deg2rad } from '@antv/g-lite';
+import { Path, deg2rad, BaseStyleProps } from '@antv/g-lite';
 import { polarToCartesian } from './util/util';
 import { isNumberEqual, PathArray } from '@antv/util';
+
+export interface SectorStyleProps extends BaseStyleProps {
+  x?: string | number;
+  y?: string | number;
+  /** 起始角度 */
+  startAngle?: string | number;
+  endAngle?: string | number;
+  r?: string | number;
+  r0?: string | number;
+  radius?:
+    | string
+    | number
+    | [string | number]
+    | [string | number, string | number]
+    | [string | number, string | number, string | number]
+    | [string | number, string | number, string | number, string | number];
+}
 
 const PI = Math.PI;
 const PI2 = PI * 2;

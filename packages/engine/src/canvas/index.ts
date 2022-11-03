@@ -12,8 +12,9 @@ import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';
 import { render, updateComponents } from './render';
 import { VNode } from './vnode';
+import { IProps } from '../types';
 
-export interface CanvasProps {
+export interface CanvasProps extends IProps {
   context?: CanvasRenderingContext2D;
   width?: number;
   height?: number;
@@ -181,6 +182,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
         right: 0,
         bottom: 0,
       },
+      // @ts-ignore
       type: Canvas,
       props,
       shape: container,

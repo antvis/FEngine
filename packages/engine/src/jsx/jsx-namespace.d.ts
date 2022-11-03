@@ -1,7 +1,7 @@
 import {
   Ref,
   ElementType,
-  Props,
+  IProps,
   GroupProps,
   RectProps,
   CircleProps,
@@ -11,22 +11,22 @@ import {
   ArcProps,
   SectorProps,
   TextProps,
-  CustomProps,
   MarkerProps,
   ImageProps,
-} from '../types';
+  PathProps,
+} from '../types/jsx';
 
 export namespace JSX {
   export interface Element {
     key: string;
     ref?: Ref;
     type: ElementType;
-    props: Props;
+    props: IProps;
     [key: string]: any;
   }
 
   export interface ElementClass {
-    props: Props;
+    props: IProps;
     render(): Element | null | Promise<void>;
   }
 
@@ -40,10 +40,9 @@ export namespace JSX {
     arc: ArcProps;
     sector: SectorProps;
     text: TextProps;
-    custom: CustomProps;
     marker: MarkerProps;
     image: ImageProps;
-    path: any;
+    path: PathProps;
     [key: string]: any;
   }
 }

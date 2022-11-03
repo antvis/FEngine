@@ -17,8 +17,21 @@ import * as Smooth from './shape/util/smooth';
 
 export { CanvasRenderer, computeLayout, Smooth };
 
-// TS 类型定义
-import * as Types from './types';
-import { FC } from './types';
-
-export { FC, Types };
+// 导出 ts 类型
+export {
+  IProps,
+  IState,
+  FC,
+  GroupProps,
+  RectProps,
+  CircleProps,
+  LineProps,
+  PolygonProps,
+  PolylineProps,
+  TextProps,
+  ImageProps,
+  PathProps,
+  ArcProps,
+  SectorProps,
+  MarkerProps,
+} from './types';

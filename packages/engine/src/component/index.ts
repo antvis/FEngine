@@ -1,16 +1,16 @@
 import { JSX } from '../jsx/jsx-namespace';
-import { Group } from '@antv/g-lite';
+import { IProps, IState } from '../types/jsx';
+import { Group, GroupStyleProps } from '@antv/g-lite';
 import { ComponentContext } from '../canvas';
 import { Updater } from './updater';
 import { VNode } from '../canvas/vnode';
 import Animator from '../canvas/render/animator';
 
-export interface IProps {
+export interface Props extends IProps {
   zIndex?: number;
-  [key: string]: any;
 }
 
-class Component<P extends IProps = any, S = any> {
+class Component<P extends Props = IProps, S = IState> {
   props: P;
   state: S;
   context: ComponentContext;
@@ -20,7 +20,7 @@ class Component<P extends IProps = any, S = any> {
   updater: Updater<S>;
   // 对应 G 的group, 每个组件渲染的父节点
   container: Group;
-  style: any;
+  style: GroupStyleProps;
   // render 返回的节点
   children: VNode | VNode[] | null;
 

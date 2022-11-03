@@ -2,8 +2,15 @@
  * @fileOverview convert the line to curve
  * @author dxq613@gmail.com
  */
-import { min as vec2Min, max as vec2Max, sub as vec2Sub, scale as vec2Scale, distance as vec2Distance, add as vec2Add} from 'gl-matrix/vec2';
-import type { vec2 } from 'gl-matrix';
+import {
+  min as vec2Min,
+  max as vec2Max,
+  sub as vec2Sub,
+  scale as vec2Scale,
+  distance as vec2Distance,
+  add as vec2Add,
+} from 'gl-matrix/vec2';
+import { vec2 } from 'gl-matrix';
 
 function getPoint(v) {
   return [v.x, v.y];
@@ -49,7 +56,7 @@ function smoothBezier(points, smooth, isLoop, constraint) {
       }
     }
 
-    const v = vec2Sub([] as unknown as vec2, nextPoint, prevPoint);
+    const v = vec2Sub(([] as unknown) as vec2, nextPoint, prevPoint);
     vec2Scale(v, v, smooth);
     let d0 = vec2Distance(point, prevPoint);
     let d1 = vec2Distance(point, nextPoint);
@@ -60,11 +67,11 @@ function smoothBezier(points, smooth, isLoop, constraint) {
       d1 /= sum;
     }
 
-    const v1 = vec2Scale([] as unknown as vec2, v, -d0);
-    const v2 = vec2Scale([] as unknown as vec2, v, d1);
+    const v1 = vec2Scale(([] as unknown) as vec2, v, -d0);
+    const v2 = vec2Scale(([] as unknown) as vec2, v, d1);
 
-    const cp0 = vec2Add([] as unknown as vec2, point, v1);
-    const cp1 = vec2Add([] as unknown as vec2, point, v2);
+    const cp0 = vec2Add(([] as unknown) as vec2, point, v1);
+    const cp1 = vec2Add(([] as unknown) as vec2, point, v2);
 
     if (hasConstraint) {
       vec2Max(cp0, cp0, min);
