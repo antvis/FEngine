@@ -60,11 +60,8 @@ class Animator extends EE {
           const {
             type: clipType,
             style: clipStyle,
+            attrs: clipAttrs,
             property: clipProperty = [],
-            easing: clipEasing,
-            duration: clipDuration,
-            delay: clipDelay,
-            iterations: clipIterations,
             start: clipStart,
             end: clipEnd,
           } = clipConfig;
@@ -72,6 +69,7 @@ class Animator extends EE {
           const clipStartStyle = {
             ...clipStyle,
             ...clipStart,
+            ...clipAttrs,
           };
           const clipEndStyle = {
             ...clipStyle,
@@ -91,14 +89,14 @@ class Animator extends EE {
           shape.ownerDocument.documentElement.appendChild(clipShape);
           const clipAnimation = clipShape.animate([clipKeyframeStart, clipKeyframeEnd], {
             fill: 'both',
-            easing: clipEasing,
-            duration: clipDuration,
-            delay: clipDelay,
-            iterations: clipIterations,
+            easing,
+            duration,
+            delay,
+            iterations,
           });
 
           // 过滤无限循环的动画
-          if (clipAnimation && clipIterations !== Infinity) {
+          if (clipAnimation && iterations !== Infinity) {
             const clipFinished = clipAnimation.finished;
             animations.push(clipFinished);
             clipFinished.then(() => {
