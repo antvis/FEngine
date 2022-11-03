@@ -13,7 +13,7 @@ export interface IContext {
   [key: string]: any;
 }
 
-export interface Ref<T> {
+export interface Ref<T = any> {
   current?: T;
 }
 

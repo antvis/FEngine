@@ -1,19 +1,19 @@
 import { IProps } from './jsx';
 import {
-  GroupStyleProps,
-  RectStyleProps,
-  CircleStyleProps,
-  LineStyleProps,
-  PolygonStyleProps,
-  PolylineStyleProps,
-  TextStyleProps,
-  ImageStyleProps,
-  PathStyleProps,
+  GroupStyleProps as GGroupStyleProps,
+  RectStyleProps as GRectStyleProps,
+  CircleStyleProps as GCircleStyleProps,
+  LineStyleProps as GLineStyleProps,
+  PolygonStyleProps as GPolygonStyleProps,
+  PolylineStyleProps as GPolylineStyleProps,
+  TextStyleProps as GTextStyleProps,
+  ImageStyleProps as GImageStyleProps,
+  PathStyleProps as GPathStyleProps,
 } from '@antv/g-lite';
 
-import { ArcStyleProps } from '../shape/arc';
-import { SectorStyleProps } from '../shape/sector';
-import { MarkerStyleProps } from '../shape/marker';
+import { ArcStyleProps as GArcStyleProps } from '../shape/arc';
+import { SectorStyleProps as GSectorStyleProps } from '../shape/sector';
+import { MarkerStyleProps as GMarkerStyleProps } from '../shape/marker';
 
 type ArrayAttribute =
   | string
@@ -54,21 +54,21 @@ interface StyleFlexProps {
   paddingBottom?: string | number;
 }
 
-type ShapeStyleProps =
-  | GroupStyleProps
-  | RectStyleProps
-  | CircleStyleProps
-  | LineStyleProps
-  | PolygonStyleProps
-  | PolylineStyleProps
-  | TextStyleProps
-  | ImageStyleProps
-  | PathStyleProps
-  | ArcStyleProps
-  | SectorStyleProps
-  | MarkerStyleProps;
+export type ShapeStyleProps =
+  | GGroupStyleProps
+  | GRectStyleProps
+  | GCircleStyleProps
+  | GLineStyleProps
+  | GPolygonStyleProps
+  | GPolylineStyleProps
+  | GTextStyleProps
+  | GImageStyleProps
+  | GPathStyleProps
+  | GArcStyleProps
+  | GSectorStyleProps
+  | GMarkerStyleProps;
 
-type ShapeProps =
+export type ShapeProps =
   | GroupProps
   | RectProps
   | CircleProps
@@ -86,26 +86,31 @@ interface StyleClipProps {
   clip?: ((style) => ShapeProps) | ShapeProps;
 }
 
-interface GroupStyle extends StyleFlexProps, StyleClipProps, GroupStyleProps {}
-interface RectStyle extends StyleFlexProps, StyleClipProps, RectStyleProps {}
-interface CircleStyle extends StyleFlexProps, StyleClipProps, CircleStyleProps {}
-interface LineStyle
+export interface GroupStyleProps extends StyleFlexProps, StyleClipProps, GGroupStyleProps {}
+export interface RectStyleProps extends StyleFlexProps, StyleClipProps, GRectStyleProps {}
+export interface CircleStyleProps
   extends StyleFlexProps,
     StyleClipProps,
-    Omit<LineStyleProps, 'x1' | 'y1' | 'x2' | 'y2'> {
+    Omit<GCircleStyleProps, 'r'> {
+  r?: number;
+}
+export interface LineStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GLineStyleProps, 'x1' | 'y1' | 'x2' | 'y2'> {
   x1?: string | number;
   y1?: string | number;
   x2?: string | number;
   y2?: string | number;
 }
-interface PolygonStyle extends StyleFlexProps, StyleClipProps, PolygonStyleProps {}
-interface PolylineStyle extends StyleFlexProps, StyleClipProps, PolylineStyleProps {}
-interface ArcStyle extends StyleFlexProps, StyleClipProps, ArcStyleProps {}
-interface SectorStyle extends StyleFlexProps, StyleClipProps, SectorStyleProps {}
-interface TextStyle extends StyleFlexProps, StyleClipProps, TextStyleProps {}
-interface ImageStyle extends StyleFlexProps, StyleClipProps, ImageStyleProps {}
-interface PathStyle extends StyleFlexProps, StyleClipProps, PathStyleProps {}
-interface MarkerStyle extends StyleFlexProps, StyleClipProps, MarkerStyleProps {}
+export interface PolygonStyleProps extends StyleFlexProps, StyleClipProps, GPolygonStyleProps {}
+export interface PolylineStyleProps extends StyleFlexProps, StyleClipProps, GPolylineStyleProps {}
+export interface ArcStyleProps extends StyleFlexProps, StyleClipProps, GArcStyleProps {}
+export interface SectorStyleProps extends StyleFlexProps, StyleClipProps, GSectorStyleProps {}
+export interface TextStyleProps extends StyleFlexProps, StyleClipProps, GTextStyleProps {}
+export interface ImageStyleProps extends StyleFlexProps, StyleClipProps, GImageStyleProps {}
+export interface PathStyleProps extends StyleFlexProps, StyleClipProps, GPathStyleProps {}
+export interface MarkerStyleProps extends StyleFlexProps, StyleClipProps, GMarkerStyleProps {}
 
 interface AnimationBase {
   // 缓动函数
@@ -115,6 +120,7 @@ interface AnimationBase {
   property?: string[];
   start?: ShapeStyleProps;
   end?: ShapeStyleProps;
+  onFrame?: (t: number) => any;
 }
 
 interface Animation extends AnimationBase {
@@ -126,28 +132,28 @@ interface ClipAnimation extends AnimationBase {
   style: ShapeStyleProps;
 }
 
-interface AnimationProps {
+export interface AnimationProps {
   appear?: Animation;
   update?: Animation;
   leave?: Animation;
 }
 
-interface ShapeElementProps<T> extends IProps {
+export interface ShapeElementProps<T> extends IProps {
   /** @deprecated use style instead */
   attrs?: T;
   style?: T;
   animation?: AnimationProps;
 }
 
-export interface GroupProps extends ShapeElementProps<GroupStyle> {}
-export interface RectProps extends ShapeElementProps<RectStyle> {}
-export interface CircleProps extends ShapeElementProps<CircleStyle> {}
-export interface LineProps extends ShapeElementProps<LineStyle> {}
-export interface PolygonProps extends ShapeElementProps<PolygonStyle> {}
-export interface PolylineProps extends ShapeElementProps<PolylineStyle> {}
-export interface ArcProps extends ShapeElementProps<ArcStyle> {}
-export interface SectorProps extends ShapeElementProps<SectorStyle> {}
-export interface TextProps extends ShapeElementProps<TextStyle> {}
-export interface ImageProps extends ShapeElementProps<ImageStyle> {}
-export interface PathProps extends ShapeElementProps<PathStyle> {}
-export interface MarkerProps extends ShapeElementProps<MarkerStyle> {}
+export interface GroupProps extends ShapeElementProps<GroupStyleProps> {}
+export interface RectProps extends ShapeElementProps<RectStyleProps> {}
+export interface CircleProps extends ShapeElementProps<CircleStyleProps> {}
+export interface LineProps extends ShapeElementProps<LineStyleProps> {}
+export interface PolygonProps extends ShapeElementProps<PolygonStyleProps> {}
+export interface PolylineProps extends ShapeElementProps<PolylineStyleProps> {}
+export interface ArcProps extends ShapeElementProps<ArcStyleProps> {}
+export interface SectorProps extends ShapeElementProps<SectorStyleProps> {}
+export interface TextProps extends ShapeElementProps<TextStyleProps> {}
+export interface ImageProps extends ShapeElementProps<ImageStyleProps> {}
+export interface PathProps extends ShapeElementProps<PathStyleProps> {}
+export interface MarkerProps extends ShapeElementProps<MarkerStyleProps> {}
