@@ -1,5 +1,5 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, pick, isNumber } from '@antv/util';
+import { isBoolean, isNumber } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
@@ -15,15 +15,6 @@ import {
   computeFlexLayout,
   fillElementLayout,
 } from './computeLayout';
-
-function pickElement(element) {
-  if (!element) return element;
-  return Children.map(element, (item) => {
-    if (!item) return item;
-    // 只需要这几个元素就可以了
-    return pick(item, ['key', 'ref', 'type', 'props']);
-  });
-}
 
 function getStyle(tagType: WorkTag, props, context) {
   const { style: customStyle = {}, attrs, zIndex } = props;
@@ -49,9 +40,10 @@ function createVNode(parent: VNode, vNode: VNode) {
 
   const tag = getWorkTag(type);
   const animator = new Animator();
+  const style = getStyle(tag, props, context);
 
   vNode.tag = tag;
-  vNode.style = getStyle(tag, props, context);
+  vNode.style = style;
   vNode.context = context;
   vNode.updater = updater;
   vNode.animate = isBoolean(animate) ? animate : parentAnimate;
@@ -59,7 +51,7 @@ function createVNode(parent: VNode, vNode: VNode) {
 
   // shape 标签
   if (tag === Shape) {
-    const shape = createShape(type as string, props);
+    const shape = createShape(type as string, { ...props, style });
     if (ref) {
       ref.current = shape;
     }
@@ -247,8 +239,7 @@ function renderVNode(
   lastChildren: VNode | VNode[] | null
 ) {
   const { component } = node;
-  // react 生成的 element 是 not extensible 的，这里新建一个新对象，并把需要的内容pick 出来
-  nextChildren = pickElement(nextChildren);
+
   // 设置新的 children
   node.children = nextChildren;
   // 如果是组件，需要同时更新组件的 children

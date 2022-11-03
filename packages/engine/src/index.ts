@@ -16,6 +16,7 @@ export { default as Gesture } from './gesture';
 export { default as Layout, LayoutProps } from './canvas/layout';
 export { CanvasRenderer, computeLayout, Smooth };
 export { default as isEqual } from './canvas/equal';
+export { default as Theme } from './canvas/theme';
 
 // 导出 ts 类型
 export {

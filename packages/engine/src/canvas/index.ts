@@ -1,12 +1,12 @@
-import { deepMix, isFunction } from '@antv/util';
+import { isFunction } from '@antv/util';
 import Component from '../component';
 import equal from './equal';
-import { Group, Text, Canvas as GCanvas } from '@antv/g-lite';
+import { Group, Text, Canvas as GCanvas, CanvasLike } from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
 import EE from '@antv/event-emitter';
-import defaultTheme, { Theme } from './theme';
+import Theme, { Theme as ThemeType } from './theme';
 import Layout from './layout';
 import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';
@@ -23,7 +23,7 @@ export interface CanvasProps extends IProps {
   animate?: boolean;
   children?: any;
   px2hd?: any;
-  theme?: Theme;
+  theme?: ThemeType;
   style?: any;
   container?: any;
   renderer?: any;
@@ -82,18 +82,18 @@ function measureText(container: Group, px2hd, theme) {
 class Canvas<P extends CanvasProps = CanvasProps> {
   props: P;
   private updater: Updater;
-  private theme: Theme;
+  private theme: ThemeType;
   private gesture: Gesture;
   private canvas: GCanvas;
   private _ee: EE;
   private container: Group;
   private context: any;
 
-  private children: any;
+  private children: VNode | VNode[] | null;
   private vNode: VNode;
   layout: Layout;
   landscape: boolean;
-  canvasElement: any;
+  canvasElement: CanvasLike;
 
   constructor(props: P) {
     const {
@@ -103,7 +103,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       height,
       theme: customTheme,
       px2hd: customPx2hd,
-      pixelRatio,
+      pixelRatio: customPixelRatio,
       createImage,
       landscape,
       container: rendererContainer,
@@ -113,8 +113,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
     // 初始化主题
-    const theme = px2hd(deepMix({}, defaultTheme, customTheme)) as Theme;
-    const devicePixelRatio = pixelRatio ? pixelRatio : theme.pixelRatio;
+    const theme = px2hd({ ...Theme.getTheme(), ...customTheme }) as ThemeType;
+    const { pixelRatio, fontSize, fontFamily, padding } = theme;
+    const devicePixelRatio = customPixelRatio ? customPixelRatio : pixelRatio;
 
     // 组件更新器
     const updater = createUpdater(this);
@@ -134,8 +135,8 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     // 设置默认的全局样式
     const documentElement = canvas.document.documentElement;
-    documentElement.style.fontSize = theme.fontSize;
-    documentElement.style.fontFamily = theme.fontFamily;
+    documentElement.setAttribute('fontSize', fontSize);
+    documentElement.setAttribute('fontFamily', fontFamily);
 
     const container = canvas.getRoot();
 
@@ -145,7 +146,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       top: 0,
       width: canvasWidth,
       height: canvasHeight,
-      padding: theme.padding,
+      padding,
       ...customStyle,
     });
     const layout = Layout.fromStyle(style);
@@ -232,7 +233,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     render(vNode);
   }
 
-  emit(type: string, event?: any) {
+  emit(type: string, event) {
     this._ee.emit(type, event);
   }
 
