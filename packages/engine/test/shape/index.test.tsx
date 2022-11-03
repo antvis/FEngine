@@ -62,7 +62,6 @@ class View extends Component {
             radius: [8, 8, 8, 8],
             startAngle: '1.57 rad',
             endAngle: '3.58 rad',
-            anticlockwise: false,
           }}
         />
         <sector
@@ -77,7 +76,6 @@ class View extends Component {
             radius: [8, 8, 8, 8],
             startAngle: '2.57 rad',
             endAngle: '3.58 rad',
-            anticlockwise: false,
           }}
         />
       </group>

@@ -217,7 +217,6 @@ describe('Canvas', () => {
     ]);
 
     await delay(50);
-    debugger;
     await canvas.update(
       (
         <Canvas context={context} pixelRatio={1}>

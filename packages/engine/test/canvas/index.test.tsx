@@ -34,8 +34,6 @@ class View extends Component {
         /> */}
         <circle
           style={{
-            x: 150,
-            y: 50,
             r: 40,
             fill: 'red',
           }}

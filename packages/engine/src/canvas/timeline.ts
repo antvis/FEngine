@@ -1,5 +1,3 @@
-import { IAnimation } from '@antv/g-lite';
-
 class Timeline {
   animations: Animation[];
 

@@ -1,5 +1,6 @@
 import { computeLayout } from './canvas/render';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
+import * as Smooth from './shape/util/smooth';
 import '@antv/g-web-animations-api';
 
 export { JSX } from './jsx/jsx-namespace';
@@ -13,12 +14,40 @@ export { default as createRef } from './createRef';
 export { default as Timeline } from './timeline';
 export { default as Gesture } from './gesture';
 export { default as Layout, LayoutProps } from './canvas/layout';
-import * as Smooth from './shape/util/smooth';
-
 export { CanvasRenderer, computeLayout, Smooth };
+export { default as isEqual } from './canvas/equal';
 
-// TS 类型定义
-import * as Types from './types';
-import { FC } from './types';
-
-export { FC, Types };
+// 导出 ts 类型
+export {
+  IProps,
+  IState,
+  FC,
+  Ref,
+  AnimationProps,
+  ShapeProps,
+  GroupProps,
+  RectProps,
+  CircleProps,
+  LineProps,
+  PolygonProps,
+  PolylineProps,
+  TextProps,
+  ImageProps,
+  PathProps,
+  ArcProps,
+  SectorProps,
+  MarkerProps,
+  ShapeStyleProps,
+  GroupStyleProps,
+  RectStyleProps,
+  CircleStyleProps,
+  LineStyleProps,
+  PolygonStyleProps,
+  PolylineStyleProps,
+  TextStyleProps,
+  ImageStyleProps,
+  PathStyleProps,
+  ArcStyleProps,
+  SectorStyleProps,
+  MarkerStyleProps,
+} from './types';

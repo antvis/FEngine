@@ -1,6 +1,16 @@
-import { Path, deg2rad } from '@antv/g-lite';
+import { Path, deg2rad, BaseStyleProps } from '@antv/g-lite';
 import { isNumberEqual, PathArray } from '@antv/util';
 import { polarToCartesian } from './util/util';
+
+export interface ArcStyleProps extends BaseStyleProps {
+  /** 起始角度 */
+  startAngle?: string | number;
+  endAngle?: string | number;
+  r?: string | number;
+  x?: string | number;
+  y?: string | number;
+  anticlockwise?: boolean;
+}
 
 export class Arc extends Path {
   parsedStyle: any;

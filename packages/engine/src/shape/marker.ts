@@ -1,14 +1,26 @@
-import type { DisplayObjectConfig } from '@antv/g-lite';
+import { DisplayObjectConfig, BaseStyleProps } from '@antv/g-lite';
 import { CustomElement, Path } from '@antv/g-lite';
-import { deepMix, PathArray } from '@antv/util'
-import { MarkerStyleProps } from './types'
+import { deepMix, PathArray } from '@antv/util';
+
+export interface MarkerStyleProps extends BaseStyleProps {
+  x?: string | number;
+  y?: string | number;
+  symbol?: 'circle' | 'square';
+  radius?:
+    | string
+    | number
+    | [string | number]
+    | [string | number, string | number]
+    | [string | number, string | number, string | number]
+    | [string | number, string | number, string | number, string | number];
+}
 
 const defaultStyle = {
-    x: 0,
-    y: 0,
-    lineWidth: 1,
-    symbol: 'circle'
-}
+  x: 0,
+  y: 0,
+  lineWidth: 1,
+  symbol: 'circle',
+};
 
 const SYMBOLS = {
   circle(x, y, r): PathArray {
@@ -31,36 +43,46 @@ const SYMBOLS = {
 };
 
 export class Marker extends CustomElement<MarkerStyleProps> {
-    static tag = 'marker';
-    private path: Path;
+  static tag = 'marker';
+  private path: Path;
 
-    constructor(config: DisplayObjectConfig<MarkerStyleProps>) {
-  
-      const style = deepMix({}, defaultStyle, config.style)
-  
-      super({
-        style,
-        type: Marker.tag,
-      });
+  constructor(config: DisplayObjectConfig<MarkerStyleProps>) {
+    const style = deepMix({}, defaultStyle, config.style);
 
-      const { radius, symbol, stroke, lineWidth, opacity, strokeOpacity, fill, fillOpacity, x, y } = this.attributes;
-      const method = SYMBOLS[symbol]
+    super({
+      style,
+      type: Marker.tag,
+    });
 
-        const path =  new Path({
-          style: {
-            opacity, 
-            strokeOpacity,
-            stroke,
-            lineWidth,
-            fill,
-            fillOpacity,
-            path: method( x, y, radius)
-          },
-        });
-        this.appendChild(path);
-    }
+    const {
+      radius,
+      symbol,
+      stroke,
+      lineWidth,
+      opacity,
+      strokeOpacity,
+      fill,
+      fillOpacity,
+      x,
+      y,
+    } = this.attributes;
+    const method = SYMBOLS[symbol];
 
-    getShape() {
-      return this.path
-    }
+    const path = new Path({
+      style: {
+        opacity,
+        strokeOpacity,
+        stroke,
+        lineWidth,
+        fill,
+        fillOpacity,
+        path: method(x, y, radius),
+      },
+    });
+    this.appendChild(path);
+  }
+
+  getShape() {
+    return this.path;
+  }
 }

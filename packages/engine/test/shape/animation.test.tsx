@@ -41,7 +41,6 @@ class View extends Component {
             // r0: 30,
             startAngle: '0rad',
             endAngle: '3.89rad',
-            anticlockwise: true,
             radius: [5, 10],
           }}
           animation={{
