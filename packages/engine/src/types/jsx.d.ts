@@ -1,4 +1,3 @@
-export * from './shape';
 import { JSX } from '../jsx/jsx-namespace';
 
 export interface IProps {
