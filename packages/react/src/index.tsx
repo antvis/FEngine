@@ -1,89 +1,143 @@
-import React, { RefObject, forwardRef } from 'react';
-import { Canvas } from '@antv/f-engine';
+import React, { RefObject } from 'react';
+import { Canvas, Children, CanvasProps as FCanvasProps } from '@antv/f-engine';
+
+function pickElement(children) {
+  if (!children) return children;
+  const result = Children.map(children, (item) => {
+    if (!item) return item;
+
+    const { key, ref, type, props } = item;
+    return {
+      key,
+      ref,
+      type,
+      props: {
+        ...props,
+        children: pickElement(props.children),
+      },
+    };
+  });
+  return result;
+}
+
 export interface CanvasProps {
   className?: string;
   pixelRatio?: number;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   padding?: (string | number)[];
   animate?: boolean;
   canvasRef?: RefObject<HTMLCanvasElement>;
   ref?: RefObject<HTMLCanvasElement>;
+  children?: React.ReactElement | React.ReactElement[] | null;
   fallback?: React.Component;
   onError?: (error: Error) => void;
-  children?: React.ReactElement | React.ReactElement[] | null;
 }
 
-type CanvasState = { error: string | null };
-export default class ReactCanvas extends React.Component<CanvasProps, CanvasState> {
+interface CanvasState {
+  error: any;
+}
+
+class ReactCanvas extends React.Component<CanvasProps, CanvasState> {
   canvasRef: RefObject<HTMLCanvasElement>;
   canvas: Canvas;
-  ready: Promise<null>;
-  resolveFn;
 
   constructor(props: CanvasProps) {
     super(props);
     const { canvasRef } = props;
-    this.state = { error: null };
     this.canvasRef = canvasRef || React.createRef();
-    this.ready = new Promise((resolve, reject) => {
-      this.resolveFn = resolve;
-    });
+    this.state = { error: null };
   }
 
-  componentDidMount = async () => {
+  catchError(error) {
+    const { onError } = this.props;
+    this.setState({ error });
+
+    console.error('图表渲染失败: ', error);
+    if (typeof onError === 'function') {
+      onError(error);
+    }
+
+    // 重新抛出，为了让 window.onerror 捕获
+    setTimeout(() => {
+      throw error;
+    }, 0);
+  }
+
+  getProps = () => {
     const { canvasRef, props } = this;
-    const { onError } = props;
     const canvasEl = canvasRef.current;
     const context = canvasEl.getContext('2d');
-    const canvas = new Canvas({
+
+    //  去掉 react 生成的 element 中无用属性
+    const children = pickElement(props.children);
+
+    return {
       // 已经有高清方案，这里默认用1
       pixelRatio: 1,
       ...props,
+      children,
       // context 内部创建，不能被覆盖
       context,
-    });
+    } as FCanvasProps;
+  };
+
+  componentDidMount() {
+    const pickProps = this.getProps();
+    const canvas = new Canvas(pickProps);
     this.canvas = canvas;
 
-    try {
-      await canvas.render();
-    } catch (error) {
-      this.setState({ error });
-      console.error('图表渲染失败: ', error);
-      if (typeof onError === 'function') {
-        onError(error);
-      }
+    canvas.render().catch((error) => {
+      this.catchError(error);
+    });
+  }
+
+  componentDidUpdate() {
+    const { state, canvas } = this;
+    const { error } = state;
+    if (error) {
+      return;
     }
-    this.resolveFn();
-  };
-
-  componentDidUpdate = async () => {
-    const { canvas, props } = this;
-    await canvas.update(props);
-  };
-
-  componentWillUnmount() {
-    const { canvas } = this;
-    canvas.destroy();
+    const pickProps = this.getProps();
+    canvas.update(pickProps).catch((error) => {
+      this.catchError(error);
+    });
   }
 
   render() {
-    const { props } = this;
+    const { props, state } = this;
     const { className = '', fallback } = props;
-    if (this.state.error) {
-      return fallback || React.createElement('div', {}, 'error');
-    } else {
-      return React.createElement('canvas', {
-        className: `f-chart ${className}`,
-        ref: this.canvasRef,
-        style: {
-          width: '100%',
-          height: '100%',
-          display: 'block',
-          padding: 0,
-          margin: 0,
-        },
-      });
+    const { error } = state;
+
+    if (error) {
+      // 直接销毁
+      this.destroy();
+      return fallback || null;
     }
+
+    return React.createElement('canvas', {
+      className: `f-chart ${className}`,
+      ref: this.canvasRef,
+      style: {
+        width: '100%',
+        height: '100%',
+        display: 'block',
+        padding: 0,
+        margin: 0,
+      },
+    });
+  }
+
+  componentWillUnmount() {
+    this.destroy();
+  }
+
+  destroy() {
+    const { canvas } = this;
+    if (!canvas) return;
+    canvas.destroy();
+    this.canvas = null;
   }
 }
+
+export default ReactCanvas;
