@@ -255,7 +255,11 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
   destroy() {
     const { canvas } = this;
-    canvas.destroy();
+
+    // 销毁也需要等 ready
+    canvas.ready.then(() => {
+      canvas.destroy();
+    });
 
     this.props = null;
     this.context = null;

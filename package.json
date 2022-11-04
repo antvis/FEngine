@@ -39,7 +39,7 @@
     "build": "father build",
     "build-watch": "CI=true father build -w",
     "build-ci": "CI=true npm run build",
-    "test": "jest --verbose ./packages/engine",
+    "test": "jest",
     "test-cov": "jest --coverage",
     "test-live": "npm run test-watch packages",
     "test-watch": "DEBUG_MODE=1 jest --watch",
