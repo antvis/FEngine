@@ -15,13 +15,6 @@ export interface MarkerStyleProps extends BaseStyleProps {
     | [string | number, string | number, string | number, string | number];
 }
 
-const defaultStyle = {
-  x: 0,
-  y: 0,
-  lineWidth: 1,
-  symbol: 'circle',
-};
-
 const SYMBOLS = {
   circle(x, y, r): PathArray {
     return [
@@ -42,47 +35,28 @@ const SYMBOLS = {
   },
 };
 
-export class Marker extends CustomElement<MarkerStyleProps> {
-  static tag = 'marker';
-  private path: Path;
+export class Marker extends Path {
+  parsedStyle: any;
 
   constructor(config: DisplayObjectConfig<MarkerStyleProps>) {
-    const style = deepMix({}, defaultStyle, config.style);
-
-    super({
-      style,
-      type: Marker.tag,
-    });
-
-    const {
-      radius,
-      symbol,
-      stroke,
-      lineWidth,
-      opacity,
-      strokeOpacity,
-      fill,
-      fillOpacity,
-      x,
-      y,
-    } = this.attributes;
-    const method = SYMBOLS[symbol];
-
-    const path = new Path({
-      style: {
-        opacity,
-        strokeOpacity,
-        stroke,
-        lineWidth,
-        fill,
-        fillOpacity,
-        path: method(x, y, radius),
-      },
-    });
-    this.appendChild(path);
+    super(config);
+    this.updatePath();
   }
 
-  getShape() {
-    return this.path;
+  setAttribute(name, value, force?: boolean) {
+    super.setAttribute(name, value, force);
+    if (['x', 'y', 'symbol', 'radius'].indexOf(name) > -1) {
+      this.updatePath();
+    }
+  }
+
+  updatePath() {
+    const { radius = [0, 0, 0, 0], symbol = 'circle', x = 0, y = 0 } = this.parsedStyle;
+    const method = SYMBOLS[symbol];
+
+    // radius 表示半径，内部自动格式化成了[]
+    const path = method(x, y, radius[0]);
+
+    super.setAttribute('path', path);
   }
 }

@@ -96,7 +96,7 @@ describe('Canvas', () => {
 
     const canvas = new Canvas(props);
     canvas.render();
-    await delay(200);
+    await delay(500);
     expect(context).toMatchImageSnapshot();
   });
 });

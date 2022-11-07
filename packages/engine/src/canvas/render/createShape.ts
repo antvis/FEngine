@@ -68,8 +68,7 @@ TagElements.map(([type, ShapeClass]) => {
 function createShape(type: string, props) {
   if (!type) return null;
   const ShapeClass = getTag(type);
-  if (!type) return null;
-
+  if (!ShapeClass) return null;
   // const result = checkCSSRule(type, originStyle);
   const shape = new ShapeClass(props);
   addEvent(shape, props);

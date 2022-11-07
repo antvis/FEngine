@@ -263,4 +263,56 @@ describe('Canvas', () => {
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });
+
+  it('marker', async () => {
+    class View extends Component {
+      constructor(props: any, context) {
+        super(props, context);
+        this.state.selected = true;
+      }
+      render() {
+        const { props } = this;
+        if (!this.state.selected) return null;
+        return (
+          <group
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              width: 300,
+              height: 50,
+            }}
+          >
+            <marker
+              style={{
+                width: '44px',
+                radius: '22px',
+                symbol: 'circle',
+                lineWidth: '2px',
+                stroke: '#fff',
+                fill: 'red',
+              }}
+            />
+            <text
+              style={{
+                text: '文本',
+              }}
+            ></text>
+          </group>
+        );
+      }
+    }
+
+    const { props } = (
+      <Canvas context={context}>
+        <View />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
 });

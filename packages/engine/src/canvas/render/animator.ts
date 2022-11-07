@@ -91,14 +91,14 @@ class Animator extends EE {
           shape.ownerDocument.documentElement.appendChild(clipShape);
           const clipAnimation = clipShape.animate([clipKeyframeStart, clipKeyframeEnd], {
             fill: 'both',
-            easing: clipEasing,
-            duration: clipDuration,
-            delay: clipDelay,
-            iterations: clipIterations,
+            easing: clipEasing || easing,
+            duration: clipDuration || duration,
+            delay: clipDelay || delay,
+            iterations: clipIterations || iterations,
           });
 
           // 过滤无限循环的动画
-          if (clipAnimation && clipIterations !== Infinity) {
+          if (clipAnimation && (clipIterations || iterations) !== Infinity) {
             const clipFinished = clipAnimation.finished;
             animations.push(clipFinished);
             clipFinished.then(() => {
