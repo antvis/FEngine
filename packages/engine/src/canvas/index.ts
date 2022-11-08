@@ -86,10 +86,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   private gesture: Gesture;
   private canvas: GCanvas;
   private _ee: EE;
-  private container: Group;
-  private context: any;
+  container: Group;
+  context: any;
 
-  private children: VNode | VNode[] | null;
+  children: VNode | VNode[] | null;
   private vNode: VNode;
   layout: Layout;
   landscape: boolean;
