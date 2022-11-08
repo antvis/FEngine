@@ -13,7 +13,7 @@ export class SmoothPolyline extends Path {
 
   setAttribute(name, value, force?: boolean) {
     super.setAttribute(name, value, force);
-    if (['smooth'].indexOf(name) > -1) {
+    if (['smooth', 'points'].indexOf(name) > -1) {
       this.updatePath();
     }
   }

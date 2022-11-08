@@ -121,6 +121,7 @@ interface AnimationBase {
   start?: ShapeStyleProps;
   end?: ShapeStyleProps;
   onFrame?: (t: number) => any;
+  onEnd?: () => any;
 }
 
 interface Animation extends AnimationBase {
