@@ -2,14 +2,6 @@
  * @fileOverview convert the line to curve
  * @author dxq613@gmail.com
  */
-import {
-  min as vec2Min,
-  max as vec2Max,
-  sub as vec2Sub,
-  scale as vec2Scale,
-  distance as vec2Distance,
-  add as vec2Add,
-} from 'gl-matrix/vec2';
 import { vec2 } from 'gl-matrix';
 
 function getPoint(v) {
@@ -34,11 +26,11 @@ function smoothBezier(points, smooth, isLoop, constraint) {
 
     for (i = 0, l = points.length; i < l; i++) {
       point = getPoint(points[i]);
-      vec2Min(min, min, point);
-      vec2Max(max, max, point);
+      vec2.min(min, min, point);
+      vec2.max(max, max, point);
     }
-    vec2Min(min, min, constraint[0]);
-    vec2Max(max, max, constraint[1]);
+    vec2.min(min, min, constraint[0]);
+    vec2.max(max, max, constraint[1]);
   }
 
   for (i = 0, len = points.length; i < len; i++) {
@@ -56,10 +48,10 @@ function smoothBezier(points, smooth, isLoop, constraint) {
       }
     }
 
-    const v = vec2Sub(([] as unknown) as vec2, nextPoint, prevPoint);
-    vec2Scale(v, v, smooth);
-    let d0 = vec2Distance(point, prevPoint);
-    let d1 = vec2Distance(point, nextPoint);
+    const v = vec2.sub(([] as unknown) as vec2, nextPoint, prevPoint);
+    vec2.scale(v, v, smooth);
+    let d0 = vec2.distance(point, prevPoint);
+    let d1 = vec2.distance(point, nextPoint);
 
     const sum = d0 + d1;
     if (sum !== 0) {
@@ -67,17 +59,17 @@ function smoothBezier(points, smooth, isLoop, constraint) {
       d1 /= sum;
     }
 
-    const v1 = vec2Scale(([] as unknown) as vec2, v, -d0);
-    const v2 = vec2Scale(([] as unknown) as vec2, v, d1);
+    const v1 = vec2.scale(([] as unknown) as vec2, v, -d0);
+    const v2 = vec2.scale(([] as unknown) as vec2, v, d1);
 
-    const cp0 = vec2Add(([] as unknown) as vec2, point, v1);
-    const cp1 = vec2Add(([] as unknown) as vec2, point, v2);
+    const cp0 = vec2.add(([] as unknown) as vec2, point, v1);
+    const cp1 = vec2.add(([] as unknown) as vec2, point, v2);
 
     if (hasConstraint) {
-      vec2Max(cp0, cp0, min);
-      vec2Min(cp0, cp0, max);
-      vec2Max(cp1, cp1, min);
-      vec2Min(cp1, cp1, max);
+      vec2.max(cp0, cp0, min);
+      vec2.min(cp0, cp0, max);
+      vec2.max(cp1, cp1, min);
+      vec2.min(cp1, cp1, max);
     }
 
     cps.push([cp0[0], cp0[1]]);
