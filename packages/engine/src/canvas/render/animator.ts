@@ -24,7 +24,16 @@ class Animator extends EE {
     const { shape, start, end, effect, children } = this;
     const animations = [];
     if (effect) {
-      const { property = [], easing, duration, delay, iterations, clip, onFrame, onEnd } = effect;
+      const {
+        property = [],
+        easing,
+        duration,
+        delay,
+        iterations,
+        clip,
+        onFrame = () => {},
+        onEnd = () => {},
+      } = effect;
 
       // 应用样式
       const style = { ...omit(end, property), ...omit(start, property) };
@@ -47,7 +56,9 @@ class Animator extends EE {
         delay,
         iterations,
       });
+
       animation.onframe = onFrame;
+
       animation.onfinish = onEnd;
       // 过滤无限循环的动画
       if (animation && iterations !== Infinity) {
