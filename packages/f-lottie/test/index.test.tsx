@@ -1,13 +1,10 @@
 import { jsx, Canvas } from '@antv/f-engine';
 import Lottie from '../src/index';
+import data from './data/data.json';
 import { createContext } from './util';
 
 describe('Lottie', () => {
   it('加载 lottie 文件', async () => {
-    const data = await (
-      await fetch('https://g-next.antv.vision/zh/examples/data/lottie/data1.json')
-    ).json();
-
     const data1 = await (
       await fetch(
         'https://gw.alipayobjects.com/os/OasisHub/3ccdf4d8-78e6-48c9-b06e-9e518057d144/data.json'
