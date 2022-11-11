@@ -27,8 +27,8 @@ export interface CanvasProps extends IProps {
   style?: any;
   container?: any;
   renderer?: any;
-  createImage?: (src?: string) => HTMLImageElement;
   landscape?: boolean;
+  createImage?: (src?: string) => HTMLImageElement;
 }
 
 export interface ComponentContext {
@@ -190,6 +190,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       animate,
       // @ts-ignore
       component: this,
+      canvas: this,
       context: componentContext,
       updater,
     };
@@ -252,6 +253,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   resize(width: number, height: number) {
     const { canvas } = this;
     canvas.resize(width, height);
+  }
+
+  toRawChildren(children) {
+    return children;
   }
 
   destroy() {
