@@ -1,5 +1,5 @@
 import Canvas from '../canvas';
-import Component from '../component';
+import Component from '.';
 
 export interface Updater<S = any> {
   enqueueSetState: (component: Component, partialState: S, callback?: () => void) => void;

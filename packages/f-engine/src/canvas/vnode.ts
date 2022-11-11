@@ -1,7 +1,7 @@
 import { JSX } from '../jsx/jsx-namespace';
 import { DisplayObject } from '@antv/g-lite';
 import Component from '../component';
-import { ComponentContext } from '../canvas';
+import { ComponentContext } from '.';
 import { Updater } from '../component/updater';
 import Animator from './render/animator';
 import { WorkTag } from './workTags';
