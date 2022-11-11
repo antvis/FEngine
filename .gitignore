@@ -79,5 +79,4 @@ demos/debug.html
 
 *.sw*
 *.un~
-public
 .cache

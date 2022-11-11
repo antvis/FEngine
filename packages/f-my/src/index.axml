@@ -2,7 +2,7 @@
   a:if="{{id}}"
   type="{{type}}"
   id="{{id}}"
-  class="f2-canvas"
+  class="f-canvas"
   width="{{width}}"
   height="{{height}}"
   onTap="click"

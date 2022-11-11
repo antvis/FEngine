@@ -1,6 +1,24 @@
 import React, { RefObject } from 'react';
 import { Canvas, Children, CanvasProps as FCanvasProps } from '@antv/f-engine';
 
+export interface CanvasProps {
+  className?: string;
+  pixelRatio?: number;
+  width?: number | string;
+  height?: number | string;
+  padding?: (string | number)[];
+  animate?: boolean;
+  canvasRef?: RefObject<HTMLCanvasElement>;
+  ref?: RefObject<HTMLCanvasElement>;
+  children?: React.ReactElement | React.ReactElement[] | null;
+  fallback?: React.Component;
+  onError?: (error: Error) => void;
+}
+
+interface CanvasState {
+  error: any;
+}
+
 function pickElement(children) {
   if (!children) return children;
   const result = Children.map(children, (item) => {
@@ -20,22 +38,11 @@ function pickElement(children) {
   return result;
 }
 
-export interface CanvasProps {
-  className?: string;
-  pixelRatio?: number;
-  width?: number | string;
-  height?: number | string;
-  padding?: (string | number)[];
-  animate?: boolean;
-  canvasRef?: RefObject<HTMLCanvasElement>;
-  ref?: RefObject<HTMLCanvasElement>;
-  children?: React.ReactElement | React.ReactElement[] | null;
-  fallback?: React.Component;
-  onError?: (error: Error) => void;
-}
-
-interface CanvasState {
-  error: any;
+class FCanvas extends Canvas {
+  // override
+  toRawChildren(children) {
+    return pickElement(children);
+  }
 }
 
 class ReactCanvas extends React.Component<CanvasProps, CanvasState> {
@@ -84,7 +91,7 @@ class ReactCanvas extends React.Component<CanvasProps, CanvasState> {
 
   componentDidMount() {
     const pickProps = this.getProps();
-    const canvas = new Canvas(pickProps);
+    const canvas = new FCanvas(pickProps);
     this.canvas = canvas;
 
     canvas.render().catch((error) => {

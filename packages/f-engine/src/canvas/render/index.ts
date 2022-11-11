@@ -34,7 +34,7 @@ function getStyle(tagType: WorkTag, props, context) {
 }
 
 function createVNode(parent: VNode, vNode: VNode) {
-  const { context, updater, animate: parentAnimate } = parent;
+  const { canvas, context, updater, animate: parentAnimate } = parent;
   const { ref, type, props } = vNode;
   const { animate, transformFrom } = props;
 
@@ -46,6 +46,7 @@ function createVNode(parent: VNode, vNode: VNode) {
   vNode.style = style;
   vNode.context = context;
   vNode.updater = updater;
+  vNode.canvas = canvas;
   vNode.animate = isBoolean(animate) ? animate : parentAnimate;
   vNode.animator = animator;
 
@@ -98,12 +99,13 @@ function createVNode(parent: VNode, vNode: VNode) {
 }
 
 function updateVNode(parent, nextNode, lastNode: VNode) {
-  const { context, updater, animate: parentAnimate } = parent;
+  const { canvas, context, updater, animate: parentAnimate } = parent;
   const { tag, animator, component, shape, children } = lastNode;
   const { props } = nextNode;
   const { animate } = props;
 
   nextNode.tag = tag;
+  nextNode.canvas = canvas;
   nextNode.context = context;
   nextNode.updater = updater;
   nextNode.component = component;
@@ -219,10 +221,10 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 
   // 3. render
   shouldProcessChildren.forEach((child: VNode) => {
-    const { component, children } = child;
+    const { canvas, component, children } = child;
     const mount = !component.children;
 
-    const newChildren = component.render();
+    const newChildren = canvas.toRawChildren(component.render());
     renderChildren(child, newChildren as VNode, children);
 
     if (mount) {
@@ -260,7 +262,7 @@ function renderVNode(
 
       Children.map(element, (child: VNode) => {
         if (!child) return;
-        const { tag, props: childProps, component, children: childLastChildren } = child;
+        const { canvas, tag, props: childProps, component, children: childLastChildren } = child;
 
         let childrenNode = [];
         if (tag === Shape) {
@@ -268,7 +270,8 @@ function renderVNode(
         } else if (tag === FunctionComponent) {
           // FunctionComponent 直接更新 props
           component.props = childProps;
-          childrenNode = renderVNode(child, component.render() as VNode, childLastChildren);
+          const newChildren = canvas.toRawChildren(component.render());
+          childrenNode = renderVNode(child, newChildren as VNode, childLastChildren);
         } else {
           childrenNode = [child];
         }
@@ -326,23 +329,24 @@ function updateComponents(components: Component[]) {
   if (!components.length) return;
 
   components.forEach((component) => {
-    const { _vNode: node, children: lastChildren, props, animator } = component;
+    const { _vNode: vNode, children: lastChildren, props, animator } = component;
 
     // 是否需要更新
     if (component.shouldUpdate(props) === false) {
       return false;
     }
     component.willUpdate();
-    const newChildren = component.render();
-    const nextChildren = renderChildren(node, newChildren as VNode, lastChildren);
+    const { canvas } = vNode;
+    const newChildren = canvas.toRawChildren(component.render());
+    const nextChildren = renderChildren(vNode, newChildren as VNode, lastChildren);
 
     // 更新 children
     component.children = nextChildren;
-    node.children = nextChildren;
+    vNode.children = nextChildren;
     component.didUpdate();
 
     // 创建动画
-    const childrenAnimation = createAnimation(node, nextChildren, lastChildren);
+    const childrenAnimation = createAnimation(vNode, nextChildren, lastChildren);
 
     if (childrenAnimation.length) {
       animator.children = childrenAnimation;
