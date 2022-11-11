@@ -9,5 +9,5 @@ export default {
   lessInBabelMode: true,
   cssModules: true,
   extraBabelPlugins: ['@babel/plugin-proposal-class-static-block'],
-  pkgs: ['engine', 'lottie', 'react', 'my', 'vue', 'wx'],
+  pkgs: ['f-engine', 'f-lottie', 'f-react', 'f-my', 'f-vue', 'f-wx'],
 };

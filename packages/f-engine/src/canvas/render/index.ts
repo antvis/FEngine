@@ -3,7 +3,7 @@ import { isBoolean, isNumber } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
-import { createShape } from '../render/createShape';
+import { createShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
 import { createAnimation } from './animation';
