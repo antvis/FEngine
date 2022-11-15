@@ -1,5 +1,5 @@
 // index.js
-import { createElement } from '@antv/f2';
+// import { createElement } from '@antv/f2';
 import Chart from './chart';
 
 const data1 = [
@@ -7,7 +7,7 @@ const data1 = [
   { genre: 'Strategy', sold: 115 },
   { genre: 'Action', sold: 120 },
   { genre: 'Shooter', sold: 350 },
-  { genre: 'Other', sold: 150 }
+  { genre: 'Other', sold: 150 },
 ];
 
 const data2 = [
@@ -15,7 +15,7 @@ const data2 = [
   { genre: 'Strategy', sold: 115 },
   { genre: 'Action', sold: 20 },
   { genre: 'Shooter', sold: 50 },
-  { genre: 'Other', sold: 50 }
+  { genre: 'Other', sold: 50 },
 ];
 
 Page({
@@ -27,7 +27,7 @@ Page({
       onRenderChart: () => {
         return this.renderChart(data1);
       },
-    })
+    });
 
     // 模拟数据更新
     setTimeout(() => {
@@ -35,7 +35,7 @@ Page({
         onRenderChart: () => {
           return this.renderChart(data2);
         },
-      })
+      });
     }, 2000);
   },
   renderChart(data) {

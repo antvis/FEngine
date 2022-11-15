@@ -22,7 +22,9 @@ export { default as Theme } from './canvas/theme';
 export {
   IProps,
   IState,
+  ComponentType,
   FC,
+  ClassComponent,
   Ref,
   AnimationProps,
   ShapeProps,

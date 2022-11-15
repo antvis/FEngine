@@ -6,7 +6,7 @@ import { Updater } from './updater';
 import { VNode } from '../canvas/vnode';
 import Animator from '../canvas/render/animator';
 
-interface ComponentStyle {
+export interface ComponentStyle {
   left?: number;
   top?: number;
   width?: number;

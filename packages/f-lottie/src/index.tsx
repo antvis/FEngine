@@ -10,13 +10,13 @@ interface LottieProps {
     // 是否自动播放
     autoplay: boolean;
   };
-  style: {
+  style?: {
     width: number;
     height: number;
     x: number;
     y: number;
   };
-  animation: Animation;
+  animation?: Animation;
 }
 
 class Lottie extends Component<LottieProps> {
@@ -28,27 +28,27 @@ class Lottie extends Component<LottieProps> {
     this.ref = createRef();
   }
 
-  async didMount(): Promise<void> {
+  didMount() {
     const { props, context } = this;
     const { data, options } = props;
     const { canvas } = context;
 
     // 文档流后挂载lottie
-    await canvas.ready;
+    canvas.ready.then(() => {
+      const animation = loadAnimation(data, options);
+      animation.render(this.ref.current);
 
-    const animation = loadAnimation(data, options);
-    animation.render(this.ref.current);
-
-    this.size = animation.size();
-    this.updateSize();
+      this.size = animation.size();
+      this.updateSize();
+    });
   }
 
-  async willUpdate() {
+  willUpdate() {
     const { context } = this;
     const { canvas } = context;
-    await canvas.ready;
-
-    this.updateSize();
+    canvas.ready.then(() => {
+      this.updateSize();
+    });
   }
 
   updateSize = () => {
