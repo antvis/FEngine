@@ -2,10 +2,14 @@ import { JSX as JSXNamespace } from './jsx-namespace';
 import { ElementType } from '../types';
 
 export namespace jsx {
+  // https://www.tslang.cn/docs/handbook/jsx.html
   export namespace JSX {
     export type Element = JSXNamespace.Element;
     export type ElementClass = JSXNamespace.ElementClass;
     export type IntrinsicElements = JSXNamespace.IntrinsicElements;
+    export type ElementAttributesProperty = JSXNamespace.ElementAttributesProperty;
+    export type IntrinsicAttributes = JSXNamespace.IntrinsicAttributes;
+    export type IntrinsicClassAttributes = JSXNamespace.IntrinsicClassAttributes;
   }
 }
 

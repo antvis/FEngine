@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, createRef, Component } from 'react';
 import { Canvas, Children, CanvasProps as FCanvasProps } from '@antv/f-engine';
 
 export interface CanvasProps {
@@ -11,7 +11,7 @@ export interface CanvasProps {
   canvasRef?: RefObject<HTMLCanvasElement>;
   ref?: RefObject<HTMLCanvasElement>;
   children?: React.ReactElement | React.ReactElement[] | null;
-  fallback?: React.Component;
+  fallback?: JSX.Element | null;
   onError?: (error: Error) => void;
 }
 
@@ -45,14 +45,14 @@ class FCanvas extends Canvas {
   }
 }
 
-class ReactCanvas extends React.Component<CanvasProps, CanvasState> {
+class ReactCanvas extends Component<CanvasProps, CanvasState> {
   canvasRef: RefObject<HTMLCanvasElement>;
   canvas: Canvas;
 
   constructor(props: CanvasProps) {
     super(props);
     const { canvasRef } = props;
-    this.canvasRef = canvasRef || React.createRef();
+    this.canvasRef = canvasRef || createRef();
     this.state = { error: null };
   }
 

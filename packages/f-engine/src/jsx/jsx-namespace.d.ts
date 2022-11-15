@@ -18,7 +18,7 @@ import {
 
 export namespace JSX {
   export interface Element {
-    key: string;
+    key?: number | string | null;
     ref?: Ref;
     type: ElementType;
     props: IProps;
@@ -28,6 +28,20 @@ export namespace JSX {
   export interface ElementClass {
     props: IProps;
     render(): Element | null | Promise<void>;
+  }
+
+  export interface ElementAttributesProperty {
+    props: IProps;
+  }
+
+  export interface IntrinsicAttributes {
+    key?: number | string;
+    ref?: Ref;
+  }
+
+  export interface IntrinsicClassAttributes {
+    key?: number | string;
+    ref?: Ref;
   }
 
   export interface IntrinsicElements {

@@ -35,7 +35,7 @@ describe('Canvas', () => {
   it('渲染顺序', async () => {
     const { props } = (
       <Canvas context={context} animate={false}>
-        <Rect id={1} />
+        <Rect />
         {null}
         <Circle />
       </Canvas>
@@ -50,8 +50,8 @@ describe('Canvas', () => {
     const update = (
       <Canvas context={context}>
         {null}
-        <Rect id={2} />
-        <Circle id={3} />
+        <Rect />
+        <Circle />
       </Canvas>
     );
 

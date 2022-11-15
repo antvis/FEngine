@@ -1,6 +1,6 @@
 import { DisplayObjectConfig, BaseStyleProps } from '@antv/g-lite';
-import { CustomElement, Path } from '@antv/g-lite';
-import { deepMix, PathArray } from '@antv/util';
+import { Path } from '@antv/g-lite';
+import { PathArray } from '@antv/util';
 
 export interface MarkerStyleProps extends BaseStyleProps {
   x?: string | number;

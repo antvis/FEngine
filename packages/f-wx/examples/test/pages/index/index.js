@@ -1,5 +1,5 @@
 // index.js
-import { createElement } from '@antv/f2';
+// import { createElement } from '@antv/f2';
 import Chart from './chart';
 import { jsx as _jsx } from "@antv/f2/jsx-runtime";
 const data1 = [{
@@ -36,17 +36,16 @@ const data2 = [{
 }];
 Page({
   data: {
-    chartData: data1,
     onRenderChart: () => {}
   },
-
   onReady() {
     this.setData({
       onRenderChart: () => {
         return this.renderChart(data1);
       }
-    }); // 模拟数据更新
+    });
 
+    // 模拟数据更新
     setTimeout(() => {
       this.setData({
         onRenderChart: () => {
@@ -55,14 +54,13 @@ Page({
       });
     }, 2000);
   },
-
   renderChart(data) {
     return _jsx(Chart, {
       data: data
-    }); // 如果不使用 jsx, 用下面代码效果也是一样的
+    });
+    // 如果不使用 jsx, 用下面代码效果也是一样的
     // return createElement(Chart, {
     //   data: data,
     // });
   }
-
 });
