@@ -1,12 +1,12 @@
 import { JSX } from '../jsx/jsx-namespace';
 import { IProps, IState } from '../types/jsx';
 import { Group } from '@antv/g-lite';
-import { ComponentContext } from '../canvas';
+import { IContext } from '../types';
 import { Updater } from './updater';
 import { VNode } from '../canvas/vnode';
 import Animator from '../canvas/render/animator';
 
-export interface ComponentStyle {
+export interface ComponentLayout {
   left?: number;
   top?: number;
   width?: number;
@@ -20,14 +20,14 @@ export interface Props extends IProps {
 class Component<P extends Props = IProps, S = IState> {
   props: P;
   state: S;
-  context: ComponentContext;
+  context: IContext;
   refs: {
     [key: string]: Component;
   };
   updater: Updater<S>;
   // 对应 G 的group, 每个组件渲染的父节点
   container: Group;
-  style: ComponentStyle;
+  layout: ComponentLayout;
   // render 返回的节点
   children: VNode | VNode[] | null;
 
@@ -38,7 +38,7 @@ class Component<P extends Props = IProps, S = IState> {
   destroyed = false;
   _vNode: VNode;
 
-  constructor(props: P, context?: ComponentContext, updater?: Updater<S>) {
+  constructor(props: P, context?: IContext, updater?: Updater<S>) {
     this.props = props;
     this.state = {} as S;
     this.context = context;
@@ -49,7 +49,7 @@ class Component<P extends Props = IProps, S = IState> {
   shouldUpdate(_nextProps: P): boolean {
     return true;
   }
-  willReceiveProps(_props: P, _context?: ComponentContext) {}
+  willReceiveProps(_props: P, _context?: IContext) {}
   willUpdate() {}
   didUpdate() {}
   render(): JSX.Element | null {

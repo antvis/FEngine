@@ -1,3 +1,5 @@
+import { isArray, isNil } from '@antv/util';
+
 const elementStyle = {
   fillStyle: 'String',
   font: 'String',
@@ -27,7 +29,7 @@ const elementStyle = {
 };
 
 // css规则表 TODO：补充 / 多种类型
-export const DEFAULT_CSS_RULE = {
+const DEFAULT_CSS_RULE = {
   group: {
     ...elementStyle,
   },
@@ -121,3 +123,40 @@ export const DEFAULT_CSS_RULE = {
     anticlockwise: 'Boolean',
   },
 };
+
+export default function checkCSSRule(type: string, style: Record<string, any>) {
+  if (!style) {
+    return style;
+  }
+
+  const cssStyle = {};
+  Object.keys(style).forEach((key) => {
+    const value = style[key];
+    if (isNil(value)) {
+      return;
+    }
+    const rule = DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key];
+    if (!rule) {
+      cssStyle[key] = value;
+      return;
+    }
+    const valueType = Object.prototype.toString.call(value);
+    if (isArray(rule)) {
+      for (let i = 0, len = rule.length; i < len; i++) {
+        if (valueType === `[object ${rule[i]}]`) {
+          cssStyle[key] = value;
+          return;
+        }
+      }
+
+      // 没有匹配的类型
+      return;
+    }
+    // string
+    if (valueType === `[object ${rule}]`) {
+      cssStyle[key] = value;
+    }
+  });
+
+  return cssStyle;
+}

@@ -1,12 +1,5 @@
-import {
-  isDate,
-  isPlainObject,
-  isNumber,
-  isString,
-  isArray,
-  isNil
-} from '@antv/util';
-import { DEFAULT_CSS_RULE } from './cssRule';
+import { isDate, isPlainObject, isNumber, isString, isArray } from '@antv/util';
+import checkCSSRule from './cssRule';
 
 // 默认设置50
 let ONE_REM: number;
@@ -41,10 +34,8 @@ function parsePadding(padding: number | number[]) {
   return [top, right, bottom, left];
 }
 
-type pxstr = `${number}px`;
-
 function batch2hd(px2hd) {
-  const batchPx2hd = (value: pxstr | pxstr[] | number | number[] | string | string[] | any) => {
+  const batchPx2hd = (value: number | number[] | string | string[] | any) => {
     // 处理带px的数据
     if (isString(value) && /^-?\d+px$/.test(value)) {
       const num = value.substr(0, value.length - 2);
@@ -80,7 +71,7 @@ function batch2hd(px2hd) {
     }
     // 默认直接返回
     return value;
-  }
+  };
   return batchPx2hd;
 }
 
@@ -123,37 +114,8 @@ function getElementsByClassName(className: string, element) {
   return rst;
 }
 
-
-function checkCSSRule(type, style, func = (value)=>!isNil(value)) {
-  const cssStyle = {}
-  for(const key in style) {
-    // 过滤undefine NAN
-    if(!style.hasOwnProperty(key) || !func(style[key]) ) continue
-
-    // 类型校验
-    if(DEFAULT_CSS_RULE[type] && DEFAULT_CSS_RULE[type][key]){
-
-      if(isArray(DEFAULT_CSS_RULE[type][key])) {
-        let isType = false
-        DEFAULT_CSS_RULE[type][key].forEach( d => {
-          if (Object.prototype.toString.call(style[key]) === `[object ${d}]`) {
-            isType = true
-          }
-        })
-
-        if(!isType)  continue
-      }
-        else if( Object.prototype.toString.call(style[key]) !== `[object ${DEFAULT_CSS_RULE[type][key]}]`) continue
-      
-    } 
-
-    cssStyle[key] = style[key]
-  }
-
-  return cssStyle
-}
-
 const px2hd = batch2hd(defaultPx2hd);
+
 export {
   px2hd,
   batch2hd,

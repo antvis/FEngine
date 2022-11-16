@@ -1,7 +1,7 @@
 import { JSX } from '../jsx/jsx-namespace';
 import { DisplayObject } from '@antv/g-lite';
 import Component from '../component';
-import { ComponentContext } from '.';
+import { IContext } from '../types';
 import { Updater } from '../component/updater';
 import Animator from './render/animator';
 import { WorkTag } from './workTags';
@@ -11,8 +11,8 @@ export interface VNodeLayout {
   height: number;
   left: number;
   top: number;
-  right: number;
-  bottom: number;
+  right?: number;
+  bottom?: number;
 }
 
 // virtual dom 的节点
@@ -23,7 +23,7 @@ export interface VNode extends JSX.Element {
   // Instance
   component?: Component;
   shape: DisplayObject;
-  context: ComponentContext;
+  context: IContext;
   updater: Updater<any>;
 
   // VNode

@@ -12,7 +12,7 @@ import { getWorkTag, ClassComponent, Shape, FunctionComponent, WorkTag } from '.
 import {
   computeLayout,
   createNodeTree,
-  computeFlexLayout,
+  computeComponentLayout,
   fillElementLayout,
 } from './computeLayout';
 
@@ -178,8 +178,7 @@ function diffElement(
   }
 
   // 更新
-  // @ts-ignore
-  return updateElement(parent, nextElement, lastElement);
+  return updateElement(parent, nextElement, lastElement as VNode);
 }
 
 function renderComponentNodes(componentNodes: VNode[] | null) {
@@ -189,9 +188,10 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 
   // 1. shouldUpdate & willReceiveProps
   const shouldProcessChildren = componentNodes.filter((node: VNode) => {
-    const { component, props, context, style } = node;
+    const { component, props, context, layout } = node;
 
-    component.style = style;
+    // 更新组件 layout
+    component.layout = layout;
 
     // 新创建的 component
     if (!component.children) return true;
@@ -293,7 +293,7 @@ function renderChildren(
 
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
-  computeFlexLayout(nodeTree);
+  computeComponentLayout(nodeTree);
   fillElementLayout(nodeTree);
 
   const { children: newChildren } = parent;

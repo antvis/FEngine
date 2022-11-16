@@ -229,15 +229,20 @@ describe('Canvas', () => {
 
     class ViewChild extends Component {
       render() {
-        const { style, props } = this;
+        const { layout, props } = this;
         const { fill } = props;
-        const { width, height } = style;
+        const { width, height } = layout;
         return <rect style={{ fill, width, height }} />;
       }
     }
 
     const { props } = (
-      <Canvas context={context}>
+      <Canvas
+        context={context}
+        style={{
+          padding: [10],
+        }}
+      >
         <group
           style={{
             display: 'flex',

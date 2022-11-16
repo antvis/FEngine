@@ -56,10 +56,11 @@ class Animator extends EE {
         delay,
         iterations,
       });
+      if (animation) {
+        animation.onframe = onFrame;
+        animation.onfinish = onEnd;
+      }
 
-      animation.onframe = onFrame;
-
-      animation.onfinish = onEnd;
       // 过滤无限循环的动画
       if (animation && iterations !== Infinity) {
         animations.push(animation.finished);
