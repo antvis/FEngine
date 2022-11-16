@@ -1,11 +1,11 @@
 import { JSX } from '../../jsx/jsx-namespace';
 import Component from '../../component';
 import Children from '../../children';
-import { isNumber, isArray, mix } from '@antv/util';
+import { isNumber, isArray } from '@antv/util';
 import getShapeAttrs from '../shape';
 import { VNode } from '../vnode';
-import { FunctionComponent, getWorkTag, Shape } from '../workTags';
-import computeFlexLayout from './css-layout';
+import { Shape, FunctionComponent, ClassComponent, getWorkTag } from '../workTags';
+import computeCSSLayout from './css-layout';
 
 export interface INode {
   className?: string;
@@ -165,7 +165,7 @@ function computeLayout(component: Component, newChildren: JSX.Element) {
   const { context, updater } = component;
   const nodeTree = renderJSXElement(newChildren, context, updater);
 
-  computeFlexLayout(nodeTree);
+  computeCSSLayout(nodeTree);
 
   // 构造一个 NodeTree, 方便外部使用
   return new NodeTree(nodeTree);
@@ -173,7 +173,7 @@ function computeLayout(component: Component, newChildren: JSX.Element) {
 
 // 创建布局的计算树
 function createNodeTree(vNode: VNode) {
-  const { type, style, context, children: vNodeChildren } = vNode;
+  const { tag, type, style, context, children: vNodeChildren } = vNode;
   const { measureText } = context;
   const children = extendMap(vNodeChildren, (child: VNode) => {
     return createNodeTree(child);
@@ -185,12 +185,43 @@ function createNodeTree(vNode: VNode) {
   }
 
   return {
+    tag,
     type,
     style,
     children,
     // 保留对 vNode 的引用，用于把布局结果回填
     vNode,
   };
+}
+
+function computeComponentLayout(node) {
+  const { children, vNode } = node;
+  // 组件当前的 layout
+  const { layout } = vNode;
+  node.layout = layout;
+  if (!children || !children.length) {
+    return;
+  }
+  for (let i = 0, len = children.length; i < len; i++) {
+    const child = children[i];
+    const { tag } = child;
+
+    if (tag === Shape || tag === FunctionComponent) {
+      computeCSSLayout(child);
+    } else {
+      // ClassComponent
+      const { width, height } = layout;
+      child.layout = {
+        width,
+        height,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+      };
+    }
+  }
+  return node;
 }
 
 function fillElementLayout(node) {
@@ -207,31 +238,25 @@ function fillElementLayout(node) {
     ...attrs,
     ...style,
   };
-  if (children && children.length) {
-    for (let i = 0, len = children.length; i < len; i++) {
-      const child = children[i];
-      const { vNode } = child;
-      const { tag, style: childStyle } = vNode;
-      if (tag !== Shape) {
-        if (layout) {
-          mix(childStyle, {
-            left: layout.left,
-            top: layout.top,
-            width: layout.width,
-            height: layout.height,
-          });
-        } else {
-          mix(childStyle, {
-            left: style.left,
-            top: style.top,
-            width: style.width,
-            height: style.height,
-          });
-        }
-      }
-      fillElementLayout(child);
+  if (!children || !children.length) {
+    return;
+  }
+  for (let i = 0, len = children.length; i < len; i++) {
+    const child = children[i];
+    const { tag } = child;
+    // 如果是 ClassComponent， 让 layout 占满父节点
+    if (tag === ClassComponent && layout) {
+      const { width, height } = layout;
+      child.layout = {
+        width,
+        height,
+        left: 0,
+        top: 0,
+      };
     }
+
+    fillElementLayout(child);
   }
 }
 
-export { computeLayout, createNodeTree, computeFlexLayout, fillElementLayout };
+export { computeLayout, createNodeTree, computeComponentLayout, fillElementLayout };

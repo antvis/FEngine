@@ -7,12 +7,12 @@ import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
 import EE from '@antv/event-emitter';
 import Theme, { Theme as ThemeType } from './theme';
-import Layout from './layout';
 import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';
 import { render, updateComponents } from './render';
 import { VNode } from './vnode';
-import { IProps } from '../types';
+import { IProps, IContext, TextStyleProps } from '../types';
+import { ClassComponent } from './workTags';
 
 export interface CanvasProps extends IProps {
   context?: CanvasRenderingContext2D;
@@ -31,11 +31,7 @@ export interface CanvasProps extends IProps {
   createImage?: (src?: string) => HTMLImageElement;
 }
 
-export interface ComponentContext {
-  [key: string]: any;
-}
-
-function measureText(container: Group, px2hd, theme) {
+function measureText(container: Group, px2hd, theme: ThemeType) {
   return (text: string, font?) => {
     const {
       fontSize = theme.fontSize,
@@ -63,8 +59,7 @@ function measureText(container: Group, px2hd, theme) {
       visibility: 'hidden',
     };
 
-    const result = checkCSSRule('text', style);
-    // @ts-ignore
+    const result = checkCSSRule('text', style) as TextStyleProps;
     const shape = new Text({ style: result });
 
     container.appendChild(shape);
@@ -78,6 +73,17 @@ function measureText(container: Group, px2hd, theme) {
   };
 }
 
+function computeLayout(style) {
+  const { left, top, width, height, padding } = style;
+  const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
+  return {
+    left: left + paddingLeft,
+    top: top + paddingTop,
+    width: width - paddingLeft - paddingRight,
+    height: height - paddingTop - paddingBottom,
+  };
+}
+
 // 顶层Canvas标签
 class Canvas<P extends CanvasProps = CanvasProps> {
   props: P;
@@ -87,11 +93,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   private canvas: GCanvas;
   private _ee: EE;
   container: Group;
-  context: any;
-
+  context: IContext;
   children: VNode | VNode[] | null;
   private vNode: VNode;
-  layout: Layout;
   landscape: boolean;
   canvasElement: CanvasLike;
 
@@ -133,13 +137,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       createImage,
     });
 
-    // 设置默认的全局样式
-    const documentElement = canvas.document.documentElement;
-    documentElement.setAttribute('fontSize', fontSize);
-    documentElement.setAttribute('fontFamily', fontFamily);
-
     const container = canvas.getRoot();
-
     const { width: canvasWidth, height: canvasHeight } = canvas.getConfig();
     const style = px2hd({
       left: 0,
@@ -149,7 +147,16 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       padding,
       ...customStyle,
     });
-    const layout = Layout.fromStyle(style);
+    const layout = computeLayout(style);
+
+    // 设置默认的全局样式
+    const documentElement = canvas.document.documentElement;
+    documentElement.setAttribute('fontSize', fontSize);
+    documentElement.setAttribute('fontFamily', fontFamily);
+
+    // 设置 container 的位置
+    container.setAttribute('x', layout.left);
+    container.setAttribute('y', layout.top);
 
     const gesture = new Gesture(canvas);
 
@@ -169,20 +176,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     const vNode: VNode = {
       key: undefined,
-      style: {
-        left: layout.left,
-        top: layout.top,
-        width: layout.width,
-        height: layout.height,
-      },
-      layout: {
-        width: layout.width,
-        height: layout.height,
-        left: layout.left,
-        top: layout.top,
-        right: 0,
-        bottom: 0,
-      },
+      tag: ClassComponent,
+      style: layout,
+      layout,
       // @ts-ignore
       type: Canvas,
       props,
