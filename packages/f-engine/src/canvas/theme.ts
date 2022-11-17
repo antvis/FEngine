@@ -9,12 +9,12 @@ const THEME: Theme = {
   padding: [0, 0, 0, 0],
 };
 
-function setTheme(theme: Theme) {
-  Object.assign(THEME, theme);
-}
+// function setTheme(theme: Theme) {
+//   Object.assign(THEME, theme);
+// }
 
-function getTheme() {
-  return THEME;
-}
+// function getTheme() {
+//   return THEME;
+// }
 
-export default { setTheme, getTheme };
+export default THEME;

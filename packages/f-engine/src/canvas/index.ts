@@ -117,7 +117,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
     // 初始化主题
-    const theme = px2hd({ ...Theme.getTheme(), ...customTheme }) as ThemeType;
+    const theme = px2hd({ ...Theme, ...customTheme }) as ThemeType;
     const { pixelRatio, fontSize, fontFamily, padding } = theme;
     const devicePixelRatio = customPixelRatio ? customPixelRatio : pixelRatio;
 
