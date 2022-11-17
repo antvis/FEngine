@@ -15,12 +15,12 @@ export { default as Timeline } from './timeline';
 export { default as Gesture } from './gesture';
 export { CanvasRenderer, computeLayout, Smooth };
 export { default as isEqual } from './canvas/equal';
-export { default as Theme } from './canvas/theme';
 
 // 导出 ts 类型
 export {
   IProps,
   IState,
+  IContext,
   ComponentType,
   FC,
   ClassComponent,
