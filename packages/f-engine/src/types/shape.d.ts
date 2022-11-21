@@ -87,12 +87,14 @@ interface StyleClipProps {
 }
 
 export interface GroupStyleProps extends StyleFlexProps, StyleClipProps, GGroupStyleProps {}
-export interface RectStyleProps extends StyleFlexProps, StyleClipProps, GRectStyleProps {}
+export interface RectStyleProps extends StyleFlexProps, StyleClipProps, GRectStyleProps {
+  radius?: ArrayAttribute;
+}
 export interface CircleStyleProps
   extends StyleFlexProps,
     StyleClipProps,
     Omit<GCircleStyleProps, 'r'> {
-  r?: number;
+  r?: string | number;
 }
 export interface LineStyleProps
   extends StyleFlexProps,
@@ -103,8 +105,14 @@ export interface LineStyleProps
   x2?: string | number;
   y2?: string | number;
 }
-export interface PolygonStyleProps extends StyleFlexProps, StyleClipProps, GPolygonStyleProps {}
-export interface PolylineStyleProps extends StyleFlexProps, StyleClipProps, GPolylineStyleProps {}
+export interface PolygonStyleProps extends StyleFlexProps, StyleClipProps, GPolygonStyleProps {
+  points: [number, number][] | [string, string][] | [number, string][] | [string, number][];
+  smooth?: boolean;
+}
+export interface PolylineStyleProps extends StyleFlexProps, StyleClipProps, GPolylineStyleProps {
+  points: [number, number][] | [string, string][] | [number, string][] | [string, number][];
+  smooth?: boolean;
+}
 export interface ArcStyleProps extends StyleFlexProps, StyleClipProps, GArcStyleProps {}
 export interface SectorStyleProps extends StyleFlexProps, StyleClipProps, GSectorStyleProps {}
 export interface TextStyleProps extends StyleFlexProps, StyleClipProps, GTextStyleProps {}
