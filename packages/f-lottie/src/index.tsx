@@ -1,4 +1,4 @@
-import { Component, createRef, jsx, Ref } from '@antv/f-engine';
+import { Component, createRef, jsx, Ref, AnimationProps } from '@antv/f-engine';
 import { loadAnimation } from '@antv/g-lottie-player';
 
 interface LottieProps {
@@ -16,7 +16,7 @@ interface LottieProps {
     x: number;
     y: number;
   };
-  animation?: Animation;
+  animation?: AnimationProps;
 }
 
 class Lottie extends Component<LottieProps> {
