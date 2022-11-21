@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-vue",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "FEngine for Vue.js",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -15,7 +15,7 @@
     "vue"
   ],
   "dependencies": {
-    "@antv/f-engine": "^0.0.8",
+    "@antv/f-engine": "^0.0.9",
     "@babel/runtime": "^7.12.5"
   },
   "devDependencies": {
