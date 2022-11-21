@@ -132,7 +132,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       renderer,
       width,
       height,
-      supportTouchEvent: true,
+      supportsTouchEvents: true,
       supportsPointerEvents: true,
       createImage,
     });

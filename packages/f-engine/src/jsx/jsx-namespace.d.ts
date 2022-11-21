@@ -1,7 +1,5 @@
+import { Ref, ElementType, IProps } from '../types/jsx';
 import {
-  Ref,
-  ElementType,
-  IProps,
   GroupProps,
   RectProps,
   CircleProps,
@@ -14,7 +12,7 @@ import {
   MarkerProps,
   ImageProps,
   PathProps,
-} from '../types/jsx';
+} from '../types/shape';
 
 export namespace JSX {
   export interface Element {

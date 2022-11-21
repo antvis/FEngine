@@ -47,7 +47,7 @@
     "snapshot": "jest --updateSnapshot",
     "lint": "eslint ./",
     "lint-fix": "eslint --fix ./",
-    "publish": "npm run build && npm run test && lerna publish --dist-tag next",
+    "publish": "npm run build && npm run test && lerna publish",
     "ci": "npm run lint && npm run build && npm run test",
     "refresh": "lerna clean && yarn && lerna bootstrap",
     "prettier": "prettier --write './packages/**/*.{ts,tsx}'"
