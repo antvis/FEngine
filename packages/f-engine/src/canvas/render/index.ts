@@ -12,8 +12,9 @@ import { getWorkTag, ClassComponent, Shape, FunctionComponent, WorkTag } from '.
 import {
   computeLayout,
   createNodeTree,
-  computeComponentLayout,
+  computeCSSLayout,
   fillElementLayout,
+  fillComponentLayout,
 } from './computeLayout';
 
 function getStyle(tagType: WorkTag, props, context) {
@@ -25,6 +26,14 @@ function getStyle(tagType: WorkTag, props, context) {
       ...attrs,
     });
   }
+
+  // const style = {
+  //   position: 'absolute',
+  //   left: 0,
+  //   top: 0,
+  //   right: 0,
+  //   bottom: 0,
+  // } as Record<string, any>;
 
   if (isNumber(zIndex)) {
     return { zIndex };
@@ -293,8 +302,9 @@ function renderChildren(
 
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
-  computeComponentLayout(nodeTree);
+  computeCSSLayout(nodeTree);
   fillElementLayout(nodeTree);
+  fillComponentLayout(parent);
 
   const { children: newChildren } = parent;
   if (!componentNodeChildren.length) {

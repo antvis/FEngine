@@ -102,16 +102,34 @@ function extendMap(arr, fn: Function) {
   if (!arr) {
     return arr;
   }
-  if (!isArray(arr)) {
-    return [fn(arr)];
-  }
   let newArray = [];
+  if (!isArray(arr)) {
+    const rst = fn(arr);
+    if (!rst) {
+      return newArray;
+    }
+    if (isArray(rst)) {
+      newArray = newArray.concat(rst);
+    } else {
+      newArray.push(rst);
+    }
+    return newArray;
+  }
+
   for (let i = 0; i < arr.length; i++) {
     const element = arr[i];
     if (isArray(element)) {
       newArray = newArray.concat(extendMap(element, fn));
     } else if (element) {
-      newArray.push(fn(element));
+      const rst = fn(element);
+      if (!rst) {
+        continue;
+      }
+      if (isArray(rst)) {
+        newArray = newArray.concat(rst);
+      } else {
+        newArray.push(rst);
+      }
     }
   }
   return newArray;
@@ -171,13 +189,29 @@ function computeLayout(component: Component, newChildren: JSX.Element) {
   return new NodeTree(nodeTree);
 }
 
-// 创建布局的计算树
+function createChildNodeTree(parent: VNode, vNodeChildren: VNode | VNode[]) {
+  const { tag } = parent;
+  const children = extendMap(vNodeChildren, (child: VNode) => {
+    const { tag: childTag, style: childStyle, children: childChildren } = child;
+    // 如果组件的根节点不是 flex, 则该组件不需要计算 flex 布局
+    if (tag !== Shape && childTag === Shape && childStyle.display !== 'flex') {
+      return null;
+    }
+    // 如果子组件不是 shape，则布局计算时，忽略当前节点
+    if (childTag !== Shape) {
+      return createChildNodeTree(child, childChildren);
+    }
+    return createNodeTree(child);
+  });
+
+  return children;
+}
+
+// 创建组件的布局树
 function createNodeTree(vNode: VNode) {
   const { tag, type, style, context, children: vNodeChildren } = vNode;
   const { measureText } = context;
-  const children = extendMap(vNodeChildren, (child: VNode) => {
-    return createNodeTree(child);
-  });
+  const children = createChildNodeTree(vNode, vNodeChildren);
 
   // 文本需要计算文本的宽高来进行flex布局
   if (type === 'text') {
@@ -192,36 +226,6 @@ function createNodeTree(vNode: VNode) {
     // 保留对 vNode 的引用，用于把布局结果回填
     vNode,
   };
-}
-
-function computeComponentLayout(node) {
-  const { children, vNode } = node;
-  // 组件当前的 layout
-  const { layout } = vNode;
-  node.layout = layout;
-  if (!children || !children.length) {
-    return;
-  }
-  for (let i = 0, len = children.length; i < len; i++) {
-    const child = children[i];
-    const { tag } = child;
-
-    if (tag === Shape || tag === FunctionComponent) {
-      computeCSSLayout(child);
-    } else {
-      // ClassComponent
-      const { width, height } = layout;
-      child.layout = {
-        width,
-        height,
-        left: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-      };
-    }
-  }
-  return node;
 }
 
 function fillElementLayout(node) {
@@ -243,20 +247,27 @@ function fillElementLayout(node) {
   }
   for (let i = 0, len = children.length; i < len; i++) {
     const child = children[i];
-    const { tag } = child;
-    // 如果是 ClassComponent， 让 layout 占满父节点
-    if (tag === ClassComponent && layout) {
-      const { width, height } = layout;
-      child.layout = {
-        width,
-        height,
-        left: 0,
-        top: 0,
-      };
-    }
-
     fillElementLayout(child);
   }
 }
 
-export { computeLayout, createNodeTree, computeComponentLayout, fillElementLayout };
+function fillComponentLayout(vNode: VNode) {
+  const { layout, children: vNodeChildren } = vNode;
+  Children.map(vNodeChildren, (child) => {
+    if (!child) {
+      return;
+    }
+    const { tag: childTag, layout: childLayout, style } = child;
+    if (childTag !== Shape && layout && !childLayout) {
+      child.layout = layout;
+      child.style = {
+        width: layout.width,
+        height: layout.height,
+        ...style,
+      };
+    }
+    fillComponentLayout(child);
+  });
+}
+
+export { computeLayout, createNodeTree, computeCSSLayout, fillElementLayout, fillComponentLayout };
