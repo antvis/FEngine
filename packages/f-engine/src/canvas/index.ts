@@ -178,7 +178,6 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       key: undefined,
       tag: ClassComponent,
       style: layout,
-      layout,
       // @ts-ignore
       type: Canvas,
       props,

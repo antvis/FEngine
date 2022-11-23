@@ -1315,18 +1315,8 @@ function layoutNode(node, parentMaxWidth, parentDirection) {
 /* eslint-enable */
 function computeLayout(node) {
   if (!node) return node;
-  const { style, children } = node;
-  // 定义flex布局时再进行css布局进行
-  if (style && style.display === 'flex') {
-    fillNodes(node);
-    layoutNode(node, null, null);
-    return node;
-  }
-  if (children && children.length) {
-    for (let i = 0, len = children.length; i < len; i++) {
-      computeLayout(children[i]);
-    }
-  }
+  fillNodes(node);
+  layoutNode(node, null, null);
   return node;
 }
 
