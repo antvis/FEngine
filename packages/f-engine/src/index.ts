@@ -23,6 +23,7 @@ export {
   IContext,
   ComponentType,
   FC,
+  HOC,
   ClassComponent,
   Ref,
   AnimationProps,
