@@ -34,3 +34,4 @@ export type ComponentType<P = IProps> = ComponentClass<P> | FunctionComponent<P>
 
 export type ClassComponent<P = {}, S = {}> = ComponentClass<P, S>;
 export type FC<P = {}> = FunctionComponent<P>;
+export type HOC<T extends ClassComponent<P, S>, P = {}, S = {}> = FC<P> & T;

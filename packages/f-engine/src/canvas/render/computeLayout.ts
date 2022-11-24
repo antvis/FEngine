@@ -4,7 +4,7 @@ import Children from '../../children';
 import { isNumber, isArray } from '@antv/util';
 import getShapeAttrs from '../shape';
 import { VNode } from '../vnode';
-import { Shape, FunctionComponent, ClassComponent, getWorkTag } from '../workTags';
+import { Shape, FunctionComponent, getWorkTag } from '../workTags';
 import computeCSSLayout from './css-layout';
 
 export interface INode {
