@@ -11,7 +11,7 @@ export { default as Canvas, CanvasProps } from './canvas';
 export { default as Component } from './component';
 export { default as Children } from './children';
 export { default as createRef } from './createRef';
-export { default as Timeline } from './timeline';
+export { default as Timeline, TimelineProps } from './timeline';
 export { default as Gesture } from './gesture';
 export { CanvasRenderer, computeLayout, Smooth };
 export { default as isEqual } from './canvas/equal';
@@ -26,6 +26,7 @@ export {
   HOC,
   ClassComponent,
   Ref,
+  LayoutProps,
   AnimationProps,
   ShapeProps,
   GroupProps,

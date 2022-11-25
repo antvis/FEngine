@@ -8,6 +8,7 @@ export namespace jsx {
     export type ElementClass = JSXNamespace.ElementClass;
     export type IntrinsicElements = JSXNamespace.IntrinsicElements;
     export type ElementAttributesProperty = JSXNamespace.ElementAttributesProperty;
+    export type ElementChildrenAttribute = JSXNamespace.ElementChildrenAttribute;
     export type IntrinsicAttributes = JSXNamespace.IntrinsicAttributes;
     export type IntrinsicClassAttributes = JSXNamespace.IntrinsicClassAttributes;
   }
