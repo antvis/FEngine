@@ -35,11 +35,21 @@ export namespace JSX {
   export interface IntrinsicAttributes {
     key?: number | string;
     ref?: Ref;
+    animate?: boolean;
+    transformFrom?: any;
+    children?: any;
   }
 
   export interface IntrinsicClassAttributes {
     key?: number | string;
     ref?: Ref;
+    animate?: boolean;
+    transformFrom?: any;
+    children?: any;
+  }
+
+  export interface ElementChildrenAttribute {
+    children: {};
   }
 
   export interface IntrinsicElements {

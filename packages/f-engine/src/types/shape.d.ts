@@ -54,6 +54,15 @@ interface StyleFlexProps {
   paddingBottom?: string | number;
 }
 
+export interface LayoutProps {
+  left?: number;
+  top?: number;
+  right?: number;
+  bottom?: number;
+  width?: number;
+  height?: number;
+}
+
 export type ShapeStyleProps =
   | GGroupStyleProps
   | GRectStyleProps
