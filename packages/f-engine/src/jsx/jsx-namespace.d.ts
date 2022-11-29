@@ -16,7 +16,7 @@ import {
 
 export namespace JSX {
   export interface Element {
-    key?: number | string | null;
+    key: number | string;
     ref?: Ref;
     type: ElementType;
     props: IProps;
