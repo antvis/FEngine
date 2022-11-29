@@ -276,11 +276,6 @@ function renderVNode(
         let childrenNode = [];
         if (tag === Shape) {
           childrenNode = renderVNode(child, childProps.children, childLastChildren);
-        } else if (tag === FunctionComponent) {
-          // FunctionComponent 直接更新 props
-          component.props = childProps;
-          const newChildren = canvas.toRawChildren(component.render());
-          childrenNode = renderVNode(child, newChildren as VNode, childLastChildren);
         } else {
           childrenNode = [child];
         }
