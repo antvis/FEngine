@@ -5,7 +5,7 @@ import { PathArray } from '@antv/util';
 export interface MarkerStyleProps extends BaseStyleProps {
   x?: string | number;
   y?: string | number;
-  symbol?: 'circle' | 'square';
+  symbol?: 'circle' | 'square' | 'arrow';
   radius?:
     | string
     | number
@@ -30,6 +30,15 @@ const SYMBOLS = {
       ['L', x + r, y - r],
       ['L', x + r, y + r],
       ['L', x - r, y + r],
+      ['Z'],
+    ];
+  },
+
+  arrow(x, y, r): PathArray {
+    return [
+      ['M', x - r, y + (2 * r) / Math.sqrt(3)],
+      ['L', x + r, y + (2 * r) / Math.sqrt(3)],
+      ['L', x, y - (2 * r) / Math.sqrt(3)],
       ['Z'],
     ];
   },
