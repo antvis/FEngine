@@ -83,6 +83,34 @@ class View extends Component {
   }
 }
 
+class View1 extends Component {
+  render() {
+    return (
+      <group>
+        <marker
+          style={{
+            fill: '#F04864',
+            radius: 10,
+            x: 50,
+            y: 100,
+            symbol: 'arrow',
+          }}
+        />
+        <marker
+          style={{
+            fill: '#F04864',
+            radius: 10,
+            x: 150,
+            y: 100,
+            symbol: 'arrow',
+            transform: 'rotate(90deg)',
+          }}
+        />
+      </group>
+    );
+  }
+}
+
 describe('Canvas', () => {
   it('arc', async () => {
     const renderer = new Renderer();
@@ -91,6 +119,21 @@ describe('Canvas', () => {
     const { props } = (
       <Canvas renderer={renderer} context={context}>
         <View ref={ref} />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('arrow', async () => {
+    const renderer = new Renderer();
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <View1 />
       </Canvas>
     );
 
