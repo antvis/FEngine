@@ -7,8 +7,8 @@ export interface ArcStyleProps extends BaseStyleProps {
   startAngle?: string | number;
   endAngle?: string | number;
   r?: string | number;
-  x?: string | number;
-  y?: string | number;
+  cx?: string | number;
+  cy?: string | number;
   anticlockwise?: boolean;
 }
 
@@ -26,11 +26,11 @@ export class Arc extends Path {
   }
 
   private updatePath() {
-    const { x, y, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
+    const { cx, cy, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
 
     const path = this.createPath(
-      x,
-      y,
+      cx,
+      cy,
       startAngle ? deg2rad(startAngle) : 0,
       endAngle ? deg2rad(endAngle) : Math.PI * 2,
       r ? r : 0,
