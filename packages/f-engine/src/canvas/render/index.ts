@@ -8,7 +8,7 @@ import { Group } from '@antv/g-lite';
 import equal from '../equal';
 import { createAnimation } from './animation';
 import Animator from './animator';
-import { getWorkTag, ClassComponent, Shape, FunctionComponent, WorkTag } from '../workTags';
+import { getWorkTag, ClassComponent, Shape, WorkTag } from '../workTags';
 import {
   computeLayout,
   createNodeTree,
@@ -271,7 +271,7 @@ function renderVNode(
 
       Children.map(element, (child: VNode) => {
         if (!child) return;
-        const { canvas, tag, props: childProps, component, children: childLastChildren } = child;
+        const { tag, props: childProps, children: childLastChildren } = child;
 
         let childrenNode = [];
         if (tag === Shape) {
