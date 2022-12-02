@@ -3,8 +3,8 @@ import { polarToCartesian } from './util/util';
 import { isNumberEqual, PathArray } from '@antv/util';
 
 export interface SectorStyleProps extends BaseStyleProps {
-  x?: string | number;
-  y?: string | number;
+  cx?: string | number;
+  cy?: string | number;
   /** 起始角度 */
   startAngle?: string | number;
   endAngle?: string | number;
@@ -125,11 +125,11 @@ export class Sector extends Path {
   }
 
   private updatePath() {
-    const { x, y, startAngle, endAngle, r, r0, radius } = this.parsedStyle;
+    const { cx, cy, startAngle, endAngle, r, r0, radius } = this.parsedStyle;
 
     const path = this.createPath(
-      x,
-      y,
+      cx,
+      cy,
       startAngle ? deg2rad(startAngle) : 0,
       endAngle ? deg2rad(endAngle) : Math.PI * 2,
       r ? r : 0,

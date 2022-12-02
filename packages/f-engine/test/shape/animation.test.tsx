@@ -11,8 +11,8 @@ class View extends Component {
           style={{
             stroke: '#F04864',
             r: 40,
-            x: 50,
-            y: 50,
+            cx: 50,
+            cy: 50,
             startAngle: '0rad',
             endAngle: `${(Math.PI * 4) / 3}rad`,
           }}
@@ -34,8 +34,8 @@ class View extends Component {
           style={{
             stroke: 'black',
             fill: '#F04864',
-            x: 150,
-            y: 100,
+            cx: 150,
+            cy: 100,
             lineWidth: 2,
             r: 50,
             // r0: 30,
