@@ -244,12 +244,6 @@ export class Sector extends Path {
       if (limitedOutBorderRadiusMax < outBorderRadiusMax && crStart === crEnd) {
         const outStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
         const outStartBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-        // const outStartBorderRadiusEndPoint = polarToCartesian(
-        //   x,
-        //   y,
-        //   r,
-        //   outStartBorderRadiusEndAngle
-        // );
         sectorPathCommands.push([
           'A',
           limitedOutBorderRadiusMax,
@@ -283,8 +277,8 @@ export class Sector extends Path {
           ]);
         }
 
-        const outRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
-        const outRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
+        const outRadiusStartAngle = mathATan2(ct0.y1, ct0.x1);
+        const outRadiusEndAngle = mathATan2(ct1.y1, ct1.x1);
         const outRadiusEndPoint = polarToCartesian(x, y, r, outRadiusEndAngle);
         sectorPathCommands.push([
           'A',
@@ -299,6 +293,7 @@ export class Sector extends Path {
         if (crEnd > 0) {
           const outEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
           const outEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
+
           sectorPathCommands.push([
             'A',
             crEnd,
@@ -319,13 +314,11 @@ export class Sector extends Path {
     // no inner ring, is a circular sector
     if (r0 < e) {
       sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
-    }
-    // the inner ring has corners
-    else if (limitedInnerBorderRadiusMax > e) {
+    } else if (limitedInnerBorderRadiusMax > e) {
       const crStart = mathMin(innerStartRadius, limitedInnerBorderRadiusMax);
       const crEnd = mathMin(innerEndRadius, limitedInnerBorderRadiusMax);
-      const ct0 = computeCornerTangents(xire, yire, 0, 0, r0 - r, crEnd, clockwise);
-      const ct1 = computeCornerTangents(0, 0, xirs, yirs, r0 - r, crStart, clockwise);
+      const ct0 = computeCornerTangents(0, 0, xire, yire, r0, -crEnd, clockwise);
+      const ct1 = computeCornerTangents(xirs, yirs, 0, 0, r0, -crStart, clockwise);
 
       sectorPathCommands.push(['L', x + ct0.cx + ct0.x0, y + ct0.cy + ct0.y0]);
 
@@ -333,34 +326,22 @@ export class Sector extends Path {
       if (limitedInnerBorderRadiusMax < innerBorderRadiusMax && crStart === crEnd) {
         const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
         const innerStartBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
-        const innerStartBorderRadiusEndPoint = polarToCartesian(
-          x,
-          y,
-          r0,
-          innerStartBorderRadiusEndAngle
-        );
+
         sectorPathCommands.push([
           'A',
-          limitedOutBorderRadiusMax,
-          limitedOutBorderRadiusMax,
+          limitedInnerBorderRadiusMax,
+          limitedInnerBorderRadiusMax,
           0,
           computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
           1,
-          innerStartBorderRadiusEndPoint.x,
-          innerStartBorderRadiusEndPoint.y,
+          x + ct1.cx + ct1.x0,
+          y + ct1.cy + ct1.y0,
         ]);
-      }
-      // draw the two corners and the ring
-      else {
+      } else {
+        // draw the two corners and the ring
         if (crEnd > 0) {
           const innerStartBorderRadiusStartAngle = mathATan2(ct0.y0, ct0.x0);
           const innerStartBorderRadiusEndAngle = mathATan2(ct0.y1, ct0.x1);
-          const innerStartBorderRadiusEndPoint = polarToCartesian(
-            x,
-            y,
-            r0 - r,
-            innerStartBorderRadiusEndAngle
-          );
           sectorPathCommands.push([
             'A',
             crEnd,
@@ -368,13 +349,13 @@ export class Sector extends Path {
             0,
             computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
             1,
-            innerStartBorderRadiusEndPoint.x,
-            innerStartBorderRadiusEndPoint.y,
+            x + ct0.cx + ct0.x1,
+            y + ct0.cy + ct0.y1,
           ]);
         }
-        const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
-        const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
-        const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
+        const innerRadiusStartAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
+        const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y0, ct1.cx + ct1.x0);
+        const innerRadiusStarPoint = polarToCartesian(x, y, r0, innerRadiusStartAngle);
         sectorPathCommands.push([
           'A',
           r0,
@@ -382,10 +363,10 @@ export class Sector extends Path {
           0,
           computeArcSweep(innerRadiusEndAngle, innerRadiusStartAngle),
           0,
-          innerRadiusEndPoint.x,
-          innerRadiusEndPoint.y,
+          innerRadiusStarPoint.x,
+          innerRadiusStarPoint.y,
         ]);
-        sectorPathCommands.push(['L', innerRadiusEndPoint.x, innerRadiusEndPoint.y]);
+        sectorPathCommands.push(['L', innerRadiusStarPoint.x, innerRadiusStarPoint.y]);
         if (crStart > 0) {
           const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
           const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
