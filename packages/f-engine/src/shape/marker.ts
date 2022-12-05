@@ -6,13 +6,7 @@ export interface MarkerStyleProps extends BaseStyleProps {
   x?: string | number;
   y?: string | number;
   symbol?: 'circle' | 'square' | 'arrow';
-  radius?:
-    | string
-    | number
-    | [string | number]
-    | [string | number, string | number]
-    | [string | number, string | number, string | number]
-    | [string | number, string | number, string | number, string | number];
+  radius?: string | number;
 }
 
 const SYMBOLS = {
@@ -60,11 +54,13 @@ export class Marker extends Path {
   }
 
   updatePath() {
-    const { radius = [0, 0, 0, 0], symbol = 'circle', x = 0, y = 0 } = this.parsedStyle;
+    const { x = 0, y = 0 } = this.parsedStyle;
+    const { radius, symbol } = this.attributes as MarkerStyleProps;
+    if (!symbol) return;
     const method = SYMBOLS[symbol];
+    if (!method) return;
 
-    // radius 表示半径，内部自动格式化成了[]
-    const path = method(x, y, radius[0]);
+    const path = method(x, y, radius);
 
     super.setAttribute('path', path);
   }
