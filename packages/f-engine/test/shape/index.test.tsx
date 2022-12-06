@@ -44,6 +44,7 @@ class View extends Component {
         />
         <marker
           style={{
+            symbol: 'circle',
             fill: '#F04864',
             radius: 10,
             x: 50,
