@@ -1,8 +1,11 @@
 import Children from '../../children';
 import { VNode } from '../vnode';
 import { DisplayObject, IChildNode, convertToPath } from '@antv/g-lite';
-import { isString, isFunction } from '@antv/util';
+import { isFunction } from '@antv/util';
 import { createShape } from './createShape';
+import { Shape } from '../workTags';
+import findClosestShapeNode from './findClosestShapeNode';
+import Animator from './animator';
 
 function applyStyle(shape: DisplayObject, style) {
   if (!style) return;
@@ -23,50 +26,96 @@ function applyStyle(shape: DisplayObject, style) {
   });
 }
 
+function findAllShapeNode(vNode: VNode | VNode[] | null) {
+  const shapeNodes = [];
+  Children.map(vNode, (node: VNode) => {
+    if (!node) return;
+    const { tag, type, children } = node;
+    if (tag === Shape && type !== 'group') {
+      shapeNodes.push(node);
+    }
+    if (children) {
+      shapeNodes.push(...findAllShapeNode(children));
+    }
+  });
+  return shapeNodes;
+}
+
+function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
+  const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
+  const { shape: lastShape, style: lastStyle } = lastNode;
+
+  const { animate, animation } = nextProps;
+  const animationEffect = animation ? animation.update : null;
+
+  if (animate === false || !animationEffect) {
+    return animator;
+  }
+
+  animator = animator || new Animator();
+  // shape 形变
+  const { start, end, property = [] } = animationEffect;
+
+  const lastPath = convertToPath(lastShape);
+  const nextPath = convertToPath(nextShape);
+
+  const startStyle = {
+    ...lastStyle,
+    ...start,
+    path: lastPath,
+  };
+  const endStyle = {
+    ...nextStyle,
+    ...end,
+    path: nextPath,
+  };
+
+  const pathShape = createShape('path', { style: { ...startStyle, path: '' } });
+
+  animator.animate(pathShape, startStyle, endStyle, {
+    ...animationEffect,
+    property: ['path'].concat(property),
+  });
+
+  animator.once('end', () => {
+    applyStyle(nextShape, endStyle);
+    pathShape.replaceWith(nextShape);
+  });
+
+  return animator;
+}
+
 function appearAnimation(vNode: VNode | VNode[] | null) {
   return Children.map(vNode, (node) => {
     if (!node) return;
     const { shape, style, children, animate, props, animator } = node;
+    animator.reset(shape);
 
     // 有叶子节点，先执行叶子节点
-    const childrenAnimation = children ? createAnimation(node, children, null) : null;
+    animator.children = children ? createAnimation(node, children, null) : null;
 
     // 不需要执行动画
     if (animate === false) {
       applyStyle(shape, style);
-      return null;
+      return animator;
     }
 
     const { animation } = props;
     const animationEffect = animation ? animation.appear : null;
-    animator.reset();
 
     if (!animationEffect) {
       // 没有动画直接应用样式
       applyStyle(shape, style);
+      return animator;
     }
+    const { start = {}, end } = animationEffect;
 
-    // 如果当前和子元素都没有动画，直接返回
-    if (!animationEffect && !(childrenAnimation && childrenAnimation.length)) {
-      return null;
-    }
+    const endStyle = {
+      ...style,
+      ...end,
+    };
 
-    // 子元素动画
-    if (childrenAnimation && childrenAnimation.length) {
-      animator.children = childrenAnimation;
-    }
-
-    // 图形有动画
-    if (animationEffect) {
-      const { start = {}, end } = animationEffect;
-
-      const endStyle = {
-        ...style,
-        ...end,
-      };
-
-      animator.animate(shape, start, endStyle, animationEffect);
-    }
+    animator.animate(shape, start, endStyle, animationEffect);
 
     return animator;
   });
@@ -74,6 +123,7 @@ function appearAnimation(vNode: VNode | VNode[] | null) {
 
 function updateAnimation(nextNode, lastNode) {
   const {
+    tag: nextTag,
     type: nextType,
     style: nextStyle,
     children: nextChildren,
@@ -82,166 +132,163 @@ function updateAnimation(nextNode, lastNode) {
     animator,
     animate,
   } = nextNode;
-  const { type: lastType, style: lastStyle, children: lastChildren, shape: lastShape } = lastNode;
+  const {
+    tag: lastTag,
+    type: lastType,
+    style: lastStyle,
+    children: lastChildren,
+    shape: lastShape,
+  } = lastNode;
+  animator.reset(nextShape);
 
   // 先处理叶子节点
-  const childrenAnimation = createAnimation(nextNode, nextChildren, lastChildren);
-
-  // 清除之前的样式
-  const resetStyle = lastStyle
-    ? Object.keys(lastStyle).reduce((prev, cur) => {
-        prev[cur] = '';
-        return prev;
-      }, {})
-    : null;
-
-  // 需要更新的样式
-  const style = {
-    ...resetStyle,
-    ...nextStyle,
-  };
-
-  // 没有动画直接应用样式
-  if (animate === false) {
-    applyStyle(nextShape, style);
-    return null;
-  }
+  animator.children = createAnimation(nextNode, nextChildren, lastChildren);
 
   const { animation } = nextProps;
-  animator.reset();
-
-  // 子元素动画
-  if (childrenAnimation && childrenAnimation.length) {
-    animator.children = childrenAnimation;
-  }
-
   const animationEffect = animation ? animation.update : null;
-  // 没有动画直接应用样式
-  if (!animationEffect) {
-    applyStyle(nextShape, style);
-    // 如果也没有子元素动画，直接返回
-    if (!childrenAnimation || !childrenAnimation.length) {
-      return null;
+
+  // 类型相同
+  if (nextType === lastType) {
+    // 清除之前的样式
+    const resetStyle = lastStyle
+      ? Object.keys(lastStyle).reduce((prev, cur) => {
+          prev[cur] = '';
+          return prev;
+        }, {})
+      : null;
+
+    // 需要更新的样式
+    const style = {
+      ...resetStyle,
+      ...nextStyle,
+    };
+
+    // 没有动画直接应用样式
+    if (animate === false || !animationEffect) {
+      applyStyle(nextShape, style);
+      return animator;
     }
-  }
-  // 自身动画
-  if (isString(nextType) && isString(lastType)) {
-    if (animationEffect) {
-      // 图形属性动画
-      if (nextType === lastType) {
-        const { start, end } = animationEffect;
 
-        const startStyle = {
-          ...lastStyle,
-          ...start,
-        };
-        const endStyle = {
-          ...style,
-          ...end,
-        };
-
-        animator.animate(nextShape, startStyle, endStyle, animationEffect);
-      } else {
-        // 形变动画
-        const { start, end, property = [] } = animationEffect;
-
-        const lastPath = convertToPath(lastShape);
-        const nextPath = convertToPath(nextShape);
-
-        const startStyle = {
-          ...lastStyle,
-          ...start,
-          path: lastPath,
-        };
-        const endStyle = {
-          ...nextStyle,
-          ...end,
-          path: nextPath,
-        };
-
-        const pathShape = createShape('path', { style: { ...startStyle, path: '' } });
-
-        lastShape.replaceWith(pathShape);
-
-        animator.animate(pathShape, startStyle, endStyle, {
-          ...animationEffect,
-          property: ['path'].concat(property),
-        });
-
-        animator.once('end', () => {
-          applyStyle(nextShape, endStyle);
-          pathShape.replaceWith(nextShape);
-        });
-      }
-    }
-  }
-  return animator;
-}
-
-function destroyAnimation(vNode: VNode) {
-  if (!vNode) return null;
-  const { shape, children, animate, style, props, animator } = vNode;
-
-  // 先处理叶子节点
-  const childrenAnimation = children
-    ? // @ts-ignore
-      Children.toArray(children)
-        .map((child) => {
-          return destroyAnimation(child as VNode);
-        })
-        .filter(Boolean)
-    : null;
-
-  if (animate === false) {
-    shape.remove();
-    return null;
-  }
-
-  const { animation } = props;
-  const animationEffect = animation ? animation.leave : null;
-
-  // 重置
-  animator.reset();
-
-  // 没有叶子节点的动画， 直接删除
-  if (!(childrenAnimation && childrenAnimation.length) && !animationEffect) {
-    shape.remove();
-    return null;
-  }
-
-  if (childrenAnimation && childrenAnimation.length) {
-    animator.children = childrenAnimation;
-  }
-
-  // 图形有动画
-  if (animationEffect) {
-    const { start, end = {} } = animationEffect;
-
+    const { start, end } = animationEffect;
     const startStyle = {
-      ...style,
+      ...lastStyle,
       ...start,
     };
-    const endStyle = end;
+    const endStyle = {
+      ...style,
+      ...end,
+    };
+    animator.animate(nextShape, startStyle, endStyle, animationEffect);
 
-    animator.animate(shape, startStyle, endStyle, animationEffect);
+    return animator;
   }
 
-  animator.once('end', () => {
-    shape.remove();
-  });
+  // 无法处理形变
+  if (nextTag !== Shape || lastTag !== Shape) {
+    lastShape.destroy();
+    return animator;
+  }
 
-  return animator;
+  // 从 shape 到 group
+  if (nextType === 'group') {
+    const shapeNodes = findAllShapeNode(nextNode.children);
+    return shapeNodes.map((node) => {
+      return morphShape(lastNode, node);
+    });
+  }
+
+  // 从 group 到 shape
+  if (lastType === 'group') {
+    const shapeNodes = findAllShapeNode(lastNode.children);
+    return shapeNodes.map((node) => {
+      return morphShape(node, nextNode);
+    });
+  }
+
+  // 没有动画直接应用样式
+  if (animate === false || !animationEffect) {
+    applyStyle(nextShape, nextStyle);
+    return animator;
+  }
+
+  return morphShape(lastNode, nextNode, animator);
+}
+
+function destroyAnimation(node: VNode) {
+  return Children.map(node, (vNode) => {
+    if (!vNode) return null;
+    const { shape, children, animate, style, props, animator } = vNode;
+    // 重置
+    animator.reset(shape);
+
+    // 先处理叶子节点
+    const childrenAnimation = children
+      ? // @ts-ignore
+        Children.toArray(children)
+          .map((child) => {
+            return destroyAnimation(child as VNode);
+          })
+          .filter(Boolean)
+      : null;
+
+    // 不需要动画直接删除
+    if (animate === false) {
+      shape.destroy();
+      return animator;
+    }
+
+    const { animation } = props;
+    const animationEffect = animation ? animation.leave : null;
+
+    // 没有叶子节点的动画， 直接删除
+    if (!(childrenAnimation && childrenAnimation.length) && !animationEffect) {
+      shape.destroy();
+      return animator;
+    }
+
+    animator.children = childrenAnimation;
+
+    // 图形有动画
+    if (animationEffect) {
+      const { start, end = {} } = animationEffect;
+
+      const startStyle = {
+        ...style,
+        ...start,
+      };
+      const endStyle = end;
+
+      animator.animate(shape, startStyle, endStyle, animationEffect);
+    }
+
+    // 动画结束后，删除图形（包括子元素动画）
+    animator.once('end', () => {
+      shape.destroy();
+    });
+
+    return animator;
+  });
 }
 
 function createAnimator(nextNode, lastNode) {
   if (!nextNode && !lastNode) {
-    return;
+    return null;
   }
 
   // delete 动画
   if (!nextNode && lastNode) {
     return destroyAnimation(lastNode);
   }
+
+  // 如果有 transform 则从 transform 比
+  const { transform } = nextNode;
+  if (transform) {
+    const closestShapeNode = findClosestShapeNode(nextNode);
+    nextNode.transform = null;
+    closestShapeNode.transform = transform;
+  }
+
+  lastNode = nextNode.transform || lastNode;
 
   // appear 动画
   if (nextNode && !lastNode) {
@@ -252,40 +299,41 @@ function createAnimator(nextNode, lastNode) {
   return updateAnimation(nextNode, lastNode);
 }
 
+function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: IChildNode) {
+  if (nextSibling) {
+    parent.insertBefore(shape, nextSibling);
+  } else {
+    parent.appendChild(shape);
+  }
+}
+
 function createAnimation(parent, nextChildren, lastChildren) {
+  if (!nextChildren && !lastChildren) {
+    return;
+  }
   const { shape: parentShape } = parent;
 
   let nextSibling: IChildNode = parentShape.firstChild;
-  const childrenAnimation = [];
+  const childrenAnimator = [];
+
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
     const animator = createAnimator(nextNode, lastNode);
 
-    // 更新文档流
-    if (nextNode && !lastNode) {
-      Children.map(nextNode, (node) => {
-        if (!node) return;
-        const { shape } = node;
-        if (nextSibling) {
-          parentShape.insertBefore(shape, nextSibling);
-        } else {
-          parentShape.appendChild(shape);
-        }
-      });
-    } else if (nextNode && lastNode) {
-      const { shape } = nextNode;
+    Children.map(animator, (item: Animator) => {
+      if (!item) return;
+      childrenAnimator.push(item);
+      const { shape } = item;
+      if (!shape || shape.destroyed) return;
+      // 更新文档流
+      if (!shape.isConnected) {
+        insertShape(parentShape, shape, nextSibling);
+        return;
+      }
       nextSibling = shape.nextSibling;
-    }
-
-    if (animator) {
-      Children.map(animator, (item) => {
-        if (!item) return;
-        childrenAnimation.push(item);
-      });
-    }
-    return animator;
+    });
   });
 
-  return childrenAnimation;
+  return childrenAnimator;
 }
 
 export { createAnimation };
