@@ -22,7 +22,7 @@ class Animator extends EE {
 
   play() {
     const { shape, start, end, effect, children } = this;
-    const animations = [];
+    const animations: Promise<any>[] = [];
     if (effect) {
       const {
         property = [],
@@ -145,8 +145,8 @@ class Animator extends EE {
     return finished;
   }
 
-  reset() {
-    this.shape = null;
+  reset(shape: DisplayObject) {
+    this.shape = shape;
     this.start = null;
     this.end = null;
     this.effect = null;

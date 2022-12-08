@@ -39,4 +39,6 @@ export interface VNode extends JSX.Element {
   animate: boolean;
   // animation
   animator: Animator;
+
+  transform?: VNode;
 }

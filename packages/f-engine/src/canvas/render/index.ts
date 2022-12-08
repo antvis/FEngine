@@ -8,7 +8,7 @@ import { Group } from '@antv/g-lite';
 import equal from '../equal';
 import { createAnimation } from './animation';
 import Animator from './animator';
-import { getWorkTag, ClassComponent, Shape, FunctionComponent, WorkTag } from '../workTags';
+import { getWorkTag, ClassComponent, Shape, WorkTag } from '../workTags';
 import {
   computeLayout,
   createNodeTree,
@@ -16,6 +16,7 @@ import {
   fillElementLayout,
   fillComponentLayout,
 } from './computeLayout';
+import findClosestShapeNode from './findClosestShapeNode';
 
 function getStyle(tagType: WorkTag, props, context) {
   const { style: customStyle = {}, attrs, zIndex } = props;
@@ -64,6 +65,8 @@ function createVNode(parent: VNode, vNode: VNode) {
     const shape = createShape(type as string, { ...props, style });
     if (ref) {
       ref.current = shape;
+      // @ts-ignore
+      ref.vNode = vNode;
     }
 
     // @ts-ignore
@@ -88,6 +91,8 @@ function createVNode(parent: VNode, vNode: VNode) {
     // 设置ref
     if (ref) {
       ref.current = component;
+      // @ts-ignore
+      ref.vNode = vNode;
     }
 
     component.context = context;
@@ -98,10 +103,9 @@ function createVNode(parent: VNode, vNode: VNode) {
     vNode.component = component;
   }
 
-  if (transformFrom && transformFrom.current) {
-    const transformVNode = transformFrom.current._vNode;
-    vNode.children = transformVNode.children;
-    transformVNode.children = null;
+  if (transformFrom && transformFrom.vNode) {
+    const transformVNode = transformFrom.vNode;
+    vNode.transform = findClosestShapeNode(transformVNode);
   }
 
   return vNode;
@@ -271,7 +275,7 @@ function renderVNode(
 
       Children.map(element, (child: VNode) => {
         if (!child) return;
-        const { canvas, tag, props: childProps, component, children: childLastChildren } = child;
+        const { tag, props: childProps, children: childLastChildren } = child;
 
         let childrenNode = [];
         if (tag === Shape) {
@@ -317,10 +321,9 @@ function render(vNode: VNode) {
 
   // render 节点
   const children = renderChildren(vNode, nextChildren, lastChildren);
-  // vNode.children = children;
+
   // 创建动画
   const childrenAnimation = createAnimation(vNode, children, lastChildren);
-
   // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
