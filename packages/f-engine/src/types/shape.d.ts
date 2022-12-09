@@ -163,15 +163,15 @@ export interface ShapeElementProps<T> extends IProps {
   animation?: AnimationProps;
 }
 
-export interface GroupProps extends ShapeElementProps<GroupStyleProps> {}
-export interface RectProps extends ShapeElementProps<RectStyleProps> {}
-export interface CircleProps extends ShapeElementProps<CircleStyleProps> {}
-export interface LineProps extends ShapeElementProps<LineStyleProps> {}
-export interface PolygonProps extends ShapeElementProps<PolygonStyleProps> {}
-export interface PolylineProps extends ShapeElementProps<PolylineStyleProps> {}
-export interface ArcProps extends ShapeElementProps<ArcStyleProps> {}
-export interface SectorProps extends ShapeElementProps<SectorStyleProps> {}
-export interface TextProps extends ShapeElementProps<TextStyleProps> {}
-export interface ImageProps extends ShapeElementProps<ImageStyleProps> {}
-export interface PathProps extends ShapeElementProps<PathStyleProps> {}
-export interface MarkerProps extends ShapeElementProps<MarkerStyleProps> {}
+export interface GroupShapeProps extends ShapeElementProps<GroupStyleProps> {}
+export interface RectShapeProps extends ShapeElementProps<RectStyleProps> {}
+export interface CircleShapeProps extends ShapeElementProps<CircleStyleProps> {}
+export interface LineShapeProps extends ShapeElementProps<LineStyleProps> {}
+export interface PolygonShapeProps extends ShapeElementProps<PolygonStyleProps> {}
+export interface PolylineShapeProps extends ShapeElementProps<PolylineStyleProps> {}
+export interface ArcShapeProps extends ShapeElementProps<ArcStyleProps> {}
+export interface SectorShapeProps extends ShapeElementProps<SectorStyleProps> {}
+export interface TextShapeProps extends ShapeElementProps<TextStyleProps> {}
+export interface ImageShapeProps extends ShapeElementProps<ImageStyleProps> {}
+export interface PathShapeProps extends ShapeElementProps<PathStyleProps> {}
+export interface MarkerShapeProps extends ShapeElementProps<MarkerStyleProps> {}
