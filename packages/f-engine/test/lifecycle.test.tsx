@@ -156,7 +156,7 @@ describe('Canvas', () => {
             <Test width={20} ref={ref} />
           </TestContainer>
         </Canvas>
-      ).props
+      ).props,
     );
     await delay(0);
     expect(pickMethod(methodCallback.mock.calls)).toEqual([
@@ -224,11 +224,93 @@ describe('Canvas', () => {
             <Test width={30} ref={ref} />
           </TestContainer>
         </Canvas>
-      ).props
+      ).props,
     );
     await delay(50);
-
     expect(ref.current.container.children[0].getAttribute('width')).toBe(30);
+    expect(pickMethod(methodCallback.mock.calls)).toEqual([
+      ['containerWillMount'],
+      ['containerRender'],
+      ['componentWillMount'],
+      ['componentWillMount'],
+      ['componentRender'],
+      ['componentDidMount'],
+      ['componentRender'],
+      ['componentDidMount'],
+      ['containerDidMount'],
+      ['containerShouldUpdate'],
+      ['containerWillReceiveProps'],
+      ['containerWillUpdate'],
+      ['containerRender'],
+      ['componentWillUnmount'],
+      ['componentDidUnmount'],
+      ['componentShouldUpdate'],
+      ['componentWillReceiveProps'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerDidUpdate'],
+      ['componentShouldUpdate'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerShouldUpdate'],
+      ['containerWillReceiveProps'],
+      ['containerWillUpdate'],
+      ['containerRender'],
+      ['componentShouldUpdate'],
+      ['componentWillReceiveProps'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerDidUpdate'],
+    ]);
+
+    await delay(50);
+    // 销毁 canvas
+    canvas.destroy();
+
+    expect(pickMethod(methodCallback.mock.calls)).toEqual([
+      ['containerWillMount'],
+      ['containerRender'],
+      ['componentWillMount'],
+      ['componentWillMount'],
+      ['componentRender'],
+      ['componentDidMount'],
+      ['componentRender'],
+      ['componentDidMount'],
+      ['containerDidMount'],
+      ['containerShouldUpdate'],
+      ['containerWillReceiveProps'],
+      ['containerWillUpdate'],
+      ['containerRender'],
+      ['componentWillUnmount'],
+      ['componentDidUnmount'],
+      ['componentShouldUpdate'],
+      ['componentWillReceiveProps'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerDidUpdate'],
+      ['componentShouldUpdate'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerShouldUpdate'],
+      ['containerWillReceiveProps'],
+      ['containerWillUpdate'],
+      ['containerRender'],
+      ['componentShouldUpdate'],
+      ['componentWillReceiveProps'],
+      ['componentWillUpdate'],
+      ['componentRender'],
+      ['componentDidUpdate'],
+      ['containerDidUpdate'],
+      ['containerWillUnmount'],
+      ['componentWillUnmount'],
+      ['componentDidUnmount'],
+      ['containerDidUnmount'],
+    ]);
   });
 
   it('第1个子组件为空', async () => {
@@ -255,7 +337,7 @@ describe('Canvas', () => {
             <Test width={10} id="2" />
           </TestContainer>
         </Canvas>
-      ).props
+      ).props,
     );
     await delay(0);
 
