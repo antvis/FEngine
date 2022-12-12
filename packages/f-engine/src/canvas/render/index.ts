@@ -365,4 +365,4 @@ function updateComponents(components: Component[]) {
   });
 }
 
-export { render, renderChildren, updateComponents, computeLayout };
+export { render, renderChildren, updateComponents, computeLayout, destroyElement };

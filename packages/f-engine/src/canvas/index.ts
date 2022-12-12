@@ -9,7 +9,7 @@ import EE from '@antv/event-emitter';
 import Theme, { Theme as ThemeType } from './theme';
 import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';
-import { render, updateComponents } from './render';
+import { render, updateComponents, destroyElement } from './render';
 import { VNode } from './vnode';
 import { IProps, IContext, TextStyleProps } from '../types';
 import { ClassComponent } from './workTags';
@@ -255,13 +255,14 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   }
 
   destroy() {
-    const { canvas } = this;
+    const { canvas, children } = this;
 
     // 销毁也需要等 ready
     canvas.ready.then(() => {
       canvas.destroy();
     });
 
+    destroyElement(children);
     this.props = null;
     this.context = null;
     this.updater = null;
