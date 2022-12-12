@@ -17,6 +17,7 @@ export interface SectorStyleProps extends BaseStyleProps {
     | [string | number, string | number]
     | [string | number, string | number, string | number]
     | [string | number, string | number, string | number, string | number];
+  anticlockwise?: boolean;
 }
 
 const PI = Math.PI;
@@ -106,7 +107,12 @@ function computeCornerTangents(
   };
 }
 
-function computeArcSweep(startAngle: number, endAngle: number) {
+function computeArcSweep(startAngle: number, endAngle: number, clockwise = true) {
+  if (!clockwise) {
+    const replaceAngle = endAngle;
+    endAngle = startAngle;
+    startAngle = replaceAngle;
+  }
   endAngle = endAngle < 0 && startAngle >= 0 ? endAngle + PI2 : endAngle;
   return endAngle - startAngle <= PI ? 0 : 1;
 }
@@ -125,7 +131,7 @@ export class Sector extends Path {
   }
 
   private updatePath() {
-    const { cx, cy, startAngle, endAngle, r, r0, radius } = this.parsedStyle;
+    const { cx, cy, startAngle, endAngle, r, r0, radius, anticlockwise = false } = this.parsedStyle;
 
     const path = this.createPath(
       cx,
@@ -134,7 +140,8 @@ export class Sector extends Path {
       endAngle ? deg2rad(endAngle) : Math.PI * 2,
       r ? r : 0,
       r0 ? r0 : 0,
-      radius ? radius : [0, 0, 0, 0]
+      radius ? radius : [0, 0, 0, 0],
+      anticlockwise
     );
     super.setAttribute('path', path);
   }
@@ -146,7 +153,8 @@ export class Sector extends Path {
     endAngle: number,
     r: number,
     r0: number,
-    borderRadius: number[]
+    borderRadius: number[],
+    anticlockwise?: boolean
   ): PathArray {
     if (r <= 0) {
       return null;
@@ -228,8 +236,9 @@ export class Sector extends Path {
         }
       }
     }
-    const arcSweep = computeArcSweep(startAngle, endAngle);
-    const clockwise = true;
+    const clockwise = !anticlockwise;
+    const arcSweep = computeArcSweep(startAngle, clockwise ? endAngle : PI2 - endAngle, clockwise);
+
     const sectorPathCommands = [];
 
     if (limitedOutBorderRadiusMax > e) {
@@ -265,31 +274,37 @@ export class Sector extends Path {
             r,
             outStartBorderRadiusEndAngle
           );
+
           sectorPathCommands.push([
             'A',
             crStart,
             crStart,
             0,
-            computeArcSweep(outStartBorderRadiusStartAngle, outStartBorderRadiusEndAngle),
-            1,
+            computeArcSweep(
+              outStartBorderRadiusStartAngle,
+              outStartBorderRadiusEndAngle,
+              clockwise
+            ),
+            clockwise ? 1 : 0,
             outStartBorderRadiusEndPoint.x,
             outStartBorderRadiusEndPoint.y,
           ]);
         }
 
-        const outRadiusStartAngle = mathATan2(ct0.y1, ct0.x1);
-        const outRadiusEndAngle = mathATan2(ct1.y1, ct1.x1);
+        const outRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
+        const outRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
         const outRadiusEndPoint = polarToCartesian(x, y, r, outRadiusEndAngle);
         sectorPathCommands.push([
           'A',
           r,
           r,
-          0,
-          computeArcSweep(outRadiusStartAngle, outRadiusEndAngle),
           1,
+          computeArcSweep(outRadiusStartAngle, outRadiusEndAngle, clockwise),
+          clockwise ? 1 : 0,
           outRadiusEndPoint.x,
           outRadiusEndPoint.y,
         ]);
+
         if (crEnd > 0) {
           const outEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
           const outEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
@@ -299,8 +314,8 @@ export class Sector extends Path {
             crEnd,
             crEnd,
             0,
-            computeArcSweep(outEndBorderRadiusStartAngle, outEndBorderRadiusEndAngle),
-            1,
+            computeArcSweep(outEndBorderRadiusStartAngle, outEndBorderRadiusEndAngle, clockwise),
+            clockwise ? 1 : 0,
             x + ct1.cx + ct1.x0,
             y + ct1.cy + ct1.y0,
           ]);
@@ -308,7 +323,7 @@ export class Sector extends Path {
       }
     } else {
       sectorPathCommands.push(['M', start.x, start.y]);
-      sectorPathCommands.push(['A', r, r, 0, arcSweep, 1, end.x, end.y]);
+      sectorPathCommands.push(['A', r, r, 0, arcSweep, clockwise ? 1 : 0, end.x, end.y]);
     }
 
     // no inner ring, is a circular sector
@@ -347,26 +362,32 @@ export class Sector extends Path {
             crEnd,
             crEnd,
             0,
-            computeArcSweep(innerStartBorderRadiusStartAngle, innerStartBorderRadiusEndAngle),
-            1,
+            computeArcSweep(
+              innerStartBorderRadiusStartAngle,
+              innerStartBorderRadiusEndAngle,
+              clockwise
+            ),
+            clockwise ? 1 : 0,
             x + ct0.cx + ct0.x1,
             y + ct0.cy + ct0.y1,
           ]);
         }
-        const innerRadiusStartAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
-        const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y0, ct1.cx + ct1.x0);
-        const innerRadiusStarPoint = polarToCartesian(x, y, r0, innerRadiusStartAngle);
+
+        const innerRadiusStartAngle = mathATan2(ct0.cy + ct0.y1, ct0.cx + ct0.x1);
+        const innerRadiusEndAngle = mathATan2(ct1.cy + ct1.y1, ct1.cx + ct1.x1);
+        const innerRadiusEndPoint = polarToCartesian(x, y, r0, innerRadiusEndAngle);
+
         sectorPathCommands.push([
           'A',
           r0,
           r0,
           0,
-          computeArcSweep(innerRadiusEndAngle, innerRadiusStartAngle),
-          0,
-          innerRadiusStarPoint.x,
-          innerRadiusStarPoint.y,
+          computeArcSweep(innerRadiusEndAngle, innerRadiusStartAngle, clockwise),
+          clockwise ? 0 : 1,
+          innerRadiusEndPoint.x,
+          innerRadiusEndPoint.y,
         ]);
-        sectorPathCommands.push(['L', innerRadiusStarPoint.x, innerRadiusStarPoint.y]);
+
         if (crStart > 0) {
           const innerEndBorderRadiusStartAngle = mathATan2(ct1.y1, ct1.x1);
           const innerEndBorderRadiusEndAngle = mathATan2(ct1.y0, ct1.x0);
@@ -376,7 +397,7 @@ export class Sector extends Path {
             crStart,
             0,
             computeArcSweep(innerEndBorderRadiusStartAngle, innerEndBorderRadiusEndAngle),
-            1,
+            clockwise ? 1 : 0,
             x + ct1.cx + ct1.x0,
             y + ct1.cy + ct1.y0,
           ]);
@@ -386,7 +407,16 @@ export class Sector extends Path {
     // the inner ring is just a circular arc
     else {
       sectorPathCommands.push(['L', innerEnd.x, innerEnd.y]);
-      sectorPathCommands.push(['A', r0, r0, 0, arcSweep, 0, innerStart.x, innerStart.y]);
+      sectorPathCommands.push([
+        'A',
+        r0,
+        r0,
+        0,
+        arcSweep,
+        clockwise ? 0 : 1,
+        innerStart.x,
+        innerStart.y,
+      ]);
     }
     sectorPathCommands.push(['Z']);
 
