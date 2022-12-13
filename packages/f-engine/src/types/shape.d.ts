@@ -78,18 +78,18 @@ export type ShapeStyleProps =
   | GMarkerStyleProps;
 
 export type ShapeProps =
-  | GroupProps
-  | RectProps
-  | CircleProps
-  | LineProps
-  | PolygonProps
-  | PolylineProps
-  | TextProps
-  | ImageProps
-  | PathProps
-  | ArcProps
-  | SectorProps
-  | MarkerProps;
+  | GroupShapeProps
+  | RectShapeProps
+  | CircleShapeProps
+  | LineShapeProps
+  | PolygonShapeProps
+  | PolylineShapeProps
+  | TextShapeProps
+  | ImageShapeProps
+  | PathShapeProps
+  | ArcShapeProps
+  | SectorShapeProps
+  | MarkerShapeProps;
 
 interface StyleClipProps {
   clip?: ((style) => ShapeProps) | ShapeProps;
