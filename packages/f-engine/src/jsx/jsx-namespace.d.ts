@@ -1,17 +1,17 @@
 import { Ref, ElementType, IProps } from '../types/jsx';
 import {
-  GroupProps,
-  RectProps,
-  CircleProps,
-  LineProps,
-  PolygonProps,
-  PolylineProps,
-  ArcProps,
-  SectorProps,
-  TextProps,
-  MarkerProps,
-  ImageProps,
-  PathProps,
+  GroupShapeProps,
+  RectShapeProps,
+  CircleShapeProps,
+  LineShapeProps,
+  PolygonShapeProps,
+  PolylineShapeProps,
+  ArcShapeProps,
+  SectorShapeProps,
+  TextShapeProps,
+  MarkerShapeProps,
+  ImageShapeProps,
+  PathShapeProps,
 } from '../types/shape';
 
 export namespace JSX {
@@ -53,18 +53,18 @@ export namespace JSX {
   }
 
   export interface IntrinsicElements {
-    group: GroupProps;
-    rect: RectProps;
-    circle: CircleProps;
-    line: LineProps;
-    polygon: PolygonProps;
-    polyline: PolylineProps;
-    arc: ArcProps;
-    sector: SectorProps;
-    text: TextProps;
-    marker: MarkerProps;
-    image: ImageProps;
-    path: PathProps;
+    group: GroupShapeProps;
+    rect: RectShapeProps;
+    circle: CircleShapeProps;
+    line: LineShapeProps;
+    polygon: PolygonShapeProps;
+    polyline: PolylineShapeProps;
+    arc: ArcShapeProps;
+    sector: SectorShapeProps;
+    text: TextShapeProps;
+    marker: MarkerShapeProps;
+    image: ImageShapeProps;
+    path: PathShapeProps;
     [key: string]: any;
   }
 }
