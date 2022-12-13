@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-react",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "FEngine for React",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -15,7 +15,7 @@
     "react"
   ],
   "dependencies": {
-    "@antv/f-engine": "^0.0.18",
+    "@antv/f-engine": "^0.0.19",
     "@babel/runtime": "^7.12.5"
   },
   "devDependencies": {
