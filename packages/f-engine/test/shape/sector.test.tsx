@@ -161,6 +161,39 @@ class View4 extends Component {
   }
 }
 
+class View5 extends Component {
+  render() {
+    return (
+      <group>
+        <sector
+          style={{
+            cx: 100,
+            cy: 150,
+            startAngle: -90,
+            endAngle: -90,
+            r: 60,
+            r0: 20,
+            fill: 'green',
+            stroke: 'black',
+          }}
+        />
+        <sector
+          style={{
+            cx: 190,
+            cy: 150,
+            startAngle: -90,
+            endAngle: 0,
+            r: 60,
+            r0: 20,
+            fill: 'red',
+            stroke: 'black',
+          }}
+        />
+      </group>
+    );
+  }
+}
+
 describe('Sector', () => {
   it('Sector', async () => {
     const { props } = (
@@ -202,6 +235,18 @@ describe('Sector', () => {
     const { props } = (
       <Canvas context={context}>
         <View4 />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+  it('临界数值 0 angle', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <View5 />
       </Canvas>
     );
 

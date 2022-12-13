@@ -40,7 +40,7 @@ function intersect(
   x2: number,
   y2: number,
   x3: number,
-  y3: number
+  y3: number,
 ): [number, number] {
   const dx10 = x1 - x0;
   const dy10 = y1 - y0;
@@ -62,7 +62,7 @@ function computeCornerTangents(
   y1: number,
   radius: number,
   cr: number,
-  clockwise: boolean
+  clockwise: boolean,
 ) {
   const x01 = x0 - x1;
   const y01 = y0 - y1;
@@ -114,7 +114,7 @@ function computeArcSweep(startAngle: number, endAngle: number, clockwise = true)
     startAngle = replaceAngle;
   }
   endAngle = endAngle < 0 && startAngle >= 0 ? endAngle + PI2 : endAngle;
-  return endAngle - startAngle <= PI ? 0 : 1;
+  return Math.abs(endAngle - startAngle) % PI2 <= PI ? 0 : 1;
 }
 
 export class Sector extends Path {
@@ -132,6 +132,7 @@ export class Sector extends Path {
 
   private updatePath() {
     const { cx, cy, startAngle, endAngle, r, r0, radius, anticlockwise = false } = this.parsedStyle;
+    if (startAngle === endAngle) return;
 
     const path = this.createPath(
       cx,
@@ -141,7 +142,7 @@ export class Sector extends Path {
       r ? r : 0,
       r0 ? r0 : 0,
       radius ? radius : [0, 0, 0, 0],
-      anticlockwise
+      anticlockwise,
     );
     super.setAttribute('path', path);
   }
@@ -154,7 +155,7 @@ export class Sector extends Path {
     r: number,
     r0: number,
     borderRadius: number[],
-    anticlockwise?: boolean
+    anticlockwise?: boolean,
   ): PathArray {
     if (r <= 0) {
       return null;
@@ -227,8 +228,8 @@ export class Sector extends Path {
             1 /
             mathSin(
               mathACos(
-                (x0 * x1 + y0 * y1) / (mathSqrt(x0 * x0 + y0 * y0) * mathSqrt(x1 * x1 + y1 * y1))
-              ) / 2
+                (x0 * x1 + y0 * y1) / (mathSqrt(x0 * x0 + y0 * y0) * mathSqrt(x1 * x1 + y1 * y1)),
+              ) / 2,
             );
           const b = mathSqrt(it[0] * it[0] + it[1] * it[1]);
           limitedOutBorderRadiusMax = mathMin(outBorderRadiusMax, (r - b) / (a + 1));
@@ -272,7 +273,7 @@ export class Sector extends Path {
             x,
             y,
             r,
-            outStartBorderRadiusEndAngle
+            outStartBorderRadiusEndAngle,
           );
 
           sectorPathCommands.push([
@@ -283,7 +284,7 @@ export class Sector extends Path {
             computeArcSweep(
               outStartBorderRadiusStartAngle,
               outStartBorderRadiusEndAngle,
-              clockwise
+              clockwise,
             ),
             clockwise ? 1 : 0,
             outStartBorderRadiusEndPoint.x,
@@ -365,7 +366,7 @@ export class Sector extends Path {
             computeArcSweep(
               innerStartBorderRadiusStartAngle,
               innerStartBorderRadiusEndAngle,
-              clockwise
+              clockwise,
             ),
             clockwise ? 1 : 0,
             x + ct0.cx + ct0.x1,
