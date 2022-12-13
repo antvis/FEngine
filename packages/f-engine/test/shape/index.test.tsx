@@ -28,6 +28,7 @@ class View extends Component {
             r: 50,
             cx: 150,
             cy: 112.5,
+            startAngle: 0,
             endAngle: `${(Math.PI * 4) / 3} rad`,
             anticlockwise: true,
           }}
@@ -38,6 +39,7 @@ class View extends Component {
             r: 0,
             cx: 10,
             cy: 10,
+            startAngle: 0,
             endAngle: `${(Math.PI * 4) / 3} rad`,
             anticlockwise: true,
           }}
