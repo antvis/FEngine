@@ -1,14 +1,31 @@
 import { Path, deg2rad, BaseStyleProps } from '@antv/g-lite';
-import { isNumberEqual, PathArray } from '@antv/util';
+import { isNumberEqual, PathArray, isNil } from '@antv/util';
 import { polarToCartesian } from './util/util';
 
 export interface ArcStyleProps extends BaseStyleProps {
-  /** 起始角度 */
-  startAngle?: string | number;
-  endAngle?: string | number;
-  r?: string | number;
+  /**
+   * @title 起始角度/弧度
+   */
+  startAngle: string | number;
+  /**
+   * @title 结束角度/弧度
+   */
+  endAngle: string | number;
+  /**
+   * @title 半径
+   */
+  r: string | number;
+  /**
+   * @title 圆心 x 坐标
+   */
   cx?: string | number;
+  /**
+   * @title 圆心 y 坐标
+   */
   cy?: string | number;
+  /**
+   * @title 逆时针绘制
+   */
   anticlockwise?: boolean;
 }
 
@@ -20,22 +37,19 @@ export class Arc extends Path {
   }
   setAttribute(name, value, force?: boolean) {
     super.setAttribute(name, value, force);
-    if (['startAngle', 'endAngle', 'r'].indexOf(name) > -1) {
+    if (['cx', 'cy', 'startAngle', 'endAngle', 'r', 'anticlockwise'].indexOf(name) > -1) {
       this.updatePath();
     }
   }
 
   private updatePath() {
-    const { cx, cy, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
+    const { cx = 0, cy = 0, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
 
-    const path = this.createPath(
-      cx,
-      cy,
-      startAngle ? deg2rad(startAngle) : 0,
-      endAngle ? deg2rad(endAngle) : Math.PI * 2,
-      r ? r : 0,
-      anticlockwise
-    );
+    if (isNil(startAngle) || isNil(endAngle) || isNil(r) || r <= 0) {
+      return;
+    }
+
+    const path = this.createPath(cx, cy, deg2rad(startAngle), deg2rad(endAngle), r, anticlockwise);
     super.setAttribute('path', path);
   }
 
@@ -45,30 +59,29 @@ export class Arc extends Path {
     startAngle: number,
     endAngle: number,
     r: number,
-    anticlockwise: boolean
+    anticlockwise: boolean,
   ): PathArray {
-    if (endAngle < startAngle) {
-      endAngle = endAngle + Math.PI * 2;
-    }
-    if (r <= 0) {
-      return null;
-    }
-
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
 
-    if (isNumberEqual(endAngle - startAngle, Math.PI * 2)) {
+    const angle = Math.abs(endAngle - startAngle);
+
+    if (angle >= Math.PI * 2 || isNumberEqual(angle, Math.PI * 2)) {
       const middlePoint = polarToCartesian(x, y, r, startAngle + Math.PI);
       return [
         ['M', start.x, start.y],
-        ['A', r, r, 0, 1, 1, middlePoint.x, middlePoint.y],
-        ['A', r, r, 0, 1, 1, start.x, start.y],
-        ['A', r, r, 0, 1, 0, middlePoint.x, middlePoint.y],
-        ['A', r, r, 0, 1, 0, start.x, start.y],
+        ['A', r, r, 0, 1, anticlockwise ? 0 : 1, middlePoint.x, middlePoint.y],
+        ['A', r, r, 0, 1, anticlockwise ? 0 : 1, start.x, start.y],
         ['Z'],
       ];
     }
-    const arcSweep = endAngle - startAngle <= Math.PI ? 0 : 1;
+    const arcSweep = anticlockwise
+      ? endAngle - startAngle <= Math.PI
+        ? 1
+        : 0
+      : endAngle - startAngle <= Math.PI
+      ? 0
+      : 1;
     return [
       ['M', start.x, start.y],
       ['A', r, r, 0, arcSweep, anticlockwise ? 0 : 1, end.x, end.y],
