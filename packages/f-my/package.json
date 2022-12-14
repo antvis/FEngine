@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-my",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "FEngine for alipay mini-program",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -17,7 +17,7 @@
     "alipay"
   ],
   "dependencies": {
-    "@antv/f-engine": "^0.0.19",
+    "@antv/f-engine": "^0.0.20",
     "@antv/f2-context": "^0.0.1",
     "@babel/runtime": "^7.12.5"
   },
