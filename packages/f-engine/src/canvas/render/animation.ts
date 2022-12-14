@@ -320,7 +320,8 @@ function createAnimation(parent, nextChildren, lastChildren) {
   }
   const { shape: parentShape } = parent;
 
-  let nextSibling: IChildNode = parentShape.firstChild;
+  // 上一个处理的元素
+  let prevSibling: IChildNode;
   const childrenAnimator = [];
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
@@ -331,12 +332,19 @@ function createAnimation(parent, nextChildren, lastChildren) {
       childrenAnimator.push(item);
       const { shape } = item;
       if (!shape || shape.destroyed) return;
+
+      let nextSibling: IChildNode;
+
       // 更新文档流
-      if (!shape.isConnected) {
-        insertShape(parentShape, shape, nextSibling);
-        return;
+      if (!prevSibling) {
+        nextSibling = parentShape.firstChild;
+      } else {
+        nextSibling = prevSibling.nextSibling;
       }
-      nextSibling = shape.nextSibling;
+      if (nextSibling !== shape) {
+        insertShape(parentShape, shape, nextSibling);
+      }
+      prevSibling = shape;
     });
   });
 
