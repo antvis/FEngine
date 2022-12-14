@@ -3,7 +3,12 @@ module.exports = {
   testEnvironment: 'jest-electron/environment',
   preset: 'ts-jest',
   collectCoverage: false,
-  collectCoverageFrom: ['packages/*/src/**/*.{ts,tsx,js}', '!**/node_modules/**'],
+  collectCoverageFrom: [
+    'packages/*/src/**/*.{ts,tsx,js}',
+    '!packages/f-my/src/**/*.{ts,tsx,js}',
+    '!packages/f-wx/src/**/*.{ts,tsx,js}',
+    '!**/node_modules/**',
+  ],
   modulePathIgnorePatterns: ['packages/*/dist'],
   testPathIgnorePatterns: [],
   testRegex: '/test/.*\\.test\\.tsx?$',
