@@ -1,30 +1,11 @@
 import Children from '../../children';
 import { VNode } from '../vnode';
 import { DisplayObject, IChildNode, convertToPath } from '@antv/g-lite';
-import { isFunction } from '@antv/util';
 import { createShape } from './createShape';
 import { Shape } from '../workTags';
 import findClosestShapeNode from './findClosestShapeNode';
 import Animator from './animator';
-
-function applyStyle(shape: DisplayObject, style) {
-  if (!style) return;
-  Object.keys(style).forEach((key) => {
-    // 特殊处理 clip
-    if (key === 'clip') {
-      const { clip } = style;
-      const clipConfig = isFunction(clip) ? clip(style) : clip;
-
-      if (clipConfig) {
-        const { type, style } = clipConfig;
-        const clipShape = createShape(type, { style });
-        (shape as DisplayObject).setAttribute('clipPath', clipShape);
-      }
-    } else {
-      (shape as DisplayObject).setAttribute(key, style[key]);
-    }
-  });
-}
+import applyStyle from './applyStyle';
 
 function findAllShapeNode(vNode: VNode | VNode[] | null) {
   const shapeNodes = [];
@@ -44,6 +25,9 @@ function findAllShapeNode(vNode: VNode | VNode[] | null) {
 function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
   const { shape: lastShape, style: lastStyle } = lastNode;
+
+  // 形变动画之前先把原 shape 销毁
+  lastShape.destroy();
 
   const { animate, animation } = nextProps;
   const animationEffect = animation ? animation.update : null;

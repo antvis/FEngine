@@ -3,6 +3,7 @@ import { omit, pick, isFunction } from '@antv/util';
 import EE from '@antv/event-emitter';
 import { VNode } from '../vnode';
 import { createShape } from './createShape';
+import applyStyle from './applyStyle';
 
 class Animator extends EE {
   node: VNode;
@@ -35,40 +36,49 @@ class Animator extends EE {
         onEnd = () => {},
       } = effect;
 
-      // 应用样式
-      const style = { ...omit(end, property), ...omit(start, property) };
-      Object.keys(style).forEach((key) => {
-        (shape as DisplayObject).setAttribute(key, style[key]);
-      });
+      // shape 动画
+      if (property.length && duration > 0) {
+        // 应用样式
+        const style = { ...omit(end, property), ...omit(start, property) };
+        Object.keys(style).forEach((key) => {
+          (shape as DisplayObject).setAttribute(key, style[key]);
+        });
 
-      // 开始帧
-      const keyframeStart = property.reduce((prev, cur: string) => {
-        prev[cur] = start[cur];
-        return prev;
-      }, {});
-      // 结束帧
-      const keyframeEnd = pick(end, property);
+        // 开始帧
+        const keyframeStart = property.reduce((prev, cur: string) => {
+          prev[cur] = start[cur];
+          return prev;
+        }, {});
+        // 结束帧
+        const keyframeEnd = pick(end, property);
 
-      const animation = shape.animate([keyframeStart, keyframeEnd], {
-        fill: 'both',
-        easing,
-        duration,
-        delay,
-        iterations,
-      });
-      if (animation) {
-        animation.onframe = onFrame;
-        animation.onfinish = onEnd;
-      }
+        const animation = shape.animate([keyframeStart, keyframeEnd], {
+          fill: 'both',
+          easing,
+          duration,
+          delay,
+          iterations,
+        });
+        if (animation) {
+          animation.onframe = onFrame;
+          animation.onfinish = onEnd;
 
-      // 过滤无限循环的动画
-      if (animation && iterations !== Infinity) {
-        animations.push(animation.finished);
+          // 过滤无限循环的动画
+          if (iterations !== Infinity) {
+            animations.push(animation.finished);
+          }
+        } else {
+          // 如果没有执行动画，直接应用结束样式
+          applyStyle(shape, end);
+        }
+      } else {
+        // 直接应用结束样式
+        applyStyle(shape, end);
       }
 
       // clip 动画
       if (clip) {
-        const clipConfig = isFunction(clip) ? clip(style) : clip;
+        const clipConfig = isFunction(clip) ? clip(end) : clip;
         if (clipConfig) {
           const {
             type: clipType,
@@ -82,42 +92,51 @@ class Animator extends EE {
             end: clipEnd,
           } = clipConfig;
 
-          const clipStartStyle = {
-            ...clipStyle,
-            ...clipStart,
-          };
-          const clipEndStyle = {
-            ...clipStyle,
-            ...clipEnd,
-          };
-          // 开始帧
-          const clipKeyframeStart = clipProperty.reduce((prev, cur: string) => {
-            prev[cur] = clipStartStyle[cur];
-            return prev;
-          }, {});
-          // 结束帧
-          const clipKeyframeEnd = pick(clipEndStyle, clipProperty);
-          const clipShape = createShape(clipType, { style: clipStartStyle });
-          shape.setAttribute('clipPath', clipShape);
+          if (clipProperty.length && clipDuration > 0) {
+            const clipStartStyle = {
+              ...clipStyle,
+              ...clipStart,
+            };
+            const clipEndStyle = {
+              ...clipStyle,
+              ...clipEnd,
+            };
+            // 开始帧
+            const clipKeyframeStart = clipProperty.reduce((prev, cur: string) => {
+              prev[cur] = clipStartStyle[cur];
+              return prev;
+            }, {});
+            // 结束帧
+            const clipKeyframeEnd = pick(clipEndStyle, clipProperty);
+            const clipShape = createShape(clipType, { style: clipStartStyle });
+            shape.setAttribute('clipPath', clipShape);
 
-          // g 中 clip 为全局，且如果要在 clip上加动画，需要手动加到canvas上
-          shape.ownerDocument.documentElement.appendChild(clipShape);
-          const clipAnimation = clipShape.animate([clipKeyframeStart, clipKeyframeEnd], {
-            fill: 'both',
-            easing: clipEasing || easing,
-            duration: clipDuration || duration,
-            delay: clipDelay || delay,
-            iterations: clipIterations || iterations,
-          });
-
-          // 过滤无限循环的动画
-          if (clipAnimation && (clipIterations || iterations) !== Infinity) {
-            const clipFinished = clipAnimation.finished;
-            animations.push(clipFinished);
-            clipFinished.then(() => {
-              // 删掉 clip
-              shape.setAttribute('clipPath', null);
+            // g 中 clip 为全局，且如果要在 clip上加动画，需要手动加到canvas上
+            shape.ownerDocument.documentElement.appendChild(clipShape);
+            const clipAnimation = clipShape.animate([clipKeyframeStart, clipKeyframeEnd], {
+              fill: 'both',
+              easing: clipEasing || easing,
+              duration: clipDuration || duration,
+              delay: clipDelay || delay,
+              iterations: clipIterations || iterations,
             });
+
+            // 过滤无限循环的动画
+            if (clipAnimation) {
+              const clipFinished = clipAnimation.finished;
+              clipFinished.then(() => {
+                // 删掉 clip
+                shape.setAttribute('clipPath', null);
+                clipShape.destroy();
+              });
+              if ((clipIterations || iterations) !== Infinity) {
+                animations.push(clipFinished);
+              }
+            } else {
+              // 没有动画，直接删掉 clip
+              shape.setAttribute('clipPath', null);
+              clipShape.destroy();
+            }
           }
         }
       }
