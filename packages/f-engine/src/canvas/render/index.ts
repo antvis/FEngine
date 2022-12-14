@@ -28,14 +28,6 @@ function getStyle(tagType: WorkTag, props, context) {
     });
   }
 
-  // const style = {
-  //   position: 'absolute',
-  //   left: 0,
-  //   top: 0,
-  //   right: 0,
-  //   bottom: 0,
-  // } as Record<string, any>;
-
   if (isNumber(zIndex)) {
     return { zIndex };
   }
@@ -45,13 +37,14 @@ function getStyle(tagType: WorkTag, props, context) {
 
 function createVNode(parent: VNode, vNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate } = parent;
-  const { ref, type, props } = vNode;
-  const { animate, transformFrom } = props;
+  const { ref, type, props: originProps } = vNode;
+  const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
   const animator = new Animator();
   const style = getStyle(tag, props, context);
 
+  vNode.parent = parent;
   vNode.tag = tag;
   vNode.style = style;
   vNode.context = context;
@@ -106,6 +99,9 @@ function createVNode(parent: VNode, vNode: VNode) {
   if (transformFrom && transformFrom.vNode) {
     const transformVNode = transformFrom.vNode;
     vNode.transform = findClosestShapeNode(transformVNode);
+    if (vNode.transform) {
+      vNode.transform.parent.children = null;
+    }
   }
 
   return vNode;
@@ -117,6 +113,7 @@ function updateVNode(parent, nextNode, lastNode: VNode) {
   const { props } = nextNode;
   const { animate } = props;
 
+  nextNode.parent = parent;
   nextNode.tag = tag;
   nextNode.canvas = canvas;
   nextNode.context = context;
@@ -173,7 +170,7 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
 function diffElement(
   parent: VNode,
   nextElement: JSX.Element,
-  lastElement: JSX.Element
+  lastElement: JSX.Element,
 ): VNode | VNode[] | null {
   if (!nextElement && !lastElement) {
     return null;
@@ -251,7 +248,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 function renderVNode(
   node: VNode,
   nextChildren: VNode | VNode[] | null,
-  lastChildren: VNode | VNode[] | null
+  lastChildren: VNode | VNode[] | null,
 ) {
   const { component } = node;
 
@@ -285,7 +282,7 @@ function renderVNode(
         }
         componentNodeChildren = componentNodeChildren.concat(childrenNode);
       });
-    }
+    },
   );
 
   return componentNodeChildren;
@@ -294,7 +291,7 @@ function renderVNode(
 function renderChildren(
   parent: VNode,
   nextChildren: VNode | VNode[] | null,
-  lastChildren: VNode | VNode[] | null
+  lastChildren: VNode | VNode[] | null,
 ) {
   // 返回的都是 classComponent 的节点
   const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);

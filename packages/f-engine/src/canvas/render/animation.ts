@@ -55,6 +55,8 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   animator = animator || new Animator();
   // shape 形变
   const { start, end, property = [] } = animationEffect;
+  const { parsedStyle: nextParsedStyle } = nextShape;
+  const { parsedStyle: lastParsedStyle } = lastShape;
 
   const lastPath = convertToPath(lastShape);
   const nextPath = convertToPath(nextShape);
@@ -72,9 +74,16 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
 
   const pathShape = createShape('path', { style: { ...startStyle, path: '' } });
 
+  // 形变双方都有的属性才能动画
+  const animateProperty = property
+    .filter((key) => {
+      return nextParsedStyle.hasOwnProperty(key) && lastParsedStyle.hasOwnProperty(key);
+    })
+    .concat('path');
+
   animator.animate(pathShape, startStyle, endStyle, {
     ...animationEffect,
-    property: ['path'].concat(property),
+    property: animateProperty,
   });
 
   animator.once('end', () => {
@@ -163,6 +172,12 @@ function updateAnimation(nextNode, lastNode) {
       ...nextStyle,
     };
 
+    // 组件，直接更新
+    if (nextTag !== Shape) {
+      applyStyle(nextShape, style);
+      return animator;
+    }
+
     // 没有动画直接应用样式
     if (animate === false || !animationEffect) {
       applyStyle(nextShape, style);
@@ -218,6 +233,9 @@ function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
     const { shape, children, animate, style, props, animator } = vNode;
+    if (shape.destroyed) {
+      return null;
+    }
     // 重置
     animator.reset(shape);
 
@@ -288,7 +306,12 @@ function createAnimator(nextNode, lastNode) {
     closestShapeNode.transform = transform;
   }
 
-  lastNode = nextNode.transform || lastNode;
+  if (nextNode.transform) {
+    if (!lastNode) {
+      return updateAnimation(nextNode, nextNode.transform);
+    }
+    return [updateAnimation(nextNode, nextNode.transform), destroyAnimation(lastNode)];
+  }
 
   // appear 动画
   if (nextNode && !lastNode) {

@@ -26,6 +26,7 @@ export interface VNode extends JSX.Element {
   context: IContext;
   updater: Updater<any>;
 
+  parent: VNode;
   // VNode
   children: VNode | VNode[] | null;
 
