@@ -68,7 +68,7 @@ class Timeline extends Component<TimelineProps> {
     const { state, props } = this;
     const { children } = props;
     const { index } = state;
-    const childrenArray = Children.toArray(children as JSX.Element);
+    const childrenArray = Children.toArray<JSX.Element>(children);
     return childrenArray[index];
   }
 }

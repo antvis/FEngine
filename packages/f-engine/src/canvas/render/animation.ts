@@ -225,10 +225,9 @@ function destroyAnimation(node: VNode) {
 
     // 先处理叶子节点
     const childrenAnimation = children
-      ? // @ts-ignore
-        Children.toArray(children)
+      ? Children.toArray(children)
           .map((child) => {
-            return destroyAnimation(child as VNode);
+            return destroyAnimation(child);
           })
           .filter(Boolean)
       : null;
