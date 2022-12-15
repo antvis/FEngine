@@ -348,7 +348,6 @@ function updateComponents(components: Component[]) {
     // 更新 children
     component.children = nextChildren;
     vNode.children = nextChildren;
-    component.didUpdate();
 
     // 创建动画
     const childrenAnimation = createAnimation(vNode, nextChildren, lastChildren);
@@ -356,9 +355,10 @@ function updateComponents(components: Component[]) {
     if (childrenAnimation.length) {
       animator.children = childrenAnimation;
     }
-
     // 执行动画
     animator.play();
+
+    component.didUpdate();
   });
 }
 

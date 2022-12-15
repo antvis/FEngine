@@ -3,7 +3,7 @@ import { createContext, delay } from '../util';
 const context = createContext();
 
 describe('动画', () => {
-  it('appear', async () => {
+  it('animation', async () => {
     const { props } = (
       <Canvas context={context}>
         <rect
@@ -15,12 +15,12 @@ describe('动画', () => {
           animation={{
             appear: {
               easing: 'easeOut',
-              duration: 300,
+              duration: 50,
               property: ['width'],
             },
             update: {
               easing: 'ease',
-              duration: 300,
+              duration: 50,
               delay: 10,
               property: ['width'],
             },
@@ -29,13 +29,13 @@ describe('动画', () => {
       </Canvas>
     );
 
-    await delay(500);
-
+    await delay(200);
     const canvas = new Canvas(props);
     await canvas.render();
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
 
     // 图形属性变化
-    await delay(1000);
     const update = (
       <Canvas context={context}>
         <rect
@@ -47,12 +47,12 @@ describe('动画', () => {
           animation={{
             appear: {
               easing: 'easeOut',
-              duration: 300,
+              duration: 50,
               property: ['width'],
             },
             update: {
               easing: 'ease',
-              duration: 300,
+              duration: 50,
               delay: 10,
               property: ['width'],
             },
@@ -61,9 +61,10 @@ describe('动画', () => {
       </Canvas>
     );
     await canvas.update(update.props);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
 
     // 形变动画
-    await delay(1000);
     const update1 = (
       <Canvas context={context}>
         <circle
@@ -76,21 +77,20 @@ describe('动画', () => {
           animation={{
             appear: {
               easing: 'easeOut',
-              duration: 300,
+              duration: 50,
               property: ['width'],
             },
             update: {
               easing: 'ease',
-              duration: 300,
+              duration: 50,
               delay: 10,
-              // property: ['width'],
             },
             leave: {
               end: {
                 opacity: 0,
               },
               easing: 'ease',
-              duration: 300,
+              duration: 50,
               delay: 10,
               property: ['opacity'],
             },
@@ -99,13 +99,15 @@ describe('动画', () => {
       </Canvas>
     );
     await canvas.update(update1.props);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
 
     // 删除动画
-    await delay(1000);
     const update2 = <Canvas context={context}></Canvas>;
     await canvas.update(update2.props);
 
-    await delay(1000);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
   });
 
   it('animate = false', async () => {
@@ -122,6 +124,58 @@ describe('动画', () => {
               easing: 'easeOut',
               duration: 3000,
               property: ['width'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('property empty', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              duration: 100,
+              end: {
+                width: 40,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('duration empty', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            appear: {
+              property: ['width'],
+              end: {
+                width: 40,
+              },
             },
           }}
         />
