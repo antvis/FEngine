@@ -19,7 +19,8 @@
   "dependencies": {
     "@antv/f-engine": "^0.0.20",
     "@antv/f2-context": "^0.0.1",
-    "@babel/runtime": "^7.12.5"
+    "@babel/runtime": "^7.12.5",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "mini-types": "^0.1.7"
