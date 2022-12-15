@@ -125,7 +125,7 @@ export class Sector extends Path {
   }
   setAttribute(name, value, force?: boolean) {
     super.setAttribute(name, value, force);
-    if (['startAngle', 'endAngle', 'r', 'r0', 'radius'].indexOf(name) > -1) {
+    if (['startAngle', 'endAngle', 'r', 'r0', 'radius', 'cx', 'cy'].indexOf(name) > -1) {
       this.updatePath();
     }
   }
