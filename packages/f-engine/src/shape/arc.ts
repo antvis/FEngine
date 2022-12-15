@@ -29,6 +29,22 @@ export interface ArcStyleProps extends BaseStyleProps {
   anticlockwise?: boolean;
 }
 
+function computeArcSweep(startAngle: number, endAngle: number, anticlockwise: boolean) {
+  // 顺时针方向
+  if (!anticlockwise) {
+    if (endAngle >= startAngle) {
+      return endAngle - startAngle <= Math.PI ? 0 : 1;
+    }
+    return endAngle - startAngle <= -Math.PI ? 0 : 1;
+  }
+
+  // 逆时针方向
+  if (endAngle >= startAngle) {
+    return endAngle - startAngle <= Math.PI ? 1 : 0;
+  }
+  return endAngle - startAngle <= -Math.PI ? 1 : 0;
+}
+
 export class Arc extends Path {
   parsedStyle: any;
   constructor(config) {
@@ -75,13 +91,7 @@ export class Arc extends Path {
         ['Z'],
       ];
     }
-    const arcSweep = anticlockwise
-      ? endAngle - startAngle <= Math.PI
-        ? 1
-        : 0
-      : endAngle - startAngle <= Math.PI
-      ? 0
-      : 1;
+    const arcSweep = computeArcSweep(startAngle, endAngle, anticlockwise);
     return [
       ['M', start.x, start.y],
       ['A', r, r, 0, arcSweep, anticlockwise ? 0 : 1, end.x, end.y],

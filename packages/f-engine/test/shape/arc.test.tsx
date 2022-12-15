@@ -90,6 +90,51 @@ describe('Arc', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  it('Arc 大角', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <arc
+          style={{
+            cx: 60,
+            cy: 60,
+            startAngle: -90,
+            endAngle: -100,
+            r: 50,
+            stroke: 'red',
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('Arc 大角', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <arc
+          style={{
+            cx: 60,
+            cy: 60,
+            startAngle: -90,
+            endAngle: -80,
+            r: 50,
+            stroke: 'red',
+            anticlockwise: true,
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+
   it('Arc 弧度', async () => {
     const { props } = (
       <Canvas context={context}>
