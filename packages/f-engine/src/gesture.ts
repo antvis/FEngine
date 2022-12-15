@@ -35,7 +35,7 @@ class Gesture {
 
   constructor(element: DisplayObject | Canvas) {
     this.el = element;
-    this.gesture = new GGesture(element);
+    this.gesture = new GGesture(element as DisplayObject);
   }
 
   on(eventName: string, listener: (...args: any[]) => void) {

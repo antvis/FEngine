@@ -15,7 +15,8 @@
     "@antv/g-mobile-webgl": "~0.7.20",
     "@antv/g-web-animations-api": "~1.0.6",
     "@antv/util": "^3.0.6",
-    "@babel/runtime": "^7.12.5"
+    "@babel/runtime": "^7.12.5",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/antvis/FEngine",
   "author": "https://github.com/orgs/antvis/people",
