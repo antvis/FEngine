@@ -1,6 +1,6 @@
 import { Path, deg2rad, BaseStyleProps } from '@antv/g-lite';
 import { polarToCartesian } from './util/util';
-import { isNumberEqual, PathArray } from '@antv/util';
+import { isNumberEqual, PathArray, isNil } from '@antv/util';
 
 export interface SectorStyleProps extends BaseStyleProps {
   cx?: string | number;
@@ -133,14 +133,17 @@ export class Sector extends Path {
 
   private updatePath() {
     const { cx, cy, startAngle, endAngle, r, r0, radius, anticlockwise = false } = this.parsedStyle;
-    if (startAngle === endAngle) return;
+
+    if (isNil(startAngle) || isNil(endAngle) || startAngle === endAngle || isNil(r) || r <= 0) {
+      return;
+    }
 
     const path = this.createPath(
       cx,
       cy,
-      startAngle ? deg2rad(startAngle) : 0,
-      endAngle ? deg2rad(endAngle) : Math.PI * 2,
-      r ? r : 0,
+      deg2rad(startAngle),
+      deg2rad(endAngle),
+      r,
       r0 ? r0 : 0,
       radius ? radius : [0, 0, 0, 0],
       anticlockwise,
@@ -158,30 +161,38 @@ export class Sector extends Path {
     borderRadius: number[],
     anticlockwise?: boolean,
   ): PathArray {
-    if (r <= 0) {
-      return null;
-    }
-
     const start = polarToCartesian(x, y, r, startAngle);
     const end = polarToCartesian(x, y, r, endAngle);
 
     const innerStart = polarToCartesian(x, y, r0, startAngle);
     const innerEnd = polarToCartesian(x, y, r0, endAngle);
 
+    const clockwise = !anticlockwise;
+    const angle = clockwise ? endAngle - startAngle : startAngle - endAngle;
+
     // 整圆
-    if (isNumberEqual(endAngle - startAngle, Math.PI * 2)) {
+    if (Math.abs(angle) >= PI2 || isNumberEqual(Math.abs(angle), PI2)) {
       // 整个圆是分割成两个圆
       const middlePoint = polarToCartesian(x, y, r, startAngle + Math.PI);
       const innerMiddlePoint = polarToCartesian(x, y, r0, startAngle + Math.PI);
       const circlePathCommands = [
         ['M', start.x, start.y],
-        ['A', r, r, 0, 1, 1, middlePoint.x, middlePoint.y],
-        ['A', r, r, 0, 1, 1, end.x, end.y],
-        ['M', innerStart.x, innerStart.y],
+        ['A', r, r, 0, 1, clockwise ? 1 : 0, middlePoint.x, middlePoint.y],
+        ['A', r, r, 0, 1, clockwise ? 1 : 0, end.x, end.y],
       ];
-      if (r0) {
-        circlePathCommands.push(['A', r0, r0, 0, 1, 0, innerMiddlePoint.x, innerMiddlePoint.y]);
-        circlePathCommands.push(['A', r0, r0, 0, 1, 0, innerEnd.x, innerEnd.y]);
+      if (r0 > 0) {
+        circlePathCommands.push(['M', innerStart.x, innerStart.y]);
+        circlePathCommands.push([
+          'A',
+          r0,
+          r0,
+          0,
+          1,
+          clockwise ? 0 : 1,
+          innerMiddlePoint.x,
+          innerMiddlePoint.y,
+        ]);
+        circlePathCommands.push(['A', r0, r0, 0, 1, clockwise ? 0 : 1, innerEnd.x, innerEnd.y]);
       }
 
       circlePathCommands.push(['M', start.x, start.y]);
@@ -190,8 +201,6 @@ export class Sector extends Path {
       return circlePathCommands as PathArray;
     }
 
-    const clockwise = !anticlockwise;
-    const angle = clockwise ? endAngle - startAngle : startAngle - endAngle;
     const xrs = r * mathCos(startAngle);
     const yrs = r * mathSin(startAngle);
     const xire = r0 * mathCos(endAngle);
