@@ -4,17 +4,17 @@ import { loadAnimation } from '@antv/g-lottie-player';
 interface LottieProps {
   // Lottie Json
   data: any;
-  options: {
+  options?: {
     // 是否循环播放 次数 ｜ 无限
-    loop: number | boolean;
+    loop?: number | boolean;
     // 是否自动播放
-    autoplay: boolean;
+    autoplay?: boolean;
   };
   style?: {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
   };
   animation?: AnimationProps;
 }
@@ -29,9 +29,19 @@ class Lottie extends Component<LottieProps> {
   }
 
   didMount() {
+    this.addLottie();
+  }
+
+  willUpdate() {
+    this.addLottie();
+  }
+
+  addLottie = () => {
     const { props, context } = this;
     const { data, options } = props;
     const { canvas } = context;
+
+    if (!data) return;
 
     // 文档流后挂载lottie
     canvas.ready.then(() => {
@@ -41,15 +51,7 @@ class Lottie extends Component<LottieProps> {
       this.size = animation.size();
       this.updateSize();
     });
-  }
-
-  willUpdate() {
-    const { context } = this;
-    const { canvas } = context;
-    canvas.ready.then(() => {
-      this.updateSize();
-    });
-  }
+  };
 
   updateSize = () => {
     const { width: currentWidth, height: currentHeight } = this.size;
