@@ -12,9 +12,9 @@ function cloneElement(element, props) {
   };
 }
 
-function map(children: any, fn: any) {
+function map<T = any>(children: T | T[] | null, fn: (child: T | null) => any) {
   if (!children) {
-    return fn(children);
+    return fn(children as null);
   }
   if (isArray(children)) {
     return children.map((child) => {
@@ -24,10 +24,10 @@ function map(children: any, fn: any) {
   return fn(children);
 }
 
-function compareArray(
-  nextElements: JSX.Element[],
-  lastElements: JSX.Element[],
-  callback: Function
+function compareArray<T extends JSX.Element = JSX.Element>(
+  nextElements: T[],
+  lastElements: T[],
+  callback: (next: T | T[] | null, last: T | T[] | null) => any,
 ) {
   const keyed = {};
   const nextLength = nextElements.length;
@@ -90,7 +90,11 @@ function compareArray(
 }
 
 // 比较2棵树
-function compare(nextElement: JSX.Element, lastElement: JSX.Element, callback: Function) {
+function compare<T extends JSX.Element = JSX.Element>(
+  nextElement: T | T[] | null,
+  lastElement: T | T[] | null,
+  callback: (next: T | T[] | null, last: T | T[] | null) => any,
+) {
   // 有一个为空
   if (!nextElement || !lastElement) {
     return callback(nextElement, lastElement);
@@ -105,18 +109,17 @@ function compare(nextElement: JSX.Element, lastElement: JSX.Element, callback: F
   return callback(nextElement, lastElement);
 }
 
-function toArray(element: JSX.Element): JSX.Element[] | null {
+function toArray<T = any>(element: T | T[] | null): T[] | null {
   if (!element) {
     return element as null;
   }
   if (!isArray(element)) {
     return [element];
   }
-  let newArray = [];
+  let newArray: T[] = [];
   for (let i = 0, len = element.length; i < len; i++) {
     const item = element[i];
     if (isArray(item)) {
-      // @ts-ignore
       newArray = newArray.concat(toArray(item));
     } else {
       newArray.push(item);

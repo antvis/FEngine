@@ -262,28 +262,22 @@ function renderVNode(
 
   let componentNodeChildren: VNode[] = [];
 
-  Children.compare(
-    // @ts-ignore
-    nextChildren,
-    // @ts-ignore
-    lastChildren,
-    (next: JSX.Element, last: JSX.Element) => {
-      const element = diffElement(node, next, last);
+  Children.compare(nextChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
+    const element = diffElement(node, next, last);
 
-      Children.map(element, (child: VNode) => {
-        if (!child) return;
-        const { tag, props: childProps, children: childLastChildren } = child;
+    Children.map(element, (child: VNode) => {
+      if (!child) return;
+      const { tag, props: childProps, children: childLastChildren } = child;
 
-        let childrenNode = [];
-        if (tag === Shape) {
-          childrenNode = renderVNode(child, childProps.children, childLastChildren);
-        } else {
-          childrenNode = [child];
-        }
-        componentNodeChildren = componentNodeChildren.concat(childrenNode);
-      });
-    },
-  );
+      let childrenNode = [];
+      if (tag === Shape) {
+        childrenNode = renderVNode(child, childProps.children, childLastChildren);
+      } else {
+        childrenNode = [child];
+      }
+      componentNodeChildren = componentNodeChildren.concat(childrenNode);
+    });
+  });
 
   return componentNodeChildren;
 }
