@@ -255,4 +255,75 @@ describe('Sector', () => {
     await delay(500);
     expect(context).toMatchImageSnapshot();
   });
+
+  it('逆时针绘制', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <sector
+          style={{
+            cx: 150,
+            cy: 150,
+            startAngle: -90,
+            endAngle: -160,
+            r: 50,
+            r0: 10,
+            fill: '#1890FF',
+            anticlockwise: true,
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+  describe('整圆', () => {
+    it('顺时针', async () => {
+      const { props } = (
+        <Canvas context={context}>
+          <sector
+            style={{
+              cx: 150,
+              cy: 150,
+              r: 50,
+              r0: 20,
+              startAngle: 0,
+              endAngle: 360,
+              fill: 'red',
+            }}
+          />
+        </Canvas>
+      );
+
+      const canvas = new Canvas(props);
+      canvas.render();
+      await delay(500);
+      expect(context).toMatchImageSnapshot();
+    });
+
+    it('逆时针', async () => {
+      const { props } = (
+        <Canvas context={context}>
+          <sector
+            style={{
+              cx: 150,
+              cy: 150,
+              r: 50,
+              r0: 20,
+              startAngle: 0,
+              endAngle: -360,
+              fill: 'blue',
+            }}
+          />
+        </Canvas>
+      );
+
+      const canvas = new Canvas(props);
+      canvas.render();
+      await delay(500);
+      expect(context).toMatchImageSnapshot();
+    });
+  });
 });
