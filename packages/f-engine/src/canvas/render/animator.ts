@@ -35,7 +35,6 @@ class Animator extends EE {
         onFrame = () => {},
         onEnd = () => {},
       } = effect;
-
       // shape 动画
       if (property.length && duration > 0) {
         // 应用样式
@@ -92,7 +91,7 @@ class Animator extends EE {
             end: clipEnd,
           } = clipConfig;
 
-          if (clipProperty.length && clipDuration > 0) {
+          if (clipProperty.length && (clipDuration || duration) > 0) {
             const clipStartStyle = {
               ...clipStyle,
               ...clipStart,
