@@ -64,6 +64,45 @@ class View extends Component {
   }
 }
 
+class View1 extends Component {
+  render() {
+    return (
+      <group
+        animation={{
+          appear: {
+            easing: 'quadraticOut',
+            duration: 450,
+            clip: {
+              type: 'sector',
+              property: ['endAngle'],
+              style: {
+                cx: 50,
+                cy: 50,
+                startAngle: `${0}rad`,
+                r: 50,
+              },
+              start: {
+                endAngle: `${0}rad`,
+              },
+              end: {
+                endAngle: `${6.28}rad`,
+              },
+            },
+          },
+        }}
+      >
+        <circle
+          style={{
+            stroke: '#F04864',
+            r: 40,
+            cx: 50,
+            cy: 50,
+          }}
+        />
+      </group>
+    );
+  }
+}
 describe('Canvas', () => {
   it('custom shape animation', async () => {
     const renderer = new Renderer();
@@ -77,8 +116,25 @@ describe('Canvas', () => {
     await delay(2000);
 
     const canvas = new Canvas(props);
-    canvas.render();
-    await delay(200);
-    // expect(context).toMatchImageSnapshot();
+    await canvas.render();
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
+  });
+  it('clip animation', async () => {
+    const renderer = new Renderer();
+    const context = createContext('clip animation');
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <View1 />
+      </Canvas>
+    );
+
+    await delay(2000);
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
   });
 });
