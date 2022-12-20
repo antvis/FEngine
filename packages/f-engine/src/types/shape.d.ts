@@ -95,39 +95,71 @@ interface StyleClipProps {
   clip?: ((style) => ShapeProps) | ShapeProps;
 }
 
-export interface GroupStyleProps extends StyleFlexProps, StyleClipProps, GGroupStyleProps {}
-export interface RectStyleProps extends StyleFlexProps, StyleClipProps, GRectStyleProps {
+type omitStyleProps = 'display';
+
+export interface GroupStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GGroupStyleProps, omitStyleProps> {}
+export interface RectStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GRectStyleProps, omitStyleProps | 'width' | 'height' | 'radius'> {
   radius?: ArrayAttribute;
 }
 export interface CircleStyleProps
   extends StyleFlexProps,
     StyleClipProps,
-    Omit<GCircleStyleProps, 'r'> {
+    Omit<GCircleStyleProps, omitStyleProps | 'r'> {
   r?: string | number;
 }
 export interface LineStyleProps
   extends StyleFlexProps,
     StyleClipProps,
-    Omit<GLineStyleProps, 'x1' | 'y1' | 'x2' | 'y2'> {
+    Omit<GLineStyleProps, omitStyleProps | 'x1' | 'y1' | 'x2' | 'y2'> {
   x1?: string | number;
   y1?: string | number;
   x2?: string | number;
   y2?: string | number;
 }
-export interface PolygonStyleProps extends StyleFlexProps, StyleClipProps, GPolygonStyleProps {
+export interface PolygonStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GPolygonStyleProps, omitStyleProps | 'points'> {
   points: [number, number][] | [string, string][] | [number, string][] | [string, number][];
   smooth?: boolean;
 }
-export interface PolylineStyleProps extends StyleFlexProps, StyleClipProps, GPolylineStyleProps {
+export interface PolylineStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GPolylineStyleProps, omitStyleProps | 'points'> {
   points: [number, number][] | [string, string][] | [number, string][] | [string, number][];
   smooth?: boolean;
 }
-export interface ArcStyleProps extends StyleFlexProps, StyleClipProps, GArcStyleProps {}
-export interface SectorStyleProps extends StyleFlexProps, StyleClipProps, GSectorStyleProps {}
-export interface TextStyleProps extends StyleFlexProps, StyleClipProps, GTextStyleProps {}
-export interface ImageStyleProps extends StyleFlexProps, StyleClipProps, GImageStyleProps {}
-export interface PathStyleProps extends StyleFlexProps, StyleClipProps, GPathStyleProps {}
-export interface MarkerStyleProps extends StyleFlexProps, StyleClipProps, GMarkerStyleProps {}
+export interface ArcStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GArcStyleProps, omitStyleProps> {}
+export interface SectorStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GSectorStyleProps, omitStyleProps> {}
+export interface TextStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GTextStyleProps, omitStyleProps> {}
+export interface ImageStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GImageStyleProps, omitStyleProps> {}
+export interface PathStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GPathStyleProps, omitStyleProps> {}
+export interface MarkerStyleProps
+  extends StyleFlexProps,
+    StyleClipProps,
+    Omit<GMarkerStyleProps, omitStyleProps> {}
 
 interface AnimationBase {
   // 缓动函数
