@@ -108,11 +108,13 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       theme: customTheme,
       px2hd: customPx2hd,
       pixelRatio: customPixelRatio,
-      createImage,
       landscape,
       container: rendererContainer,
       style: customStyle,
       animate = true,
+      createImage,
+      requestAnimationFrame,
+      cancelAnimationFrame,
     } = props;
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
@@ -135,6 +137,8 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       supportsTouchEvents: true,
       supportsPointerEvents: true,
       createImage,
+      requestAnimationFrame,
+      cancelAnimationFrame,
     });
 
     const container = canvas.getRoot();

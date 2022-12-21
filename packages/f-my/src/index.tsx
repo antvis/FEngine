@@ -1,5 +1,6 @@
 import { Canvas } from '@antv/f-engine';
 import { my as F2Context } from '@antv/f2-context';
+import { raf, caf } from './raf';
 
 function wrapEvent(e) {
   if (!e) return;
@@ -52,8 +53,17 @@ Component({
           () => {
             const myCtx = my.createCanvasContext(id);
             const context = F2Context(myCtx);
-            this.canvasRender({ width, height, context, pixelRatio });
-          }
+            const fCanvas = this.createCanvas({
+              width,
+              height,
+              context,
+              pixelRatio,
+              createImage: (src) => src,
+              requestAnimationFrame: raf,
+              cancelAnimationFrame: caf,
+            });
+            fCanvas.render();
+          },
         );
       });
   },
@@ -88,15 +98,38 @@ Component({
             return;
           }
           const canvas = res[0].node;
-          const { width, height } = canvas;
+          const {
+            width,
+            height,
+            createImage,
+            requestAnimationFrame,
+            cancelAnimationFrame,
+          } = canvas;
           const pixelRatio = getPixelRatio();
           canvas.width = width * pixelRatio;
           canvas.height = height * pixelRatio;
           const context = canvas.getContext('2d');
-          this.canvasRender({ width, height, pixelRatio, context });
+          const fCanvas = this.createCanvas({
+            width,
+            height,
+            pixelRatio,
+            context,
+            createImage,
+            requestAnimationFrame,
+            cancelAnimationFrame,
+          });
+          fCanvas.render();
         });
     },
-    canvasRender({ width, height, pixelRatio, context }) {
+    createCanvas({
+      width,
+      height,
+      pixelRatio,
+      context,
+      createImage,
+      requestAnimationFrame,
+      cancelAnimationFrame,
+    }) {
       if (!width || !height) {
         return;
       }
@@ -107,10 +140,13 @@ Component({
         height,
         context,
         children,
+        createImage,
+        requestAnimationFrame,
+        cancelAnimationFrame,
       });
-      canvas.render();
       this.canvas = canvas;
       this.canvasEl = canvas.getCanvasEl();
+      return canvas;
     },
     click(e) {
       const canvasEl = this.canvasEl;

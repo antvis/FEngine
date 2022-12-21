@@ -1,6 +1,6 @@
 <canvas
   type="2d"
-  class="f2-canvas"
+  class="f-canvas"
   bindtap="click"
   bindtouchstart="touchStart"
   bindtouchmove="touchMove"
