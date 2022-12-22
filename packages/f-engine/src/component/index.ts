@@ -67,7 +67,6 @@ class Component<P extends Props = IProps, S = IState> {
   }
   destroy() {
     this.destroyed = true;
-    this._vNode = null;
     this.animator = null;
   }
 }
