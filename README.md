@@ -19,6 +19,9 @@ await canvas.render();
 # 安装依赖 (推荐用 yarn)
 $ yarn
 
+# 先执行下 build
+$ npm run build
+
 # 通过单测调试
 $ npm run test-watch 'packages/f-engine/test/canvas/index.test.tsx'
 

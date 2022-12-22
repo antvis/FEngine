@@ -58,8 +58,6 @@ function createVNode(parent: VNode, vNode: VNode) {
     const shape = createShape(type as string, { ...props, style });
     if (ref) {
       ref.current = shape;
-      // @ts-ignore
-      ref.vNode = vNode;
     }
 
     // @ts-ignore
@@ -84,8 +82,6 @@ function createVNode(parent: VNode, vNode: VNode) {
     // 设置ref
     if (ref) {
       ref.current = component;
-      // @ts-ignore
-      ref.vNode = vNode;
     }
 
     component.context = context;
@@ -96,8 +92,8 @@ function createVNode(parent: VNode, vNode: VNode) {
     vNode.component = component;
   }
 
-  if (transformFrom && transformFrom.vNode) {
-    const transformVNode = transformFrom.vNode;
+  if (transformFrom && transformFrom.current) {
+    const transformVNode = transformFrom.current._vNode;
     vNode.transform = findClosestShapeNode(transformVNode);
     if (vNode.transform) {
       vNode.transform.parent.children = null;
