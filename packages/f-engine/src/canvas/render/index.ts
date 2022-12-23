@@ -1,5 +1,5 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, isNumber } from '@antv/util';
+import { hasKey, isBoolean, isNumber } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
@@ -200,7 +200,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
     component.layout = layout;
 
     // 新创建的 component
-    if (!component.children) return true;
+    if (!hasKey(component, 'children')) return true;
     // 不需要更新
     if (component.shouldUpdate(props) === false) {
       return false;
