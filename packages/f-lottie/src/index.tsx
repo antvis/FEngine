@@ -1,6 +1,5 @@
 import { Component, createRef, jsx, Ref, AnimationProps } from '@antv/f-engine';
 import { loadAnimation } from '@antv/g-lottie-player';
-
 interface LottieProps {
   // Lottie Json
   data: any;
@@ -16,6 +15,7 @@ interface LottieProps {
     x?: number;
     y?: number;
   };
+  LottieAnimation?: Ref;
   animation?: AnimationProps;
 }
 
@@ -38,7 +38,7 @@ class Lottie extends Component<LottieProps> {
 
   addLottie = () => {
     const { props, context } = this;
-    const { data, options } = props;
+    const { data, options, LottieAnimation } = props;
     const { canvas } = context;
 
     if (!data) return;
@@ -46,6 +46,9 @@ class Lottie extends Component<LottieProps> {
     // 文档流后挂载lottie
     canvas.ready.then(() => {
       const animation = loadAnimation(data, options);
+      if (LottieAnimation) {
+        LottieAnimation.current = animation;
+      }
       animation.render(this.ref.current);
 
       this.size = animation.size();
