@@ -1,5 +1,6 @@
 import { Component, createRef, jsx, Ref, AnimationProps } from '@antv/f-engine';
 import { loadAnimation } from '@antv/g-lottie-player';
+
 interface LottieProps {
   // Lottie Json
   data: any;
@@ -15,13 +16,20 @@ interface LottieProps {
     x?: number;
     y?: number;
   };
-  LottieAnimation?: Ref;
+  play?: {
+    speed?: number;
+    // 开始帧
+    start?: number;
+    // 结束帧
+    end?: number;
+  };
   animation?: AnimationProps;
 }
 
 class Lottie extends Component<LottieProps> {
   size: { width: number; height: number };
   ref: Ref;
+  animation: any;
 
   constructor(props) {
     super(props);
@@ -38,21 +46,25 @@ class Lottie extends Component<LottieProps> {
 
   addLottie = () => {
     const { props, context } = this;
-    const { data, options, LottieAnimation } = props;
+    const { data, options, play } = props;
     const { canvas } = context;
 
     if (!data) return;
 
     // 文档流后挂载lottie
     canvas.ready.then(() => {
-      const animation = loadAnimation(data, options);
-      if (LottieAnimation) {
-        LottieAnimation.current = animation;
-      }
-      animation.render(this.ref.current);
+      this.animation = this.animation ? this.animation : loadAnimation(data, options);
+      this.animation.render(this.ref.current);
 
-      this.size = animation.size();
+      this.size = this.animation.size();
       this.updateSize();
+
+      // 播放控制
+      if (play) {
+        const { speed = 1, start = 0, end = this.animation.getDuration(true) } = play;
+        this.animation.setSpeed(speed);
+        this.animation.playSegments([start, end]);
+      }
     });
   };
 
