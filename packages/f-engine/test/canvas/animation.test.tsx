@@ -187,4 +187,48 @@ describe('动画', () => {
     await delay(100);
     expect(context).toMatchImageSnapshot();
   });
+
+  class View extends Component {
+    render() {
+      const { animation } = this.props;
+      return (
+        <rect
+          style={{
+            width: '80px',
+            height: '80px',
+            fill: 'red',
+          }}
+          animation={animation}
+        />
+      );
+    }
+  }
+
+  it('component animation', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <View
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 100,
+              property: ['y'],
+              start: {
+                y: 0,
+              },
+              end: {
+                y: 180,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    await delay(200);
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
 });

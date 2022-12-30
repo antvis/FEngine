@@ -81,14 +81,14 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
 function appearAnimation(vNode: VNode | VNode[] | null) {
   return Children.map(vNode, (node) => {
     if (!node) return;
-    const { shape, style, children, animate, props, animator } = node;
+    const { tag, shape, style, children, animate, props, animator } = node;
     animator.reset(shape);
 
     // 有叶子节点，先执行叶子节点
     animator.children = children ? createAnimation(node, children, null) : null;
 
     // 不需要执行动画
-    if (animate === false) {
+    if (animate === false || tag !== Shape) {
       applyStyle(shape, style);
       return animator;
     }
@@ -216,7 +216,7 @@ function updateAnimation(nextNode, lastNode) {
 function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
-    const { shape, children, animate, style, props, animator } = vNode;
+    const { tag, shape, children, animate, style, props, animator } = vNode;
     if (shape.destroyed) {
       return null;
     }
@@ -250,7 +250,7 @@ function destroyAnimation(node: VNode) {
     animator.children = childrenAnimation;
 
     // 图形有动画
-    if (animationEffect) {
+    if (animationEffect && tag === Shape) {
       const { start, end = {} } = animationEffect;
 
       const startStyle = {
@@ -324,8 +324,8 @@ function createAnimation(parent, nextChildren, lastChildren) {
   const childrenAnimator = [];
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
+    // shape 层才执行动画
     const animator = createAnimator(nextNode, lastNode);
-
     Children.map(animator, (item: Animator) => {
       if (!item) return;
       childrenAnimator.push(item);
