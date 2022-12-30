@@ -211,7 +211,7 @@ describe('动画', () => {
           animation={{
             appear: {
               easing: 'easeOut',
-              duration: 500,
+              duration: 100,
               property: ['y'],
               start: {
                 y: 0,
