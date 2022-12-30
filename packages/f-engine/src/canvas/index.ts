@@ -7,7 +7,7 @@ import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
 import EE from '@antv/event-emitter';
 import Theme, { Theme as ThemeType } from './theme';
-import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
+import { px2hd as defaultPx2hd, checkCSSRule, batch2hd, pickElement } from './util';
 import Gesture from '../gesture';
 import { render, updateComponents, destroyElement } from './render';
 import { VNode } from './vnode';
@@ -210,7 +210,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
   async update(nextProps: P) {
     const { props, vNode } = this;
-    if (equal(nextProps, props)) {
+
+    const children = pickElement(props.children);
+    if (equal(nextProps, { ...props, children })) {
       return;
     }
 

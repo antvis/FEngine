@@ -1,4 +1,5 @@
 import { jsx, Canvas, Component } from '../../src';
+import { pickElement } from '../../src/canvas/util';
 import { createContext, delay } from '../util';
 const context = createContext();
 
@@ -188,9 +189,11 @@ describe('动画', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  const mockCallback = jest.fn();
   class View extends Component {
     render() {
       const { animation } = this.props;
+      mockCallback();
       return (
         <rect
           style={{
@@ -198,7 +201,14 @@ describe('动画', () => {
             height: '80px',
             fill: 'red',
           }}
-          animation={animation}
+          animation={{
+            ...animation,
+            update: {
+              easing: 'linear',
+              duration: 450,
+              property: ['x', 'y'],
+            },
+          }}
         />
       );
     }
@@ -211,7 +221,7 @@ describe('动画', () => {
           animation={{
             appear: {
               easing: 'easeOut',
-              duration: 100,
+              duration: 500,
               property: ['y'],
               start: {
                 y: 0,
@@ -230,5 +240,29 @@ describe('动画', () => {
     await canvas.render();
     await delay(500);
     expect(context).toMatchImageSnapshot();
+
+    const { props: nextProps } = (
+      <Canvas context={context}>
+        <View
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 500,
+              property: ['y'],
+              start: {
+                y: 0,
+              },
+              end: {
+                y: 180,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+    // 相同的props，不会触发重 渲染
+    await canvas.update({ ...nextProps, children: pickElement(props.children) });
+
+    expect(mockCallback.mock.calls.length).toBe(1);
   });
 });

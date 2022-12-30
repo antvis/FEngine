@@ -1,4 +1,5 @@
 import { isDate, isPlainObject, isNumber, isString, isArray } from '@antv/util';
+import Children from '../children';
 import checkCSSRule from './cssRule';
 
 // 默认设置50
@@ -116,6 +117,25 @@ function getElementsByClassName(className: string, element) {
 
 const px2hd = batch2hd(defaultPx2hd);
 
+function pickElement(children) {
+  if (!children) return children;
+  const result = Children.map(children, (item) => {
+    if (!item) return item;
+
+    const { key, ref, type, props } = item;
+    return {
+      key,
+      ref,
+      type,
+      props: {
+        ...props,
+        children: pickElement(props.children),
+      },
+    };
+  });
+  return result;
+}
+
 export {
   px2hd,
   batch2hd,
@@ -124,4 +144,5 @@ export {
   isInBBox,
   checkCSSRule,
   getElementsByClassName,
+  pickElement,
 };
