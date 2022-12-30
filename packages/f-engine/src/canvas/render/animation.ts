@@ -281,6 +281,11 @@ function createAnimator(nextNode, lastNode) {
     return destroyAnimation(lastNode);
   }
 
+  // const { tag, children } = nextNode;
+  // if (tag !== Shape) {
+  //   return createAnimator(children, lastNode ? lastNode.children : null);
+  // }
+
   // 如果有 transform 则从 transform 比
   const { transform } = nextNode;
   if (transform) {
@@ -324,8 +329,8 @@ function createAnimation(parent, nextChildren, lastChildren) {
   const childrenAnimator = [];
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
+    // shape 层才执行动画
     const animator = createAnimator(nextNode, lastNode);
-
     Children.map(animator, (item: Animator) => {
       if (!item) return;
       childrenAnimator.push(item);
