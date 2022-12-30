@@ -1,7 +1,7 @@
 import { jsx, Canvas } from '@antv/f-engine';
 import Lottie from '../src/index';
 import data from './data/data.json';
-import { createContext } from './util';
+import { createContext, delay } from './util';
 
 describe('Lottie', () => {
   it('加载 lottie 文件', async () => {
@@ -62,6 +62,46 @@ describe('Lottie', () => {
           data={data1}
           options={{ loop: true, autoplay: true }}
           style={{ width: 100, height: 100 }}
+        />
+      </Canvas>
+    );
+
+    await canvas.update(nextProps);
+  });
+
+  it('播控 lottie', async () => {
+    const data1 = await (
+      await fetch(
+        'https://gw.alipayobjects.com/os/OasisHub/9c49e111-b7dd-4a53-9c8e-a1ada16c6969/data.json',
+      )
+    ).json();
+
+    const context = createContext('', {
+      width: '600px',
+      height: '300px',
+    });
+
+    const { props } = (
+      <Canvas context={context}>
+        <Lottie
+          data={data1}
+          options={{ loop: true, autoplay: true }}
+          play={{ start: 0, speed: 1, end: 10 }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    await delay(3000);
+
+    const { props: nextProps } = (
+      <Canvas context={context}>
+        <Lottie
+          data={data1}
+          options={{ loop: true, autoplay: true }}
+          play={{ start: 10, speed: 1, end: 24 }}
         />
       </Canvas>
     );
