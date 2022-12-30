@@ -1,5 +1,5 @@
 {
   "usingComponents": {
-    "f2": "@antv/f2-wx"
+    "f-canvas": "@antv/f-wx"
   }
 }
