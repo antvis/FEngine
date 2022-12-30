@@ -200,7 +200,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
     component.layout = layout;
 
     // 新创建的 component
-    if (!component.children) return true;
+    if (!component.isMounted) return true;
     // 不需要更新
     if (component.shouldUpdate(props) === false) {
       return false;
@@ -218,7 +218,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
   // 2. willMount / willUpdate
   shouldProcessChildren.forEach((child: VNode) => {
     const { component } = child;
-    if (!component.children) {
+    if (!component.isMounted) {
       component.willMount();
     } else {
       component.willUpdate();
@@ -228,13 +228,13 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
   // 3. render
   shouldProcessChildren.forEach((child: VNode) => {
     const { canvas, component, children } = child;
-    const mount = !component.children;
 
     const newChildren = canvas.toRawChildren(component.render());
     renderChildren(child, newChildren as VNode, children);
 
-    if (mount) {
+    if (!component.isMounted) {
       component.didMount();
+      component.isMounted = true;
     } else {
       component.didUpdate();
     }

@@ -23,6 +23,7 @@ class Component<P extends Props = IProps, S = IState> {
   layout: LayoutProps;
   // render 返回的节点
   children: VNode | VNode[] | null;
+  isMounted = false;
 
   animate: boolean;
   animator: Animator;

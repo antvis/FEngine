@@ -361,4 +361,67 @@ describe('Canvas', () => {
     expect(methodCallback.mock.calls[2]).toEqual(['componentWillMount', { width: 10, id: '2' }]);
     expect(methodCallback.mock.calls[10]).toEqual(['componentWillMount', { width: 20, id: '1' }]);
   });
+
+  it('children is null', async () => {
+    const methodCallback = jest.fn((method: string) => method);
+
+    class TestNull extends Component {
+      willMount() {
+        methodCallback('componentWillMount');
+      }
+
+      didMount() {
+        methodCallback('componentDidMount');
+      }
+
+      shouldUpdate() {
+        methodCallback('componentShouldUpdate');
+        return true;
+      }
+
+      willReceiveProps(nextProps) {
+        methodCallback('componentWillReceiveProps');
+      }
+
+      willUpdate() {
+        methodCallback('componentWillUpdate');
+      }
+
+      didUpdate() {
+        methodCallback('componentDidUpdate');
+      }
+      render() {
+        methodCallback('render');
+        return null;
+      }
+    }
+    const { props } = (
+      <Canvas context={context} pixelRatio={1}>
+        <TestNull />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    await delay(50);
+    canvas.update(
+      (
+        <Canvas context={context} pixelRatio={1}>
+          <TestNull a={1} />
+        </Canvas>
+      ).props,
+    );
+    await delay(50);
+    expect(pickMethod(methodCallback.mock.calls)).toEqual([
+      ['componentWillMount'],
+      ['render'],
+      ['componentDidMount'],
+      ['componentShouldUpdate'],
+      ['componentWillReceiveProps'],
+      ['componentWillUpdate'],
+      ['render'],
+      ['componentDidUpdate'],
+    ]);
+  });
 });
