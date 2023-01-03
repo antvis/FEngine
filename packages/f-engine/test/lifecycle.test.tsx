@@ -217,7 +217,7 @@ describe('Canvas', () => {
     ]);
 
     await delay(50);
-    await canvas.update(
+    canvas.update(
       (
         <Canvas context={context} pixelRatio={1}>
           <TestContainer animate={false}>
@@ -226,7 +226,7 @@ describe('Canvas', () => {
         </Canvas>
       ).props,
     );
-    await delay(500);
+    await delay(100);
     expect(ref.current.container.children[0].getAttribute('width')).toBe(30);
     expect(pickMethod(methodCallback.mock.calls)).toEqual([
       ['containerWillMount'],

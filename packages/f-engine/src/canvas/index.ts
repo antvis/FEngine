@@ -223,7 +223,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     this.props = nextProps;
     vNode.props = nextProps;
     vNode.animate = animate;
-    await this.render();
+    render(vNode);
   }
 
   async render() {
