@@ -187,7 +187,7 @@ describe('Canvas', () => {
 
     await delay(50);
     ref.current.forceUpdate();
-    await delay(10);
+    await delay(100);
     expect(pickMethod(methodCallback.mock.calls)).toEqual([
       ['containerWillMount'],
       ['containerRender'],
@@ -217,7 +217,7 @@ describe('Canvas', () => {
     ]);
 
     await delay(50);
-    canvas.update(
+    await canvas.update(
       (
         <Canvas context={context} pixelRatio={1}>
           <TestContainer animate={false}>
