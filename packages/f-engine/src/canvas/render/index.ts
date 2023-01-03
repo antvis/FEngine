@@ -1,5 +1,5 @@
 import { JSX } from '../../jsx/jsx-namespace';
-import { isBoolean, isNumber } from '@antv/util';
+import { isBoolean, isNumber, pick } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
@@ -17,6 +17,15 @@ import {
   fillComponentLayout,
 } from './computeLayout';
 import findClosestShapeNode from './findClosestShapeNode';
+
+function pickElement(element: JSX.Element | JSX.Element[] | null) {
+  if (!element) return element;
+  return Children.map(element, (item) => {
+    if (!item) return item;
+    // 只需要这几个元素就可以了
+    return pick(item, ['key', 'ref', 'type', 'props']);
+  });
+}
 
 function getStyle(tagType: WorkTag, props, context) {
   const { style: customStyle = {}, attrs, zIndex } = props;
@@ -248,17 +257,20 @@ function renderVNode(
 ) {
   const { component } = node;
 
+  // 不修改原始对象，这里重新 pick 一次，
+  const newChildren = pickElement(nextChildren);
+
   // 设置新的 children
-  node.children = nextChildren;
+  node.children = newChildren;
   // 如果是组件，需要同时更新组件的 children
   // 等同于 node.tag === ClassComponent || node.tag === FunctionComponent
   if (component) {
-    component.children = nextChildren;
+    component.children = newChildren;
   }
 
   let componentNodeChildren: VNode[] = [];
 
-  Children.compare(nextChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
+  Children.compare(newChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
     const element = diffElement(node, next, last);
 
     Children.map(element, (child: VNode) => {

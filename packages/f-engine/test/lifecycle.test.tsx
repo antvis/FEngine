@@ -424,4 +424,42 @@ describe('Canvas', () => {
       ['componentDidUpdate'],
     ]);
   });
+
+  it('属性无变化', async () => {
+    methodCallback.mockClear();
+
+    const { props } = (
+      <Canvas context={context} pixelRatio={1}>
+        <TestContainer>
+          {null}
+          <Test width={10} id="2" />
+        </TestContainer>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    await delay(50);
+    await canvas.update(
+      (
+        <Canvas context={context} pixelRatio={1}>
+          <TestContainer>
+            {null}
+            <Test width={10} id="2" />
+          </TestContainer>
+        </Canvas>
+      ).props,
+    );
+    await delay(10);
+
+    expect(pickMethod(methodCallback.mock.calls)).toEqual([
+      ['containerWillMount'],
+      ['containerRender'],
+      ['componentWillMount'],
+      ['componentRender'],
+      ['componentDidMount'],
+      ['containerDidMount'],
+    ]);
+  });
 });
