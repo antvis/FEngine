@@ -354,7 +354,7 @@ function updateComponents(components: Component[]) {
     // 创建动画
     const childrenAnimation = createAnimation(vNode, nextChildren, lastChildren);
 
-    if (childrenAnimation.length) {
+    if (childrenAnimation && childrenAnimation.length) {
       animator.children = childrenAnimation;
     }
     // 执行动画
