@@ -1,6 +1,10 @@
 function delay(time) {
+  const half = Math.round(time / 2);
   return new Promise((resolve) => {
-    setTimeout(resolve, time);
+    // 用 2 个 setTimeout 是为了提升 ci 的成功率
+    setTimeout(() => {
+      setTimeout(resolve, half);
+    }, half);
   });
 }
 

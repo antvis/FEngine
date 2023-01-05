@@ -97,7 +97,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   children: VNode | VNode[] | null;
   private vNode: VNode;
   landscape: boolean;
-  canvasElement: CanvasLike;
+  el: CanvasLike;
 
   constructor(props: P) {
     const {
@@ -202,7 +202,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     this.theme = theme;
     this.canvas = canvas;
     this.container = container;
-    this.canvasElement = canvasElement;
+    this.el = canvasElement;
     this.vNode = vNode;
     // todo: 横屏事件逻辑
     this.landscape = landscape;
@@ -246,7 +246,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   }
 
   getCanvasEl() {
-    return this.canvasElement;
+    return this.el;
   }
 
   resize(width: number, height: number) {
@@ -259,22 +259,27 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   }
 
   destroy() {
-    const { canvas, children } = this;
-
-    // 销毁也需要等 ready
-    canvas.ready.then(() => {
-      canvas.destroy();
-    });
-
+    const { canvas, children, el } = this;
     destroyElement(children);
+    // 需要清理 canvas 画布内容，否则会导致 spa 应用 ios 下 canvas 白屏
+    // https://stackoverflow.com/questions/52532614/total-canvas-memory-use-exceeds-the-maximum-limit-safari-12
+    // https://github.com/antvis/F2/issues/630
+    el.width = 0;
+    el.height = 0;
+
     this.props = null;
     this.context = null;
     this.updater = null;
     this.theme = null;
     this.canvas = null;
     this.container = null;
-    this.canvasElement = null;
+    this.el = null;
     this.vNode = null;
+
+    // 销毁也需要等 ready
+    canvas.ready.then(() => {
+      canvas.destroy();
+    });
   }
 }
 
