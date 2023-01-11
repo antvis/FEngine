@@ -1,6 +1,6 @@
 import { DisplayObject } from '@antv/g-lite';
 import { omit, pick, isFunction } from '@antv/util';
-import EE from '@antv/event-emitter';
+import EE from 'eventemitter3';
 import { VNode } from '../vnode';
 import { createShape } from './createShape';
 import applyStyle from './applyStyle';
