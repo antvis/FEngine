@@ -5,7 +5,7 @@ import { Group, Text, Canvas as GCanvas, CanvasLike } from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
-import EE from '@antv/event-emitter';
+import EE from 'eventemitter3';
 import Theme, { Theme as ThemeType } from './theme';
 import { px2hd as defaultPx2hd, checkCSSRule, batch2hd } from './util';
 import Gesture from '../gesture';

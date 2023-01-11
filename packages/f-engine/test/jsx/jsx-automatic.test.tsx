@@ -1,8 +1,7 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource ../../src/jsx */
 
-import { jsx } from '../../src/jsx/jsx-automatic';
-import Fragment from '../../src/jsx/fragment';
+import { JSX } from '../../src/jsx/jsx-namespace';
 
 describe('jsx automatic 模式', () => {
   it('tagName one children', () => {
