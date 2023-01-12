@@ -154,9 +154,8 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     const layout = computeLayout(style);
 
     // 设置默认的全局样式
-    const documentElement = canvas.document.documentElement;
-    documentElement.setAttribute('fontSize', fontSize);
-    documentElement.setAttribute('fontFamily', fontFamily);
+    container.setAttribute('fontSize', fontSize);
+    container.setAttribute('fontFamily', fontFamily);
 
     // 设置 container 的位置
     container.setAttribute('x', layout.left);
