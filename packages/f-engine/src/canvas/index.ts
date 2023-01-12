@@ -1,7 +1,7 @@
 import { isFunction } from '@antv/util';
 import Component from '../component';
 import equal from './equal';
-import { Group, Text, Canvas as GCanvas, CanvasLike } from '@antv/g-lite';
+import { Group, Text, Canvas as GCanvas, CanvasLike, IRenderer } from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
@@ -16,6 +16,8 @@ import { ClassComponent } from './workTags';
 
 export interface CanvasProps extends IProps {
   context?: CanvasRenderingContext2D;
+  container?: HTMLElement;
+  renderer?: IRenderer;
   width?: number;
   height?: number;
   pixelRatio?: number;
@@ -25,8 +27,6 @@ export interface CanvasProps extends IProps {
   px2hd?: any;
   theme?: ThemeType;
   style?: any;
-  container?: any;
-  renderer?: any;
   landscape?: boolean;
   createImage?: (src?: string) => HTMLImageElement;
 }
