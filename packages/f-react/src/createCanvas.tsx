@@ -1,19 +1,6 @@
 import React, { RefObject, createRef, Component } from 'react';
 // 对 f-engine 只有类型引用
-import { Canvas, CanvasProps as FCanvasProps } from '@antv/f-engine';
-
-// map 是 f-engine 的 Children.map， 因为 f-engine 有副作用的存在，导致 tree sharking 失效，所以这里只能先拷贝一份
-function map<T = any>(children: T | T[] | null, fn: (child: T | null) => any) {
-  if (!children) {
-    return fn(children as null);
-  }
-  if (Array.isArray(children)) {
-    return children.map((child) => {
-      return map(child, fn);
-    });
-  }
-  return fn(children);
-}
+import { Canvas, CanvasProps as FCanvasProps, Children } from '@antv/f-engine';
 
 export interface CanvasProps {
   className?: string;
@@ -35,7 +22,7 @@ export interface CanvasState {
 
 function pickElement(children) {
   if (!children) return children;
-  const result = map(children, (item) => {
+  const result = Children.map(children, (item) => {
     if (!item) return item;
 
     const { key, ref, type, props } = item;

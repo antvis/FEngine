@@ -14,6 +14,9 @@ import { VNode } from './vnode';
 import { IProps, IContext, TextStyleProps } from '../types';
 import { ClassComponent } from './workTags';
 
+// 添加动画模块
+import '@antv/g-web-animations-api';
+
 export interface CanvasProps extends IProps {
   context?: CanvasRenderingContext2D;
   container?: HTMLElement;

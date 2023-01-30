@@ -2,9 +2,6 @@ import { computeLayout } from './canvas/render';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import * as Smooth from './shape/util/smooth';
 
-// 这里有副作用，所以 package.json 不能加 "sideEffects": false
-import '@antv/g-web-animations-api';
-
 export { JSX } from './jsx/jsx-namespace';
 // export createElement 别名
 export { jsx as createElement, Fragment, jsx } from './jsx';
