@@ -5,6 +5,7 @@
   "module": "es/index.js",
   "types": "es/index.d.ts",
   "miniprogram": "dist",
+  "sideEffects": false,
   "dependencies": {
     "@antv/g-gesture": "~0.0.40",
     "@antv/g-lite": "~1.0.6",
