@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-wx",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "FEngine for weixin mini-program",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -18,7 +18,7 @@
     "weixin"
   ],
   "dependencies": {
-    "@antv/f-engine": "^0.0.28",
+    "@antv/f-engine": "^0.0.29",
     "@babel/runtime": "^7.12.5",
     "tslib": "^2.3.1"
   },
