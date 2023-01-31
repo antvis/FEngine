@@ -1,13 +1,7 @@
 import { CSS, PropertySyntax } from '@antv/g-lite';
 
-// 注册 css 属性
+// 注册 css 属性，不能注册已有属性，比如 r width等
 const SECTOR_CSS_PROPERTY = [
-  {
-    name: 'r',
-    inherits: false,
-    interpolable: true,
-    syntax: PropertySyntax.LENGTH_PERCENTAGE,
-  },
   {
     name: 'r0',
     inherits: false,

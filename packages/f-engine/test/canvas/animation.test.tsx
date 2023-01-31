@@ -110,6 +110,50 @@ describe('动画', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  it('clip animation', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <group
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 1000,
+              clip: {
+                type: 'circle',
+                property: ['r'],
+                style: {
+                  cx: 40,
+                  cy: 40,
+                  r: 0,
+                },
+                start: {
+                  r: 5,
+                },
+                end: {
+                  r: 20,
+                },
+              },
+            },
+          }}
+        >
+          <rect
+            style={{
+              width: 400,
+              height: 400,
+              fill: 'red',
+            }}
+          />
+        </group>
+      </Canvas>
+    );
+
+    await delay(200);
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+    await delay(1000);
+  });
   it('animate = false', async () => {
     const { props } = (
       <Canvas context={context} animate={false}>
