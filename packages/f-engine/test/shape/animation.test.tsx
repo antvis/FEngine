@@ -137,4 +137,63 @@ describe('Canvas', () => {
     await delay(500);
     expect(context).toMatchImageSnapshot();
   });
+
+  it.skip('line', async () => {
+    // pionts 暂不支持 插值，无动画
+    const renderer = new Renderer();
+    const context = createContext('line');
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <polyline
+          style={{
+            points: [
+              [0, 3],
+              [20, 10],
+              [30, 80],
+              [40, 40],
+            ],
+            stroke: 'blue',
+          }}
+          animation={{
+            update: {
+              easing: 'linear',
+              duration: 1000,
+              property: ['points'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(500);
+
+    const { props: nextProps } = (
+      <Canvas renderer={renderer} context={context}>
+        <polyline
+          style={{
+            points: [
+              [0, 10],
+              [20, 80],
+              [50, 40],
+              [70, 10],
+            ],
+            stroke: 'blue',
+            smooth: true,
+          }}
+          animation={{
+            update: {
+              easing: 'linear',
+              duration: 4000,
+              property: ['points'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    await canvas.update(nextProps);
+  });
 });
