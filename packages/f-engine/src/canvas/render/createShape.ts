@@ -1,5 +1,4 @@
 import {
-  Group,
   Text,
   Circle,
   Ellipse,
@@ -48,7 +47,7 @@ const EVENT_LIST = [
 
 // 默认标签
 const TagElements = [
-  ['group', Group],
+  ['group', Rect],
   ['text', Text],
   ['circle', Circle],
   ['path', Path],
