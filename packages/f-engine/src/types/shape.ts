@@ -93,6 +93,7 @@ export type ShapeProps =
 
 interface StyleClipProps {
   clip?: ((style) => ShapeProps) | ShapeProps;
+  offset?: ((style) => ShapeProps) | ShapeProps;
 }
 
 type omitStyleProps = 'display';
