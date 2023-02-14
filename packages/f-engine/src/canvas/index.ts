@@ -164,7 +164,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     container.setAttribute('x', layout.left);
     container.setAttribute('y', layout.top);
 
-    const gesture = new Gesture(canvas);
+    const gesture = new Gesture(container);
 
     // 供全局使用的一些变量
     const componentContext = {

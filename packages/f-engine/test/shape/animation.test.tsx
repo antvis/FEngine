@@ -1,4 +1,4 @@
-import { jsx, Canvas, Component } from '../../src';
+import { jsx, Canvas, Component, createRef } from '../../src';
 import { createContext, delay } from '../util';
 const context = createContext();
 import { Renderer } from '@antv/g-mobile-canvas';
@@ -195,5 +195,152 @@ describe('Canvas', () => {
     );
 
     await canvas.update(nextProps);
+  });
+
+  it('line offsetPath', async () => {
+    const renderer = new Renderer();
+    const context = createContext('line');
+
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <polyline
+          style={{
+            points: [
+              [0, 3],
+              [50, 10],
+              [130, 80],
+              [250, 40],
+            ],
+            stroke: 'blue',
+          }}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 1000,
+              property: ['points'],
+              clip: {
+                type: 'rect',
+                property: ['width'],
+                style: {
+                  x: 0,
+                  y: 0,
+                  height: 225,
+                },
+                start: {
+                  width: 0,
+                },
+                end: {
+                  width: 250,
+                },
+              },
+            },
+          }}
+        />
+        <circle
+          style={{
+            fill: '#808080',
+            r: 10,
+            offset: {
+              type: 'polyline',
+              style: {
+                points: [
+                  [0, 3],
+                  [50, 10],
+                  [130, 80],
+                  [250, 40],
+                ],
+              },
+            },
+          }}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 1000,
+              property: ['offsetDistance'],
+              start: {
+                offsetDistance: 0,
+              },
+              end: {
+                offsetDistance: 1,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(1500);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('offsetPath 为 ref', async () => {
+    const renderer = new Renderer();
+    const context = createContext('offsetPath-ref');
+    const ref = createRef();
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <polyline
+          ref={ref}
+          style={{
+            points: [
+              [0, 3],
+              [50, 10],
+              [130, 80],
+              [250, 40],
+            ],
+            stroke: 'blue',
+          }}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 1000,
+              property: ['points'],
+              clip: {
+                type: 'rect',
+                property: ['width'],
+                style: {
+                  x: 0,
+                  y: 0,
+                  height: 225,
+                },
+                start: {
+                  width: 0,
+                },
+                end: {
+                  width: 250,
+                },
+              },
+            },
+          }}
+        />
+        <circle
+          style={{
+            fill: '#808080',
+            r: 10,
+            offset: ref,
+          }}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 1000,
+              property: ['offsetDistance'],
+              start: {
+                offsetDistance: 0,
+              },
+              end: {
+                offsetDistance: 1,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(1500);
+    expect(context).toMatchImageSnapshot();
   });
 });

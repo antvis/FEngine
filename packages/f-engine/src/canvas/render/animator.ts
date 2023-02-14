@@ -39,10 +39,7 @@ class Animator extends EE {
       if (property.length && duration > 0) {
         // 应用样式
         const style = { ...omit(end, property), ...omit(start, property) };
-        Object.keys(style).forEach((key) => {
-          (shape as DisplayObject).setAttribute(key, style[key]);
-        });
-
+        applyStyle(shape, style);
         // 开始帧
         const keyframeStart = property.reduce((prev, cur: string) => {
           prev[cur] = start[cur];
