@@ -1,7 +1,7 @@
 import { jsx, Canvas } from '@antv/f-engine';
 import Lottie from '../src/index';
 import data from './data/data.json';
-import { createContext, delay } from './util';
+import { createContext, delay } from '@antv/f-test-utils';
 
 describe('Lottie', () => {
   it('加载 lottie 文件', async () => {
