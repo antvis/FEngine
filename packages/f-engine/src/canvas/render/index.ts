@@ -131,6 +131,15 @@ function updateVNode(parent, nextNode, lastNode: VNode) {
   nextNode.animator = animator;
   nextNode.style = getStyle(tag, props, context);
 
+  // 更新 vNode 的引用
+  if (component) {
+    component._vNode = nextNode;
+  } else {
+    // 说明是 shape 标签
+    // @ts-ignore
+    shape._vNode = nextNode;
+  }
+
   return nextNode;
 }
 
