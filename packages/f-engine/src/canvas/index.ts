@@ -168,6 +168,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     // 供全局使用的一些变量
     const componentContext = {
+      ctx: context,
       root: this,
       canvas,
       left: layout.left,
