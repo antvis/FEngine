@@ -146,23 +146,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
     const container = canvas.getRoot();
     const { width: canvasWidth, height: canvasHeight } = canvas.getConfig();
-    const style = px2hd({
-      left: 0,
-      top: 0,
-      width: canvasWidth,
-      height: canvasHeight,
-      padding,
-      ...customStyle,
-    });
-    const layout = computeLayout(style);
 
     // 设置默认的全局样式
     container.setAttribute('fontSize', fontSize);
     container.setAttribute('fontFamily', fontFamily);
-
-    // 设置 container 的位置
-    container.setAttribute('x', layout.left);
-    container.setAttribute('y', layout.top);
 
     const gesture = new Gesture(container);
 
@@ -171,10 +158,6 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       ctx: context,
       root: this,
       canvas,
-      left: layout.left,
-      top: layout.top,
-      width: layout.width,
-      height: layout.height,
       px2hd,
       theme,
       gesture,
@@ -184,7 +167,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     const vNode: VNode = {
       key: undefined,
       tag: ClassComponent,
-      style: layout,
+      // style: layout,
       // @ts-ignore
       type: Canvas,
       props,
@@ -209,6 +192,8 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     this.vNode = vNode;
     // todo: 横屏事件逻辑
     this.landscape = landscape;
+
+    this.updateLayout({ ...props, width: canvasWidth, height: canvasHeight });
   }
 
   updateComponents(components: Component[]) {
@@ -252,9 +237,42 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     return this.el;
   }
 
-  resize(width: number, height: number) {
+  async resize(width: number, height: number) {
     const { canvas } = this;
     canvas.resize(width, height);
+    this.updateLayout({ ...this.props, width, height });
+    await this.render();
+  }
+
+  updateLayout(props) {
+    const { width, height } = props;
+    const { px2hd, theme } = this.context;
+    const style = px2hd({
+      left: 0,
+      top: 0,
+      width,
+      height,
+      padding: theme.padding,
+      ...props.style,
+    });
+    const layout = computeLayout(style);
+    const { left, top } = layout;
+    // 设置 container 的位置
+    this.container.setAttribute('x', left);
+    this.container.setAttribute('y', top);
+
+    this.context = {
+      ...this.context,
+      left,
+      top,
+      width: layout.width,
+      height: layout.height,
+    };
+    this.vNode = {
+      ...this.vNode,
+      style: layout,
+      context: this.context,
+    };
   }
 
   toRawChildren(children) {
