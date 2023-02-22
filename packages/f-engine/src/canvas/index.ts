@@ -18,7 +18,7 @@ import { ClassComponent } from './workTags';
 import '@antv/g-web-animations-api';
 
 export interface CanvasProps extends IProps {
-  context?: CanvasRenderingContext2D;
+  context?: CanvasRenderingContext2D | WebGLRenderingContext;
   container?: HTMLElement;
   renderer?: IRenderer;
   width?: number;
