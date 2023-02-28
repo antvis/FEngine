@@ -29,14 +29,14 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   // 形变动画之前先把原 shape 销毁
   lastShape.destroy();
 
-  const { animate, animation } = nextProps;
+  const { animate, animation, player } = nextProps;
   const animationEffect = animation ? animation.update : null;
 
   if (animate === false || !animationEffect) {
     return animator;
   }
 
-  animator = animator || new Animator();
+  animator = animator || new Animator(player);
   // shape 形变
   const { start, end, property = [] } = animationEffect;
   const { parsedStyle: nextParsedStyle } = nextShape;
