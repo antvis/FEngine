@@ -11,18 +11,11 @@ class Animator extends EE {
   start: any;
   end: any;
   effect: any;
-  //播控设置
-  player: any = { pause: false };
   // 本层动画
   animation: IAnimation;
   // 节点动画树
   children: Animator[];
-  status: 'playing' | 'pause' | 'end';
 
-  constructor(player) {
-    super();
-    this.player = { ...this.player, ...player };
-  }
   animate(shape, start, end, effect) {
     this.shape = shape;
     this.start = start;
@@ -30,19 +23,10 @@ class Animator extends EE {
     this.effect = effect;
   }
 
-  play() {
-    const { shape, start, end, effect, children, status, player } = this;
-    const { pause } = player;
+  // 首次播放
+  loadPlay() {
+    const { shape, start, end, effect, children } = this;
 
-    // 继续播放
-    if (status === 'pause' && !pause) {
-      this.replay();
-      return;
-    }
-
-    this.status = 'playing';
-
-    // 首次播放
     const animations: IAnimation[] = [];
     if (effect) {
       const {
@@ -163,16 +147,11 @@ class Animator extends EE {
     if (children && children.length) {
       children.forEach((child) => {
         if (!child) return;
-        const childAnimator = child.play();
+        const childAnimator = child.loadPlay();
         if (childAnimator) {
           animations.push(...childAnimator);
         }
       });
-    }
-
-    //暂停
-    if (pause) {
-      this.pause();
     }
 
     this.endEmit(animations);
@@ -181,7 +160,6 @@ class Animator extends EE {
 
   pause() {
     const { children, animation } = this;
-    this.status = 'pause';
     if (animation) {
       animation.pause();
     }
@@ -196,18 +174,16 @@ class Animator extends EE {
   endEmit(animations) {
     if (!animations.length) {
       this.emit('end');
-      this.status = 'end';
       return null;
     }
 
     const finished = Promise.all(animations.map((d) => d.finished));
     finished.then(() => {
       this.emit('end');
-      this.status = 'end';
     });
   }
 
-  replay() {
+  play() {
     const { children, animation } = this;
     if (animation) {
       animation.play();
@@ -218,10 +194,6 @@ class Animator extends EE {
         child.play();
       });
     }
-  }
-
-  update(player) {
-    this.player = { ...this.player, ...player };
   }
 
   reset(shape: DisplayObject) {

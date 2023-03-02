@@ -47,10 +47,10 @@ function getStyle(tagType: WorkTag, props, context) {
 function createVNode(parent: VNode, vNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate } = parent;
   const { ref, type, props: originProps } = vNode;
-  const { animate, transformFrom, player, ...props } = originProps;
+  const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
-  const animator = new Animator(player);
+  const animator = new Animator();
   const style = getStyle(tag, props, context);
 
   vNode.parent = parent;
@@ -116,7 +116,7 @@ function updateVNode(parent, nextNode, lastNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate } = parent;
   const { tag, animator, component, shape, children } = lastNode;
   const { props } = nextNode;
-  const { animate, player } = props;
+  const { animate } = props;
 
   nextNode.parent = parent;
   nextNode.tag = tag;
@@ -128,7 +128,6 @@ function updateVNode(parent, nextNode, lastNode: VNode) {
   nextNode.parent = parent;
   nextNode.children = children;
   nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
-  animator.update(player);
   nextNode.animator = animator;
   nextNode.style = getStyle(tag, props, context);
 
@@ -326,7 +325,7 @@ function renderChildren(
 
 function render(vNode: VNode) {
   const { children: lastChildren, props } = vNode;
-  const { children: nextChildren, pause } = props;
+  const { children: nextChildren } = props;
 
   // render 节点
   const children = renderChildren(vNode, nextChildren, lastChildren);
@@ -336,7 +335,7 @@ function render(vNode: VNode) {
   // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
-      animator.play();
+      animator.loadPlay();
     });
   }
 }
@@ -368,7 +367,7 @@ function updateComponents(components: Component[]) {
       animator.children = childrenAnimation;
     }
     // 执行动画
-    animator.play();
+    animator.loadPlay();
 
     component.didUpdate();
   });
