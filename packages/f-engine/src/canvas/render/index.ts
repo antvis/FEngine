@@ -335,7 +335,7 @@ function render(vNode: VNode) {
   // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
-      animator.play();
+      animator.loadPlay();
     });
   }
 }
@@ -367,7 +367,7 @@ function updateComponents(components: Component[]) {
       animator.children = childrenAnimation;
     }
     // 执行动画
-    animator.play();
+    animator.loadPlay();
 
     component.didUpdate();
   });
