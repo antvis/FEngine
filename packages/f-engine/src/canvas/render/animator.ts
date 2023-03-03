@@ -42,7 +42,10 @@ class Animator extends EE {
       // shape 动画
       if (property.length && duration > 0) {
         // 应用样式
-        const style = { ...omit(end, property), ...omit(start, property) };
+
+        const test = { ...omit(start, property), ...omit(end, property) };
+        const style = { ...start, ...omit(end, property) };
+
         applyStyle(shape, style);
         // 开始帧
         const keyframeStart = property.reduce((prev, cur: string) => {

@@ -275,4 +275,53 @@ describe('动画', () => {
     await delay(500);
     expect(context).toMatchImageSnapshot();
   });
+
+  it('animation中不变的属性', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: 40,
+            height: 40,
+            fill: 'red',
+          }}
+          animation={{
+            update: {
+              easing: 'ease',
+              duration: 50,
+              property: ['width'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    await delay(200);
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(200);
+
+    const update = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: 80,
+            height: 80,
+            fill: 'red',
+          }}
+          animation={{
+            update: {
+              easing: 'ease',
+              duration: 50,
+              delay: 10,
+              property: ['width'],
+            },
+          }}
+        />
+      </Canvas>
+    );
+    await canvas.update(update.props);
+    await delay(200);
+    expect(context).toMatchImageSnapshot();
+  });
 });

@@ -28,7 +28,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
 
   // 形变动画之前先把原 shape 销毁
   lastShape.destroy();
-
+  console.log('destroy', lastShape);
   const { animate, animation } = nextProps;
   const animationEffect = animation ? animation.update : null;
 
@@ -185,6 +185,7 @@ function updateAnimation(nextNode, lastNode) {
   // 无法处理形变
   if (nextTag !== Shape || lastTag !== Shape) {
     lastShape.destroy();
+    console.log('destroy', lastShape);
     return animator;
   }
 
@@ -235,6 +236,7 @@ function destroyAnimation(node: VNode) {
     // 不需要动画直接删除
     if (animate === false) {
       shape.destroy();
+      console.log('destroy', shape);
       return animator;
     }
 
@@ -244,6 +246,7 @@ function destroyAnimation(node: VNode) {
     // 没有叶子节点的动画， 直接删除
     if (!(childrenAnimation && childrenAnimation.length) && !animationEffect) {
       shape.destroy();
+      console.log('destroy', shape);
       return animator;
     }
 
@@ -265,6 +268,7 @@ function destroyAnimation(node: VNode) {
     // 动画结束后，删除图形（包括子元素动画）
     animator.once('end', () => {
       shape.destroy();
+      console.log('destroy', shape);
     });
 
     return animator;
@@ -310,6 +314,7 @@ function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: I
     parent.insertBefore(shape, nextSibling);
   } else {
     parent.appendChild(shape);
+    console.log('hhhh', parent, shape);
   }
 }
 

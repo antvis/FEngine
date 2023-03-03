@@ -105,7 +105,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   constructor(props: P) {
     const {
       context,
-      renderer = new CanvasRenderer(),
+      renderer = new CanvasRenderer({
+        enableDirtyCheck: true,
+      }),
       width,
       height,
       theme: customTheme,

@@ -12,12 +12,12 @@ class Component1 extends Component {
           height: 20,
           fill: 'red',
         }}
-        animation={{
-          appear: {
-            property: ['x'],
-            duration: 100,
-          },
-        }}
+        // animation={{
+        //   // appear: {
+        //   //   property: ['x'],
+        //   //   duration: 100,
+        //   // },
+        // }}
       />
     );
   }
@@ -35,7 +35,7 @@ class Component2 extends Component {
         }}
         animation={{
           update: {
-            duration: 100,
+            duration: 200,
             property: ['fill'],
           },
         }}
@@ -51,7 +51,7 @@ class Wrapper extends Component {
 }
 
 describe('测试组件变化', () => {
-  it('组件切换', async () => {
+  it.only('组件切换', async () => {
     const context = createContext();
     const { props } = (
       <Canvas context={context}>
@@ -66,7 +66,11 @@ describe('测试组件变化', () => {
     await delay(100);
     await canvas.render();
     await delay(1000);
-
+    console.log(canvas.canvas);
+    canvas.canvas.addEventListener('click', (e) => {
+      console.log(e.target);
+    });
+    // debugger;
     expect(context).toMatchImageSnapshot();
   });
 
