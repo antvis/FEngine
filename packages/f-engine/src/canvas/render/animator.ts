@@ -15,6 +15,8 @@ class Animator extends EE {
   animation: IAnimation;
   // 节点动画树
   children: Animator[];
+  maxTimeAnimation: IAnimation;
+  totalFrame: number = 0;
 
   animate(shape, start, end, effect) {
     this.shape = shape;
@@ -23,11 +25,8 @@ class Animator extends EE {
     this.effect = effect;
   }
 
-  // 首次播放
-  loadPlay() {
-    const { shape, start, end, effect, children } = this;
-
-    const animations: IAnimation[] = [];
+  playLayer() {
+    const { shape, start, end, effect } = this;
     if (effect) {
       const {
         property = [],
@@ -65,9 +64,9 @@ class Animator extends EE {
 
           // 过滤无限循环的动画
           if (iterations !== Infinity) {
-            animations.push(animation);
+            // animations.push(animation);
           }
-          this.animation = animation;
+          return animation;
         } else {
           // 如果没有执行动画，直接应用结束样式
           applyStyle(shape, end);
@@ -132,8 +131,9 @@ class Animator extends EE {
                 clipShape.destroy();
               });
               if ((clipIterations || iterations) !== Infinity) {
-                animations.push(clipAnimation);
+                // animations.push(clipAnimation);
               }
+              return clipAnimation;
             } else {
               // 没有动画，直接删掉 clip
               shape.setAttribute('clipPath', null);
@@ -143,6 +143,17 @@ class Animator extends EE {
         }
       }
     }
+  }
+
+  // 首次播放
+  loadPlay() {
+    const { children } = this;
+    const animations: IAnimation[] = [];
+
+    // 播放本层动画
+    const layerAnimation = this.playLayer();
+    this.animation = layerAnimation;
+    layerAnimation && animations.push(layerAnimation);
 
     if (children && children.length) {
       children.forEach((child) => {
@@ -176,8 +187,15 @@ class Animator extends EE {
       this.emit('end');
       return null;
     }
-
-    const finished = Promise.all(animations.map((d) => d.finished));
+    const finished = Promise.all(
+      animations.map((d) => {
+        if (d._totalDuration > this.totalFrame) {
+          this.totalFrame = d._totalDuration;
+          this.maxTimeAnimation = d;
+        }
+        return d.finished;
+      }),
+    );
     finished.then(() => {
       this.emit('end');
     });
@@ -196,12 +214,42 @@ class Animator extends EE {
     }
   }
 
+  stop() {
+    const { children, animation } = this;
+    if (animation) {
+      animation.finish();
+    }
+    if (children && children.length) {
+      children.forEach((child) => {
+        if (!child) return;
+        child.stop();
+      });
+    }
+  }
+
+  goTo(frame: number) {
+    const { children, animation } = this;
+    if (animation) {
+      animation.currentTime = frame;
+    }
+    if (children && children.length) {
+      children.forEach((child) => {
+        if (!child) return;
+        child.goTo(frame);
+      });
+    }
+  }
+
   reset(shape: DisplayObject) {
     this.shape = shape;
     this.start = null;
     this.end = null;
     this.effect = null;
     this.children = null;
+  }
+
+  getCurrentFrame() {
+    return this.maxTimeAnimation.currentTime;
   }
 }
 
