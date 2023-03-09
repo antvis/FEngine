@@ -6,13 +6,13 @@ import { createShape } from './createShape';
 import applyStyle from './applyStyle';
 
 class Animator extends EE {
-  node: VNode;
+  vNode: VNode;
   shape: DisplayObject;
   start: any;
   end: any;
   effect: any;
   // 本层动画
-  animation: IAnimation;
+  animations: IAnimation[];
   // 节点动画树
   children: Animator[];
 
@@ -24,8 +24,8 @@ class Animator extends EE {
   }
 
   // 首次播放
-  loadPlay() {
-    const { shape, start, end, effect, children } = this;
+  run() {
+    const { vNode, shape, start, end, effect, children } = this;
 
     const animations: IAnimation[] = [];
     if (effect) {
@@ -67,7 +67,6 @@ class Animator extends EE {
           if (iterations !== Infinity) {
             animations.push(animation);
           }
-          this.animation = animation;
         } else {
           // 如果没有执行动画，直接应用结束样式
           applyStyle(shape, end);
@@ -125,7 +124,6 @@ class Animator extends EE {
             // 过滤无限循环的动画
             if (clipAnimation) {
               const clipFinished = clipAnimation.finished;
-              this.animation = clipAnimation;
               clipFinished.then(() => {
                 // 删掉 clip
                 shape.setAttribute('clipPath', null);
@@ -147,31 +145,59 @@ class Animator extends EE {
     if (children && children.length) {
       children.forEach((child) => {
         if (!child) return;
-        const childAnimator = child.loadPlay();
+        const childAnimator = child.run();
         if (childAnimator) {
           animations.push(...childAnimator);
         }
       });
     }
+    this.animations = animations;
 
+    // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
+    if (vNode) {
+      const { component } = vNode;
+      if (vNode && vNode.component) {
+        // @ts-ignore
+        component.animationWillPlay && component.animationWillPlay();
+      }
+    }
     this.endEmit(animations);
     return animations;
   }
 
-  pause() {
-    const { children, animation } = this;
-    if (animation) {
-      animation.pause();
-    }
-    if (children && children.length) {
-      children.forEach((child) => {
-        if (!child) return;
-        child.pause();
-      });
-    }
+  play() {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((animation) => {
+      animation.play();
+    });
   }
 
-  endEmit(animations) {
+  pause() {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((animation) => {
+      animation.pause();
+    });
+  }
+
+  goTo(frame: number) {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((animation) => {
+      animation.currentTime = frame;
+    });
+  }
+
+  finish() {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((animation) => {
+      animation.pause();
+    });
+  }
+
+  endEmit(animations: IAnimation[]) {
     if (!animations.length) {
       this.emit('end');
       return null;
@@ -181,19 +207,6 @@ class Animator extends EE {
     finished.then(() => {
       this.emit('end');
     });
-  }
-
-  play() {
-    const { children, animation } = this;
-    if (animation) {
-      animation.play();
-    }
-    if (children && children.length) {
-      children.forEach((child) => {
-        if (!child) return;
-        child.play();
-      });
-    }
   }
 
   reset(shape: DisplayObject) {

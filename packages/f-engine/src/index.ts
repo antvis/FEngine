@@ -14,6 +14,7 @@ export { default as Timeline, TimelineProps } from './timeline';
 export { default as Gesture } from './gesture';
 export { CanvasRenderer, computeLayout, Smooth };
 export { default as isEqual } from './canvas/equal';
+export { default as Player, PlayerProps } from './player';
 
 // 导出 ts 类型
 export {
