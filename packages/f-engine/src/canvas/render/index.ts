@@ -53,6 +53,8 @@ function createVNode(parent: VNode, vNode: VNode) {
   const animator = new Animator();
   const style = getStyle(tag, props, context);
 
+  animator.vNode = vNode;
+
   vNode.parent = parent;
   vNode.tag = tag;
   vNode.style = style;
@@ -112,11 +114,13 @@ function createVNode(parent: VNode, vNode: VNode) {
   return vNode;
 }
 
-function updateVNode(parent, nextNode, lastNode: VNode) {
+function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate } = parent;
   const { tag, animator, component, shape, children } = lastNode;
   const { props } = nextNode;
   const { animate } = props;
+
+  animator.vNode = nextNode;
 
   nextNode.parent = parent;
   nextNode.tag = tag;
@@ -170,7 +174,7 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
   const { type: lastType, props: lastProps } = lastElement;
 
   if (nextType === lastType) {
-    const nextVNode = updateVNode(parent, nextElement, lastElement);
+    const nextVNode = updateVNode(parent, nextElement as VNode, lastElement);
     // props 无变化 和 context 都无变化
     if (equal(nextProps, lastProps) && parent.context === lastElement.context) {
       return null;
@@ -262,19 +266,19 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 }
 
 function renderVNode(
-  node: VNode,
+  vNode: VNode,
   nextChildren: VNode | VNode[] | null,
   lastChildren: VNode | VNode[] | null,
 ) {
-  const { component } = node;
+  const { component } = vNode;
 
   // 不修改原始对象，这里重新 pick 一次，
   const newChildren = pickElement(nextChildren);
 
   // 设置新的 children
-  node.children = newChildren;
+  vNode.children = newChildren;
   // 如果是组件，需要同时更新组件的 children
-  // 等同于 node.tag === ClassComponent || node.tag === FunctionComponent
+  // 等同于 vNode.tag === ClassComponent || vNode.tag === FunctionComponent
   if (component) {
     component.children = newChildren;
   }
@@ -282,7 +286,7 @@ function renderVNode(
   let componentNodeChildren: VNode[] = [];
 
   Children.compare(newChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
-    const element = diffElement(node, next, last);
+    const element = diffElement(vNode, next, last);
 
     Children.map(element, (child: VNode) => {
       if (!child) return;
@@ -337,7 +341,7 @@ function render(vNode: VNode) {
   // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
-      animator.loadPlay();
+      animator.run();
     });
   }
 }
@@ -365,11 +369,11 @@ function updateComponents(components: Component[]) {
     // 创建动画
     const childrenAnimation = createAnimation(vNode, nextChildren, lastChildren);
 
-    if (childrenAnimation && childrenAnimation.length) {
+    if (childrenAnimation.length) {
       animator.children = childrenAnimation;
     }
     // 执行动画
-    animator.loadPlay();
+    animator.run();
 
     component.didUpdate();
   });

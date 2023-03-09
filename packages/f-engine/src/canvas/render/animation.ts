@@ -313,15 +313,20 @@ function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: I
   }
 }
 
-function createAnimation(parent, nextChildren, lastChildren) {
+// 处理 children 的动画
+function createAnimation(
+  parent: VNode,
+  nextChildren: VNode | VNode[],
+  lastChildren: VNode | VNode[],
+) {
   if (!nextChildren && !lastChildren) {
-    return;
+    return [];
   }
   const { shape: parentShape } = parent;
 
   // 上一个处理的元素
   let prevSibling: IChildNode;
-  const childrenAnimator = [];
+  const childrenAnimator: Animator[] = [];
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
     // shape 层才执行动画
