@@ -23,11 +23,55 @@ describe('player', () => {
                 y: 180,
               },
             },
+            update: {
+              easing: 'linear',
+              duration: 500,
+            },
           }}
         />
       );
     }
   }
+
+  class View1 extends Component {
+    render() {
+      return (
+        <circle
+          style={{
+            cx: '80px',
+            cy: '80px',
+            fill: 'red',
+            r: '50px',
+          }}
+          animation={{
+            appear: {
+              easing: 'easeOut',
+              duration: 1000,
+              property: ['r'],
+              start: {
+                r: 0,
+              },
+              end: {
+                r: 25,
+              },
+            },
+            update: {
+              easing: 'easeOut',
+              duration: 1000,
+              property: ['r'],
+              start: {
+                r: 0,
+              },
+              end: {
+                r: 25,
+              },
+            },
+          }}
+        />
+      );
+    }
+  }
+
   it('animation pause', async () => {
     const context = createContext('animation pause');
     const { props } = (
@@ -53,6 +97,17 @@ describe('player', () => {
     });
 
     await delay(3000);
+    expect(context).toMatchImageSnapshot();
+
+    await canvas.update({
+      children: (
+        <Player frame={100} state="pause">
+          <View1 />
+        </Player>
+      ),
+    });
+
+    await delay(500);
     expect(context).toMatchImageSnapshot();
   });
 });

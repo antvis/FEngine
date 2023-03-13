@@ -1,6 +1,8 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import { IAnimation } from '@antv/g-lite';
+import Children from './children';
+import { isArray } from '@antv/util';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -23,6 +25,7 @@ export interface PlayerProps {
 
 class Player extends Component<PlayerProps> {
   private animations: IAnimation[];
+  private shape;
   private setPlayState() {
     const { animator, props } = this;
     const { frame, state: playState } = props;
@@ -47,19 +50,38 @@ class Player extends Component<PlayerProps> {
   }
 
   animationWillPlay() {
-    const { animator } = this;
+    const { animator, children, shape } = this;
     const { animations } = animator;
     // TODO: 这里需要优化
     // 因为 animator.run() 会重置 animations，到时上次的 animation 丢失，这里需要想个机制保留下来
     if (!this.animations) {
       this.animations = animations;
     }
+
+    if (shape) {
+      if (!this.isSameChildren(children, shape)) {
+        this.animations = animations;
+      }
+    } else {
+      this.shape = children;
+    }
+
     animator.animations = this.animations;
     this.setPlayState();
   }
 
   render() {
     return this.props.children;
+  }
+
+  isSameChildren(nextChildren, lastChildren) {
+    return Children.compare(nextChildren, lastChildren, (next, last) => {
+      if (!next && !last) return true;
+      const { children, type } = next;
+      const { children: lastChildNodes, type: lastType } = last;
+      if (type !== lastType) return false;
+      return this.isSameChildren(children, lastChildNodes);
+    });
   }
 }
 
