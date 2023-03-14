@@ -24,8 +24,6 @@ export interface PlayerProps {
 }
 
 class Player extends Component<PlayerProps> {
-  private animations: IAnimation[];
-  private shape;
   private setPlayState() {
     const { animator, props } = this;
     const { frame, state: playState } = props;
@@ -50,23 +48,12 @@ class Player extends Component<PlayerProps> {
   }
 
   animationWillPlay() {
-    const { animator, children, shape } = this;
+    const { animator, props } = this;
+    // @ts-ignore
+    const { timeline } = props;
     const { animations } = animator;
-    // TODO: 这里需要优化
-    // 因为 animator.run() 会重置 animations，到时上次的 animation 丢失，这里需要想个机制保留下来
-    if (!this.animations) {
-      this.animations = animations;
-    }
-
-    if (shape) {
-      if (!this.isSameChildren(children, shape)) {
-        this.animations = animations;
-      }
-    } else {
-      this.shape = children;
-    }
-
-    animator.animations = this.animations;
+    timeline.addAnimation(animations);
+    animator.animations = timeline.getAnimation();
     this.setPlayState();
   }
 
@@ -74,15 +61,15 @@ class Player extends Component<PlayerProps> {
     return this.props.children;
   }
 
-  isSameChildren(nextChildren, lastChildren) {
-    return Children.compare(nextChildren, lastChildren, (next, last) => {
-      if (!next && !last) return true;
-      const { children, type } = next;
-      const { children: lastChildNodes, type: lastType } = last;
-      if (type !== lastType) return false;
-      return this.isSameChildren(children, lastChildNodes);
-    });
-  }
+  // isSameChildren(nextChildren, lastChildren) {
+  //   return Children.compare(nextChildren, lastChildren, (next, last) => {
+  //     if (!next && !last) return true;
+  //     const { children, type } = next;
+  //     const { children: lastChildNodes, type: lastType } = last;
+  //     if (type !== lastType) return false;
+  //     return this.isSameChildren(children, lastChildNodes);
+  //   });
+  // }
 }
 
 export default Player;

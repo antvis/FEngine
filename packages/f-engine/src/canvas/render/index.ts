@@ -45,10 +45,13 @@ function getStyle(tagType: WorkTag, props, context) {
 }
 
 function createVNode(parent: VNode, vNode: VNode) {
-  const { canvas, context, updater, animate: parentAnimate } = parent;
+  const { canvas, context, updater, animate: parentAnimate, props: parentProps } = parent;
+  const { timeline } = parentProps;
   const { ref, type, props: originProps } = vNode;
   const { animate, transformFrom, ...props } = originProps;
 
+  //子元素发生变化删掉缓存的animator
+  timeline && timeline.pop();
   const tag = getWorkTag(type);
   const animator = new Animator();
   const style = getStyle(tag, props, context);
