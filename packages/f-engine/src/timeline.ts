@@ -1,6 +1,7 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Children from './children';
+import { IAnimation } from '@antv/g-lite';
 
 export interface TimelineProps {
   /**
@@ -20,6 +21,11 @@ export interface TimelineProps {
   loop?: boolean;
   /**
    * @ignore
+   * 自动播放
+   */
+  autoPlay?: boolean;
+  /**
+   * @ignore
    * 子组件
    */
   children?: any;
@@ -28,6 +34,7 @@ export interface TimelineProps {
 class Timeline extends Component<TimelineProps> {
   index: number;
   delay: number;
+  animations = [];
 
   constructor(props: TimelineProps) {
     super(props);
@@ -42,20 +49,40 @@ class Timeline extends Component<TimelineProps> {
   }
 
   didMount() {
-    this.animator.on('end', this.next);
+    const { autoPlay = true } = this.props;
+    if (autoPlay) {
+      this.animator.on('end', this.next);
+    }
   }
 
   didUnmount(): void {
     this.animator.off('end', this.next);
   }
 
+  addAnimation(animation) {
+    const { index } = this.state;
+    if (this.animations[index]) return;
+    this.animations[index] = animation;
+  }
+
+  pop() {
+    const { index } = this.state;
+    this.animations[index] = null;
+  }
+
+  getAnimation() {
+    const { index } = this.state;
+    return this.animations[index];
+  }
+
   next = () => {
     const { state, props } = this;
     const { index, count, delay } = state;
-    const { loop } = props;
+    const { loop, autoPlay = true } = props;
 
     const next = loop ? (index + 1) % count : index + 1;
-    if (next < count) {
+
+    if (next < count && autoPlay) {
       setTimeout(() => {
         this.setState({
           index: next,
@@ -69,7 +96,7 @@ class Timeline extends Component<TimelineProps> {
     const { children } = props;
     const { index } = state;
     const childrenArray = Children.toArray<JSX.Element>(children);
-    return childrenArray[index];
+    return Children.cloneElement(childrenArray[index], { timeline: this });
   }
 }
 

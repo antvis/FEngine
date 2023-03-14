@@ -1,4 +1,4 @@
-import { jsx, Canvas, Component, Player } from '../../src';
+import { jsx, Canvas, Component, Player, Timeline } from '../../src';
 import { createContext, delay } from '../util';
 
 describe('player', () => {
@@ -76,9 +76,12 @@ describe('player', () => {
     const context = createContext('animation pause');
     const { props } = (
       <Canvas context={context}>
-        <Player frame={100} state="pause">
-          <View />
-        </Player>
+        <Timeline autoPlay={false}>
+          <Player frame={100} state="pause">
+            <View />
+          </Player>
+          <View1 />
+        </Timeline>
       </Canvas>
     );
 
@@ -90,24 +93,28 @@ describe('player', () => {
 
     await canvas.update({
       children: (
-        <Player frame={500} state="play">
-          <View />
-        </Player>
+        <Timeline>
+          <Player frame={500} state="play">
+            <View />
+          </Player>
+        </Timeline>
       ),
     });
 
-    await delay(3000);
+    await delay(1000);
     expect(context).toMatchImageSnapshot();
 
     await canvas.update({
       children: (
-        <Player frame={100} state="pause">
-          <View1 />
-        </Player>
+        <Timeline>
+          <Player frame={300} state="pause">
+            <View1 />
+          </Player>
+        </Timeline>
       ),
     });
 
-    await delay(500);
+    await delay(1000);
     expect(context).toMatchImageSnapshot();
   });
 });
