@@ -159,6 +159,8 @@ function destroyElement(vNode: VNode | VNode[] | null) {
       destroyElement(children);
       component.didUnmount();
       component.destroy();
+    } else {
+      destroyElement(children);
     }
   });
 }
