@@ -138,7 +138,7 @@ describe('Canvas', () => {
     expect(context).toMatchImageSnapshot();
   });
 
-  it.skip('line', async () => {
+  it('line', async () => {
     // pionts 暂不支持 插值，无动画
     const renderer = new Renderer();
     const context = createContext('line');
@@ -158,7 +158,7 @@ describe('Canvas', () => {
           animation={{
             update: {
               easing: 'linear',
-              duration: 1000,
+              duration: 100,
               property: ['points'],
             },
           }}
@@ -186,7 +186,7 @@ describe('Canvas', () => {
           animation={{
             update: {
               easing: 'linear',
-              duration: 4000,
+              duration: 200,
               property: ['points'],
             },
           }}
@@ -217,7 +217,7 @@ describe('Canvas', () => {
             appear: {
               easing: 'quadraticOut',
               duration: 1000,
-              property: ['points'],
+              // property: ['points'],
               clip: {
                 type: 'rect',
                 property: ['width'],
@@ -296,7 +296,7 @@ describe('Canvas', () => {
             appear: {
               easing: 'quadraticOut',
               duration: 1000,
-              property: ['points'],
+              // property: ['points'],
               clip: {
                 type: 'rect',
                 property: ['width'],

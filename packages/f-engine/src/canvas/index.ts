@@ -113,7 +113,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       pixelRatio: customPixelRatio,
       landscape,
       container: rendererContainer,
-      style: customStyle,
+      // style: customStyle,
       animate = true,
       createImage,
       requestAnimationFrame,
@@ -123,7 +123,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
     // 初始化主题
     const theme = px2hd({ ...Theme, ...customTheme }) as ThemeType;
-    const { pixelRatio, fontSize, fontFamily, padding } = theme;
+    const { pixelRatio, fontSize, fontFamily } = theme;
     const devicePixelRatio = customPixelRatio ? customPixelRatio : pixelRatio;
 
     // 组件更新器
