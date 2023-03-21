@@ -5,6 +5,11 @@ import { VNode } from '../vnode';
 import { createShape } from './createShape';
 import applyStyle from './applyStyle';
 
+let idNumber = 0;
+export interface Animation {
+  animation: IAnimation;
+  id: string;
+}
 class Animator extends EE {
   vNode: VNode;
   shape: DisplayObject;
@@ -12,10 +17,15 @@ class Animator extends EE {
   end: any;
   effect: any;
   // 本层动画
-  animations: IAnimation[];
+  animations: Animation[];
   // 节点动画树
   children: Animator[];
+  id: string;
 
+  constructor() {
+    super();
+    this.id = `${idNumber++}`;
+  }
   animate(shape, start, end, effect) {
     this.shape = shape;
     this.start = start;
@@ -27,7 +37,7 @@ class Animator extends EE {
   run() {
     const { vNode, shape, start, end, effect, children } = this;
 
-    const animations: IAnimation[] = [];
+    const animations: Animation[] = [];
     if (effect) {
       const {
         property = [],
@@ -65,7 +75,10 @@ class Animator extends EE {
 
           // 过滤无限循环的动画
           if (iterations !== Infinity) {
-            animations.push(animation);
+            animations.push({
+              id: this.id,
+              animation,
+            });
           }
         } else {
           // 如果没有执行动画，直接应用结束样式
@@ -130,7 +143,10 @@ class Animator extends EE {
                 clipShape.destroy();
               });
               if ((clipIterations || iterations) !== Infinity) {
-                animations.push(clipAnimation);
+                animations.push({
+                  id: this.id,
+                  animation: clipAnimation,
+                });
               }
             } else {
               // 没有动画，直接删掉 clip
@@ -153,6 +169,8 @@ class Animator extends EE {
     }
     this.animations = animations;
 
+    this.emit('inited');
+
     // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
     if (vNode) {
       const { component } = vNode;
@@ -168,42 +186,42 @@ class Animator extends EE {
   play() {
     const { animations } = this;
     if (!animations || !animations.length) return;
-    animations.forEach((animation) => {
-      animation.play();
+    animations.forEach((d) => {
+      d.animation.play();
     });
   }
 
   pause() {
     const { animations } = this;
     if (!animations || !animations.length) return;
-    animations.forEach((animation) => {
-      animation.pause();
+    animations.forEach((d) => {
+      d.animation.pause();
     });
   }
 
   goTo(frame: number) {
     const { animations } = this;
     if (!animations || !animations.length) return;
-    animations.forEach((animation) => {
-      animation.currentTime = frame;
+    animations.forEach((d) => {
+      d.animation.currentTime = frame;
     });
   }
 
   finish() {
     const { animations } = this;
     if (!animations || !animations.length) return;
-    animations.forEach((animation) => {
-      animation.pause();
+    animations.forEach((d) => {
+      d.animation.pause();
     });
   }
 
-  endEmit(animations: IAnimation[]) {
+  endEmit(animations: Animation[]) {
     if (!animations.length) {
       this.emit('end');
       return null;
     }
 
-    const finished = Promise.all(animations.map((d) => d.finished));
+    const finished = Promise.all(animations.map((d) => d.animation.finished));
     finished.then(() => {
       this.emit('end');
     });

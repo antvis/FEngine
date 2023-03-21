@@ -24,7 +24,7 @@ function findAllShapeNode(vNode: VNode | VNode[] | null) {
 
 function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
-  const { shape: lastShape, style: lastStyle } = lastNode;
+  const { shape: lastShape, style: lastStyle, animator: lastAnimation } = lastNode;
 
   // 形变动画之前先把原 shape 销毁
   lastShape.destroy();
@@ -70,6 +70,11 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
     property: animateProperty,
   });
 
+  const { timeline } = nextNode?.context;
+  animator.once('inited', () => {
+    timeline.delete(lastAnimation?.id);
+    timeline.concat(animator?.animations);
+  });
   animator.once('end', () => {
     applyStyle(nextShape, endStyle);
     pathShape.replaceWith(nextShape);
@@ -81,7 +86,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
 function appearAnimation(vNode: VNode | VNode[] | null) {
   return Children.map(vNode, (node) => {
     if (!node) return;
-    const { tag, shape, style, children, animate, props, animator } = node;
+    const { tag, shape, style, children, animate, props, animator, context } = node;
     animator.reset(shape);
 
     // 有叶子节点，先执行叶子节点
@@ -109,7 +114,10 @@ function appearAnimation(vNode: VNode | VNode[] | null) {
     };
 
     animator.animate(shape, start, endStyle, animationEffect);
-
+    const { timeline } = context;
+    animator.once('inited', () => {
+      timeline.concat(animator.animations);
+    });
     return animator;
   });
 }
@@ -124,6 +132,7 @@ function updateAnimation(nextNode, lastNode) {
     shape: nextShape,
     animator,
     animate,
+    context,
   } = nextNode;
   const {
     tag: lastTag,
@@ -177,8 +186,11 @@ function updateAnimation(nextNode, lastNode) {
       ...style,
       ...end,
     };
+    const { timeline } = context;
     animator.animate(nextShape, startStyle, endStyle, animationEffect);
-
+    animator.once('inited', () => {
+      timeline.concat(animator.animations);
+    });
     return animator;
   }
 
@@ -216,7 +228,9 @@ function updateAnimation(nextNode, lastNode) {
 function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
-    const { tag, shape, children, animate, style, props, animator } = vNode;
+    const { tag, shape, children, animate, style, props, animator, context } = vNode;
+    const { timeline } = context;
+
     if (shape.destroyed) {
       return null;
     }
@@ -260,6 +274,10 @@ function destroyAnimation(node: VNode) {
       const endStyle = end;
 
       animator.animate(shape, startStyle, endStyle, animationEffect);
+
+      animator.once('inited', () => {
+        timeline.repaly(animator.animations);
+      });
     }
 
     // 动画结束后，删除图形（包括子元素动画）

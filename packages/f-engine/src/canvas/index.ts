@@ -13,7 +13,7 @@ import { render, updateComponents, destroyElement } from './render';
 import { VNode } from './vnode';
 import { IProps, IContext, TextStyleProps } from '../types';
 import { ClassComponent } from './workTags';
-
+import Control from './control';
 // 添加动画模块
 import '@antv/g-web-animations-api';
 
@@ -162,6 +162,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       theme,
       gesture,
       measureText: measureText(container, px2hd, theme),
+      timeline: new Control(),
     };
 
     const vNode: VNode = {

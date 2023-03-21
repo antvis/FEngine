@@ -46,12 +46,10 @@ function getStyle(tagType: WorkTag, props, context) {
 
 function createVNode(parent: VNode, vNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate, props: parentProps } = parent;
-  const { timeline } = parentProps;
+
   const { ref, type, props: originProps } = vNode;
   const { animate, transformFrom, ...props } = originProps;
 
-  //子元素发生变化删掉缓存的animator
-  timeline && timeline.pop();
   const tag = getWorkTag(type);
   const animator = new Animator();
   const style = getStyle(tag, props, context);
@@ -183,6 +181,8 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
     return nextVNode;
   }
 
+  // const { timeline } = parent.context;
+  // timeline.pop();
   const nextVNode = createVNode(parent, nextElement as VNode);
   destroyElement(lastElement);
   return nextVNode;
@@ -193,6 +193,7 @@ function diffElement(
   nextElement: JSX.Element,
   lastElement: JSX.Element,
 ): VNode | VNode[] | null {
+  // debugger;
   if (!nextElement && !lastElement) {
     return null;
   }
@@ -311,6 +312,7 @@ function renderChildren(
   nextChildren: VNode | VNode[] | null,
   lastChildren: VNode | VNode[] | null,
 ) {
+  // debugger;
   // 返回的都是 classComponent 的节点
   const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);
 

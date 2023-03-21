@@ -24,6 +24,7 @@ export interface PlayerProps {
 }
 
 class Player extends Component<PlayerProps> {
+  private playState: string = 'pause';
   private setPlayState() {
     const { animator, props } = this;
     const { frame, state: playState } = props;
@@ -34,12 +35,15 @@ class Player extends Component<PlayerProps> {
 
     switch (playState) {
       case 'play':
+        this.playState = 'play';
         animator.play();
         break;
       case 'pause':
+        this.playState = 'pause';
         animator.pause();
         break;
       case 'finish':
+        this.playState = 'finish';
         animator.finish();
         break;
       default:
@@ -48,11 +52,11 @@ class Player extends Component<PlayerProps> {
   }
 
   animationWillPlay() {
-    const { animator, props } = this;
+    const { animator, context } = this;
     // @ts-ignore
-    const { timeline } = props;
+    const { timeline } = context;
     const { animations } = animator;
-    timeline.addAnimation(animations);
+    timeline.add(animations);
     animator.animations = timeline.getAnimation();
     this.setPlayState();
   }
@@ -60,16 +64,6 @@ class Player extends Component<PlayerProps> {
   render() {
     return this.props.children;
   }
-
-  // isSameChildren(nextChildren, lastChildren) {
-  //   return Children.compare(nextChildren, lastChildren, (next, last) => {
-  //     if (!next && !last) return true;
-  //     const { children, type } = next;
-  //     const { children: lastChildNodes, type: lastType } = last;
-  //     if (type !== lastType) return false;
-  //     return this.isSameChildren(children, lastChildNodes);
-  //   });
-  // }
 }
 
 export default Player;
