@@ -34,7 +34,6 @@ export interface TimelineProps {
 class Timeline extends Component<TimelineProps> {
   index: number;
   delay: number;
-  animations = [];
 
   constructor(props: TimelineProps) {
     super(props);
@@ -59,22 +58,6 @@ class Timeline extends Component<TimelineProps> {
     this.animator.off('end', this.next);
   }
 
-  addAnimation(animation) {
-    const { index } = this.state;
-    if (this.animations[index]) return;
-    this.animations[index] = animation;
-  }
-
-  pop() {
-    const { index } = this.state;
-    this.animations[index] = null;
-  }
-
-  getAnimation() {
-    const { index } = this.state;
-    return this.animations[index];
-  }
-
   next = () => {
     const { state, props } = this;
     const { index, count, delay } = state;
@@ -96,7 +79,7 @@ class Timeline extends Component<TimelineProps> {
     const { children } = props;
     const { index } = state;
     const childrenArray = Children.toArray<JSX.Element>(children);
-    return Children.cloneElement(childrenArray[index], { timeline: this });
+    return childrenArray[index];
   }
 }
 
