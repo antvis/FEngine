@@ -142,6 +142,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
+      useNativeClickEvent: true,
     });
 
     const container = canvas.getRoot();

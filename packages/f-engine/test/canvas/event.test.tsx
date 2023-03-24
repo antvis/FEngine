@@ -6,7 +6,7 @@ import { Renderer } from '@antv/g-mobile-canvas';
 describe('Event', () => {
   it('Event', async () => {
     const onPan = jest.fn();
-
+    const onClick = jest.fn();
     const renderer = new Renderer();
     const { props } = (
       <Canvas renderer={renderer} context={context}>
@@ -17,6 +17,7 @@ describe('Event', () => {
             fill: 'red',
           }}
           onPan={onPan}
+          onClick={onClick}
         />
       </Canvas>
     );
@@ -31,5 +32,7 @@ describe('Event', () => {
     await delay(200);
 
     expect(onPan.mock.calls.length).toBe(1);
+    // move不触发click事件
+    expect(onClick.mock.calls.length).toBe(0);
   });
 });
