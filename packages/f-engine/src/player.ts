@@ -1,8 +1,6 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
-import { IAnimation } from '@antv/g-lite';
-import Children from './children';
-import { isArray } from '@antv/util';
+import Control from './canvas/control';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -24,10 +22,10 @@ export interface PlayerProps {
 }
 
 class Player extends Component<PlayerProps> {
-  private playState: string = 'pause';
   private setPlayState() {
-    const { animator, props } = this;
+    const { animator, props, context } = this;
     const { frame, state: playState } = props;
+    const { timeline } = context;
 
     if (frame) {
       animator.goTo(frame);
@@ -35,20 +33,24 @@ class Player extends Component<PlayerProps> {
 
     switch (playState) {
       case 'play':
-        this.playState = 'play';
+        timeline.setPlayState('play');
         animator.play();
         break;
       case 'pause':
-        this.playState = 'pause';
+        timeline.setPlayState('pause');
         animator.pause();
         break;
       case 'finish':
-        this.playState = 'finish';
+        timeline.setPlayState('finish');
         animator.finish();
         break;
       default:
         break;
     }
+  }
+
+  didMount(): void {
+    this.context.timeline = new Control(this);
   }
 
   animationWillPlay() {

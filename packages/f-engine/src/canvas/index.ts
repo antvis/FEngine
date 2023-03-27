@@ -163,7 +163,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       theme,
       gesture,
       measureText: measureText(container, px2hd, theme),
-      timeline: new Control(),
+      timeline: null,
     };
 
     const vNode: VNode = {
