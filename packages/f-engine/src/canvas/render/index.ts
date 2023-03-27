@@ -45,13 +45,13 @@ function getStyle(tagType: WorkTag, props, context) {
 }
 
 function createVNode(parent: VNode, vNode: VNode) {
-  const { canvas, context, updater, animate: parentAnimate, props: parentProps } = parent;
+  const { canvas, context, updater, animate: parentAnimate } = parent;
 
   const { ref, type, props: originProps } = vNode;
   const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
-  const animator = new Animator();
+  const animator = new Animator(context.timeline);
   const style = getStyle(tag, props, context);
 
   animator.vNode = vNode;
@@ -379,7 +379,7 @@ function updateComponents(components: Component[]) {
     const { timeline } = context;
 
     if (timeline) {
-      timeline.concat(animator.animations);
+      timeline.push(animator.animations);
       timeline.play.animationWillPlay();
     }
 

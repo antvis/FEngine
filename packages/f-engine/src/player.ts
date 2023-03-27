@@ -1,6 +1,6 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
-import Control from './canvas/control';
+import Timeline from './canvas/timeline';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -23,34 +23,16 @@ export interface PlayerProps {
 
 class Player extends Component<PlayerProps> {
   private setPlayState() {
-    const { animator, props, context } = this;
+    const { props, context } = this;
     const { frame, state: playState } = props;
     const { timeline } = context;
 
-    if (frame) {
-      animator.goTo(frame);
-    }
-
-    switch (playState) {
-      case 'play':
-        timeline.setPlayState('play');
-        animator.play();
-        break;
-      case 'pause':
-        timeline.setPlayState('pause');
-        animator.pause();
-        break;
-      case 'finish':
-        timeline.setPlayState('finish');
-        animator.finish();
-        break;
-      default:
-        break;
-    }
+    timeline.goTo(frame);
+    timeline.setPlayState(playState);
   }
 
-  didMount(): void {
-    this.context.timeline = new Control(this);
+  willMount(): void {
+    this.context.timeline = new Timeline(this);
   }
 
   animationWillPlay() {

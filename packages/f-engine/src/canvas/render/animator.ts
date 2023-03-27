@@ -4,12 +4,8 @@ import EE from 'eventemitter3';
 import { VNode } from '../vnode';
 import { createShape } from './createShape';
 import applyStyle from './applyStyle';
+import Timeline from '../timeline';
 
-let idNumber = 0;
-export interface Animation {
-  animation: IAnimation;
-  id: string;
-}
 class Animator extends EE {
   vNode: VNode;
   shape: DisplayObject;
@@ -17,14 +13,14 @@ class Animator extends EE {
   end: any;
   effect: any;
   // 本层动画
-  animations: Animation[];
+  animations: IAnimation[];
   // 节点动画树
   children: Animator[];
-  id: string;
+  timeline: Timeline;
 
-  constructor() {
+  constructor(timeline) {
     super();
-    this.id = `${idNumber++}`;
+    this.timeline = timeline;
   }
   animate(shape, start, end, effect) {
     this.shape = shape;
@@ -37,7 +33,7 @@ class Animator extends EE {
   run() {
     const { vNode, shape, start, end, effect, children } = this;
 
-    const animations: Animation[] = [];
+    const animations: IAnimation[] = [];
     if (effect) {
       const {
         property = [],
@@ -75,10 +71,7 @@ class Animator extends EE {
 
           // 过滤无限循环的动画
           if (iterations !== Infinity) {
-            animations.push({
-              id: this.id,
-              animation,
-            });
+            animations.push(animation);
           }
         } else {
           // 如果没有执行动画，直接应用结束样式
@@ -143,10 +136,7 @@ class Animator extends EE {
                 clipShape.destroy();
               });
               if ((clipIterations || iterations) !== Infinity) {
-                animations.push({
-                  id: this.id,
-                  animation: clipAnimation,
-                });
+                animations.push(clipAnimation);
               }
             } else {
               // 没有动画，直接删掉 clip
@@ -169,8 +159,9 @@ class Animator extends EE {
     }
     this.animations = animations;
 
-    this.emit('inited');
-
+    if (this.timeline) {
+      this.timeline.push(animations);
+    }
     // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
     if (vNode) {
       const { component } = vNode;
@@ -187,7 +178,7 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.animation.play();
+      d.play();
     });
   }
 
@@ -195,7 +186,7 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.animation.pause();
+      d.pause();
     });
   }
 
@@ -203,7 +194,7 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.animation.currentTime = frame;
+      d.currentTime = frame;
     });
   }
 
@@ -211,17 +202,17 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.animation.pause();
+      d.pause();
     });
   }
 
-  endEmit(animations: Animation[]) {
+  endEmit(animations: IAnimation[]) {
     if (!animations.length) {
       this.emit('end');
       return null;
     }
 
-    const finished = Promise.all(animations.map((d) => d.animation.finished));
+    const finished = Promise.all(animations.map((d) => d.finished));
     finished.then(() => {
       this.emit('end');
     });

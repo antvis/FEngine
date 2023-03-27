@@ -197,8 +197,7 @@ describe('Canvas', () => {
     await canvas.update(nextProps);
   });
 
-  // 报错
-  it.skip('line offsetPath', async () => {
+  it('line offsetPath', async () => {
     const renderer = new Renderer();
     const context = createContext('line');
 
@@ -276,7 +275,7 @@ describe('Canvas', () => {
     expect(context).toMatchImageSnapshot();
   });
 
-  it.skip('offsetPath 为 ref', async () => {
+  it('offsetPath 为 ref', async () => {
     const renderer = new Renderer();
     const context = createContext('offsetPath-ref');
     const ref = createRef();
