@@ -181,8 +181,6 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
     return nextVNode;
   }
 
-  // const { timeline } = parent.context;
-  // timeline.pop();
   const nextVNode = createVNode(parent, nextElement as VNode);
   destroyElement(lastElement);
   return nextVNode;
@@ -193,7 +191,6 @@ function diffElement(
   nextElement: JSX.Element,
   lastElement: JSX.Element,
 ): VNode | VNode[] | null {
-  // debugger;
   if (!nextElement && !lastElement) {
     return null;
   }
@@ -312,7 +309,6 @@ function renderChildren(
   nextChildren: VNode | VNode[] | null,
   lastChildren: VNode | VNode[] | null,
 ) {
-  // debugger;
   // 返回的都是 classComponent 的节点
   const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);
 
@@ -361,7 +357,7 @@ function updateComponents(components: Component[]) {
       return false;
     }
     component.willUpdate();
-    const { canvas } = vNode;
+    const { canvas, context } = vNode;
     const newChildren = canvas.toRawChildren(component.render());
     const nextChildren = renderChildren(vNode, newChildren as VNode, lastChildren);
 
@@ -375,8 +371,15 @@ function updateComponents(components: Component[]) {
     if (childrenAnimation.length) {
       animator.children = childrenAnimation;
     }
+
     // 执行动画
     animator.run();
+    const { timeline } = context;
+
+    if (timeline) {
+      timeline.concat(animator.animations);
+      timeline.play.animationWillPlay();
+    }
 
     component.didUpdate();
   });

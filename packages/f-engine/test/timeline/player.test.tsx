@@ -177,7 +177,7 @@ describe('player', () => {
     expect(context).toMatchImageSnapshot();
   });
 
-  it.only('元素props改变', async () => {
+  it('元素props改变', async () => {
     const context = createContext('元素props改变');
     const { props } = (
       <Canvas context={context}>
@@ -193,14 +193,14 @@ describe('player', () => {
 
     await canvas.update({
       children: (
-        <Player frame={100} state="pause">
+        <Player frame={100} state="play">
           <View width={'130px'} />
         </Player>
       ),
     });
 
     await delay(1000);
-    // expect(context).toMatchImageSnapshot();
+    expect(context).toMatchImageSnapshot();
   });
 
   it('子元素改变', async () => {
@@ -281,7 +281,7 @@ describe('player', () => {
     const context = createContext('元素props改变');
     const { props } = (
       <Canvas context={context}>
-        <Player frame={100} state="play">
+        <Player frame={100} state="pause">
           <View3 />
         </Player>
       </Canvas>
@@ -290,6 +290,6 @@ describe('player', () => {
     const canvas = new Canvas(props);
     await canvas.render();
     await delay(1000);
-    // expect(context).toMatchImageSnapshot();
+    expect(context).toMatchImageSnapshot();
   });
 });

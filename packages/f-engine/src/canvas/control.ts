@@ -4,9 +4,16 @@ import { Animation } from './render/animator';
 class Control {
   animations: Animation[][];
   frame: number = 0;
+  playState: string = 'play';
+  play: null;
 
-  constructor() {
+  constructor(playComponent) {
     this.animations = [];
+    this.play = playComponent;
+  }
+
+  setPlayState(state) {
+    this.playState = state;
   }
 
   add(animation: Animation[]) {
@@ -40,7 +47,7 @@ class Control {
     this.animations[frame].filter((d) => d.id != id);
   }
 
-  repaly(next: Animation[]) {
+  replace(next: Animation[]) {
     const { frame } = this;
     if (!this.animations[frame]) return;
     const newAnimation = next.map((index) => {

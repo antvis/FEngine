@@ -72,6 +72,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
 
   const { timeline } = nextNode?.context;
   animator.once('inited', () => {
+    if (!timeline) return;
     timeline.delete(lastAnimation?.id);
     timeline.concat(animator?.animations);
   });
@@ -116,7 +117,7 @@ function appearAnimation(vNode: VNode | VNode[] | null) {
     animator.animate(shape, start, endStyle, animationEffect);
     const { timeline } = context;
     animator.once('inited', () => {
-      timeline.concat(animator.animations);
+      timeline && timeline.concat(animator.animations);
     });
     return animator;
   });
@@ -189,7 +190,7 @@ function updateAnimation(nextNode, lastNode) {
     const { timeline } = context;
     animator.animate(nextShape, startStyle, endStyle, animationEffect);
     animator.once('inited', () => {
-      timeline.concat(animator.animations);
+      timeline && timeline.concat(animator.animations);
     });
     return animator;
   }
@@ -276,7 +277,7 @@ function destroyAnimation(node: VNode) {
       animator.animate(shape, startStyle, endStyle, animationEffect);
 
       animator.once('inited', () => {
-        timeline.repaly(animator.animations);
+        timeline && timeline.replace(animator.animations);
       });
     }
 
