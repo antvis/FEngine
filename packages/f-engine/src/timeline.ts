@@ -1,7 +1,6 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Children from './children';
-import { IAnimation } from '@antv/g-lite';
 
 export interface TimelineProps {
   /**
