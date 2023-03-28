@@ -20,6 +20,11 @@ export interface TimelineProps {
   loop?: boolean;
   /**
    * @ignore
+   * 自动播放
+   */
+  autoPlay?: boolean;
+  /**
+   * @ignore
    * 子组件
    */
   children?: any;
@@ -42,7 +47,10 @@ class Timeline extends Component<TimelineProps> {
   }
 
   didMount() {
-    this.animator.on('end', this.next);
+    const { autoPlay = true } = this.props;
+    if (autoPlay) {
+      this.animator.on('end', this.next);
+    }
   }
 
   didUnmount(): void {
@@ -52,10 +60,11 @@ class Timeline extends Component<TimelineProps> {
   next = () => {
     const { state, props } = this;
     const { index, count, delay } = state;
-    const { loop } = props;
+    const { loop, autoPlay = true } = props;
 
     const next = loop ? (index + 1) % count : index + 1;
-    if (next < count) {
+
+    if (next < count && autoPlay) {
       setTimeout(() => {
         this.setState({
           index: next,

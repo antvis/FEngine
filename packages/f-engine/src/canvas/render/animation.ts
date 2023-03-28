@@ -23,8 +23,8 @@ function findAllShapeNode(vNode: VNode | VNode[] | null) {
 }
 
 function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
-  const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
-  const { shape: lastShape, style: lastStyle } = lastNode;
+  const { props: nextProps, shape: nextShape, style: nextStyle, context } = nextNode;
+  const { shape: lastShape, style: lastStyle, animator: lastAnimation } = lastNode;
 
   // 形变动画之前先把原 shape 销毁
   lastShape.destroy();
@@ -36,7 +36,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
     return animator;
   }
 
-  animator = animator || new Animator();
+  animator = animator || new Animator(context.timeline);
   // shape 形变
   const { start, end, property = [] } = animationEffect;
   const { parsedStyle: nextParsedStyle } = nextShape;
@@ -69,6 +69,9 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
     ...animationEffect,
     property: animateProperty,
   });
+
+  const { timeline } = nextNode?.context;
+  timeline && timeline.delete(lastAnimation);
 
   animator.once('end', () => {
     applyStyle(nextShape, endStyle);
@@ -109,7 +112,6 @@ function appearAnimation(vNode: VNode | VNode[] | null) {
     };
 
     animator.animate(shape, start, endStyle, animationEffect);
-
     return animator;
   });
 }
@@ -177,8 +179,8 @@ function updateAnimation(nextNode, lastNode) {
       ...style,
       ...end,
     };
-    animator.animate(nextShape, startStyle, endStyle, animationEffect);
 
+    animator.animate(nextShape, startStyle, endStyle, animationEffect);
     return animator;
   }
 
@@ -216,7 +218,9 @@ function updateAnimation(nextNode, lastNode) {
 function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
-    const { tag, shape, children, animate, style, props, animator } = vNode;
+    const { tag, shape, children, animate, style, props, animator, context } = vNode;
+    const { timeline } = context;
+
     if (shape.destroyed) {
       return null;
     }
@@ -260,6 +264,7 @@ function destroyAnimation(node: VNode) {
       const endStyle = end;
 
       animator.animate(shape, startStyle, endStyle, animationEffect);
+      timeline && timeline.delete(animator.animations);
     }
 
     // 动画结束后，删除图形（包括子元素动画）
@@ -313,15 +318,20 @@ function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: I
   }
 }
 
-function createAnimation(parent, nextChildren, lastChildren) {
+// 处理 children 的动画
+function createAnimation(
+  parent: VNode,
+  nextChildren: VNode | VNode[],
+  lastChildren: VNode | VNode[],
+) {
   if (!nextChildren && !lastChildren) {
-    return;
+    return [];
   }
   const { shape: parentShape } = parent;
 
   // 上一个处理的元素
   let prevSibling: IChildNode;
-  const childrenAnimator = [];
+  const childrenAnimator: Animator[] = [];
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
     // shape 层才执行动画
