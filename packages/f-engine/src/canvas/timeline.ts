@@ -36,6 +36,12 @@ class Timeline {
     animator.goTo(frame);
   }
 
+  setSpeed(speed) {
+    if (!speed) return;
+    const { animator } = this.play;
+    animator.setSpeed(speed);
+  }
+
   add(animation: IAnimation[]) {
     const { frame } = this;
     if (this.animations[frame]) {

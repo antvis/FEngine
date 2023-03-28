@@ -151,9 +151,16 @@ describe('player', () => {
   }
   it('元素未改变,只有播控props改变', async () => {
     const context = createContext('播控props改变');
+    let frame = -1;
     const { props } = (
       <Canvas context={context}>
-        <Player frame={100} state="pause">
+        <Player
+          frame={100}
+          state="pause"
+          getTotalFrame={(index) => {
+            frame = index;
+          }}
+        >
           <View />
         </Player>
       </Canvas>
@@ -161,6 +168,8 @@ describe('player', () => {
 
     const canvas = new Canvas(props);
     await canvas.render();
+
+    expect(frame).toEqual(1000);
     await delay(1000);
 
     expect(context).toMatchImageSnapshot();
@@ -175,6 +184,25 @@ describe('player', () => {
 
     await delay(1000);
     expect(context).toMatchImageSnapshot();
+  });
+
+  it('播控速度& onfinish', async () => {
+    const context = createContext('播控props测试');
+    const callback = jest.fn();
+    const { props } = (
+      <Canvas context={context}>
+        <Player state="play" speed={0.5} onfinish={callback}>
+          <View />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(500);
+    expect(callback.mock.calls.length).toBe(0);
+    await delay(1500);
+    expect(callback.mock.calls.length).toBe(1);
   });
 
   it('元素props改变', async () => {

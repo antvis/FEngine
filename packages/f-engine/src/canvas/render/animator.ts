@@ -198,6 +198,14 @@ class Animator extends EE {
     });
   }
 
+  setSpeed(speed: number) {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((d) => {
+      d.playbackRate = speed;
+    });
+  }
+
   finish() {
     const { animations } = this;
     if (!animations || !animations.length) return;
