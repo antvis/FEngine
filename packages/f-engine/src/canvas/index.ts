@@ -151,7 +151,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     container.setAttribute('fontSize', fontSize);
     container.setAttribute('fontFamily', fontFamily);
 
-    const gesture = new Gesture(container);
+    const gesture = new Gesture(canvas);
 
     // 供全局使用的一些变量
     const componentContext = {
