@@ -146,9 +146,9 @@ function createVNode(parent: VNode, vNode: VNode) {
 }
 
 function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
-  const { canvas, updater, animate: parentAnimate } = parent;
-  const { tag, context, animator, component, shape, children } = lastNode;
-  const { props } = nextNode;
+  const { canvas, context, updater, animate: parentAnimate } = parent;
+  const { tag, animator, component, shape, children } = lastNode;
+  const { type, props } = nextNode;
   const { animate } = props;
 
   animator.vNode = nextNode;
@@ -156,7 +156,7 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   nextNode.parent = parent;
   nextNode.tag = tag;
   nextNode.canvas = canvas;
-  nextNode.context = context;
+  nextNode.context = readVNodeContext(type, context);
   nextNode.updater = updater;
   nextNode.component = component;
   nextNode.shape = shape;
