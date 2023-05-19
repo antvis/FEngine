@@ -138,6 +138,8 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       height,
       supportsTouchEvents: true,
       supportsPointerEvents: true,
+      // 允许在canvas外部触发
+      alwaysTriggerPointerEventOnCanvas: true,
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
