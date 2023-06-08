@@ -1,8 +1,8 @@
 {
   "name": "@antv/f-engine",
   "version": "0.0.42",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "main": "lib/index.js",
+  "module": "es/index.js",
   "types": "es/index.d.ts",
   "miniprogram": "dist",
   "sideEffects": false,
