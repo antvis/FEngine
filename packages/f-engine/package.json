@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-engine",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "types": "es/index.d.ts",
