@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-engine",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "main": "lib/index.js",
   "module": "es/index.js",
   "types": "es/index.d.ts",
@@ -20,7 +20,7 @@
     "tslib": "^2.3.1"
   },
   "devDependencies": {
-    "@antv/f-test-utils": "^0.0.2"
+    "@antv/f-test-utils": "^0.0.3"
   },
   "homepage": "https://github.com/antvis/FEngine",
   "author": "https://github.com/orgs/antvis/people",
