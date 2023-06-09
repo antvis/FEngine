@@ -4,7 +4,7 @@ import { isBoolean, isNumber, pick } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
-import { createShape } from './createShape';
+import { createShape, updateShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
 import { createAnimation } from './animation';
@@ -159,7 +159,7 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   nextNode.context = readVNodeContext(type, context);
   nextNode.updater = updater;
   nextNode.component = component;
-  nextNode.shape = shape;
+  nextNode.shape = updateShape(shape, props);
   nextNode.parent = parent;
   nextNode.children = children;
   nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
