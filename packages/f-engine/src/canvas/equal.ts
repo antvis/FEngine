@@ -29,9 +29,9 @@ function equal(a, b): boolean {
     return false;
   }
 
-  // 如果是function， 则认为是相对
+  // 函数不相等，也认为不同
   if (isFunction(a)) {
-    return true;
+    return false;
   }
 
   // 值类型，Number String Boolean

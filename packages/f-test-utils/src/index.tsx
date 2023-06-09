@@ -93,9 +93,7 @@ const gestureSimulator = async (dom, eventType: string, option: Option | Option[
   }
 
   if (eventType === 'click') {
-    dispatchEvent(dom, 'mousedown', events[0]);
-    await delay(50);
-    dispatchEvent(dom, 'mouseup', events[0]);
+    dispatchEvent(dom, 'click', events[0]);
     return;
   }
 };

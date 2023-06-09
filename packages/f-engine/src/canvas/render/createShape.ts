@@ -102,6 +102,13 @@ function createShape(type: string, props) {
   return shape;
 }
 
+function updateShape(shape: DisplayObject, props) {
+  // 清空事件，重新绑定
+  shape.removeAllEventListeners();
+  addEvent(shape, props);
+  return shape;
+}
+
 function addEvent(shape, props) {
   const gesture = new Gesture(shape);
 
@@ -111,4 +118,4 @@ function addEvent(shape, props) {
   });
 }
 
-export { createShape, addEvent };
+export { createShape, updateShape, addEvent };

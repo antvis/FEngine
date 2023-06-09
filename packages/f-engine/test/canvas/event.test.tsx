@@ -75,4 +75,48 @@ describe('Event', () => {
     expect(onPan.mock.calls.length).toBe(2);
     expect(onPress.mock.calls.length).toBe(2);
   });
+
+  it('change data event has changed', async () => {
+    const onClick = jest.fn();
+    const { props } = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: '200px',
+            height: '200px',
+            fill: 'red',
+          }}
+          onClick={() => {
+            onClick('rect1');
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(300);
+    gestureSimulator(context.canvas, 'click', { x: 10, y: 10 });
+    await delay(100);
+    expect(onClick.mock.calls[0][0]).toBe('rect1');
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <rect
+          style={{
+            width: '200px',
+            height: '200px',
+            fill: 'red',
+          }}
+          onClick={() => {
+            onClick('rect2');
+          }}
+        />
+      </Canvas>
+    );
+    await canvas.update(newProps);
+    gestureSimulator(context.canvas, 'click', { x: 10, y: 10 });
+    await delay(100);
+    expect(onClick.mock.calls[1][0]).toBe('rect2');
+  });
 });
