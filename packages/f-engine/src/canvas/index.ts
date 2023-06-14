@@ -1,7 +1,7 @@
 import { isFunction } from '@antv/util';
 import Component from '../component';
 import equal from './equal';
-import { Group, Text, Canvas as GCanvas, CanvasLike, IRenderer } from '@antv/g-lite';
+import { Group, Text, Canvas as GCanvas, CanvasLike, IRenderer, runtime } from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
@@ -137,7 +137,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       width,
       height,
       supportsTouchEvents: true,
-      supportsPointerEvents: true,
+      // https://caniuse.com/?search=PointerEvent ios 13 以下不支持 Pointer
+      supportsPointerEvents: runtime.globalThis.PointerEvent ? true : false,
+      // 允许在canvas外部触发
+      alwaysTriggerPointerEventOnCanvas: true,
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,

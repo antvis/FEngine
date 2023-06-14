@@ -55,4 +55,27 @@ describe('compare', () => {
       type: 'rect',
     });
   });
+
+  it('compare Array map key', () => {
+    const lastElement = (
+      <group>
+        {[1, 2].map((id) => (
+          <rect key={id} />
+        ))}
+      </group>
+    );
+    const nextElement = (
+      <group>
+        {[3, 4].map((id) => (
+          <rect key={id} />
+        ))}
+      </group>
+    );
+
+    const callback = jest.fn();
+
+    Children.compare(nextElement.props.children, lastElement.props.children, callback);
+
+    expect(callback.mock.calls.length).toBe(4);
+  });
 });

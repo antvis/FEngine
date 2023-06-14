@@ -97,8 +97,23 @@ function createShape(type: string, props) {
   if (!ShapeClass) return null;
   // const result = checkCSSRule(type, originStyle);
   const shape = new ShapeClass(props);
-  addEvent(shape, props);
+  // @ts-ignore
+  shape.gesture = addEvent(shape, props);
 
+  return shape;
+}
+
+function updateShape(shape: DisplayObject, props, lastProps) {
+  // @ts-ignore
+  const gesture = shape.gesture;
+  if (gesture) {
+    // 清空事件
+    EVENT_LIST.forEach(([eventName, handlerName]) => {
+      if (!lastProps[handlerName]) return;
+      gesture.off(eventName, lastProps[handlerName]);
+    });
+  }
+  addEvent(shape, props);
   return shape;
 }
 
@@ -109,6 +124,7 @@ function addEvent(shape, props) {
     if (!props[handlerName]) return;
     gesture.on(eventName, props[handlerName]);
   });
+  return gesture;
 }
 
-export { createShape, addEvent };
+export { createShape, updateShape, addEvent };

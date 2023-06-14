@@ -1,9 +1,10 @@
 import { JSX } from '../../jsx/jsx-namespace';
+import { ElementType } from '../../types/jsx';
 import { isBoolean, isNumber, pick } from '@antv/util';
 import Component from '../../component';
 import Children from '../../children';
 import { VNode } from '../vnode';
-import { createShape } from './createShape';
+import { createShape, updateShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
 import { createAnimation } from './animation';
@@ -44,13 +45,41 @@ function getStyle(tagType: WorkTag, props, context) {
   return {};
 }
 
+// vnode 上的 context 做父子节点的 context 传递
+function readVNodeContext(vNodeType: ElementType, parentContext) {
+  // @ts-ignore
+  const contextInjecter = vNodeType.contextInjecter;
+  if (!contextInjecter) {
+    return parentContext;
+  }
+  // copy parentContext
+  return { ...parentContext };
+}
+
+// component 上的 context 是实际使用的 context
+function readComponentContext(vNodeType: ElementType, vNodeContext) {
+  // @ts-ignore
+  const contextType = vNodeType.contextType;
+  if (!contextType) {
+    return vNodeContext;
+  }
+  const { _currentValue } = contextType;
+
+  if (!_currentValue) {
+    return vNodeContext;
+  }
+
+  return _currentValue;
+}
+
 function createVNode(parent: VNode, vNode: VNode) {
-  const { canvas, context, updater, animate: parentAnimate } = parent;
+  const { canvas, context: parentContext, updater, animate: parentAnimate } = parent;
 
   const { ref, type, props: originProps } = vNode;
   const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
+  const context = readVNodeContext(type, parentContext);
   const animator = new Animator(context.timeline);
   const style = getStyle(tag, props, context);
 
@@ -76,16 +105,17 @@ function createVNode(parent: VNode, vNode: VNode) {
     shape._vNode = vNode; // shape 保留 vNode 的引用
     vNode.shape = shape;
   } else {
+    const componentContext = readComponentContext(type, context);
     // 组件
     let component: Component;
     if (tag === ClassComponent) {
       // @ts-ignore
-      component = new type(props, context, updater);
+      component = new type(props, componentContext, updater);
     } else {
-      component = new Component(props, context, updater);
+      component = new Component(props, componentContext, updater);
       component.render = function() {
         // @ts-ignore
-        return type(this.props, context, updater);
+        return type(this.props, componentContext, updater);
       };
     }
     const group = new Group();
@@ -96,7 +126,7 @@ function createVNode(parent: VNode, vNode: VNode) {
       ref.current = component;
     }
 
-    component.context = context;
+    component.context = componentContext;
     component.updater = updater;
     component.animator = animator;
     component._vNode = vNode;
@@ -117,8 +147,8 @@ function createVNode(parent: VNode, vNode: VNode) {
 
 function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate } = parent;
-  const { tag, animator, component, shape, children } = lastNode;
-  const { props } = nextNode;
+  const { tag, animator, component, shape, children, props: lastProps } = lastNode;
+  const { type, props } = nextNode;
   const { animate } = props;
 
   animator.vNode = nextNode;
@@ -126,17 +156,17 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   nextNode.parent = parent;
   nextNode.tag = tag;
   nextNode.canvas = canvas;
-  nextNode.context = context;
+  nextNode.context = readVNodeContext(type, context);
   nextNode.updater = updater;
   nextNode.component = component;
-  nextNode.shape = shape;
+  nextNode.shape = updateShape(shape, props, lastProps);
   nextNode.parent = parent;
   nextNode.children = children;
   nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
   nextNode.animator = animator;
   nextNode.style = getStyle(tag, props, context);
 
-  // 更新 vNode 的引用
+  // 更新 component
   if (component) {
     component._vNode = nextNode;
   } else {
@@ -219,7 +249,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 
   // 1. shouldUpdate & willReceiveProps
   const shouldProcessChildren = componentNodes.filter((node: VNode) => {
-    const { component, props, context, layout } = node;
+    const { type, component, props, context, layout } = node;
 
     // 更新组件 layout
     component.layout = layout;
@@ -230,7 +260,8 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
     if (component.shouldUpdate(props) === false) {
       return false;
     }
-    component.willReceiveProps(props, context);
+    const componentContext = readComponentContext(type, context);
+    component.willReceiveProps(props, componentContext);
     component.props = props;
     component.context = context;
     return true;
