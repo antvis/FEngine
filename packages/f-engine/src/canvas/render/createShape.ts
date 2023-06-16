@@ -106,14 +106,20 @@ function createShape(type: string, props) {
 function updateShape(shape: DisplayObject, props, lastProps) {
   // @ts-ignore
   const gesture = shape.gesture;
+  // 如果 shape 上存在 gesture，说明是 jsx 标签创建的元素，才需要更新事件
   if (gesture) {
-    // 清空事件
+    // 先清除上次 props 绑定的事件
     EVENT_LIST.forEach(([eventName, handlerName]) => {
       if (!lastProps[handlerName]) return;
       gesture.off(eventName, lastProps[handlerName]);
     });
+
+    // 绑定最新的事件
+    EVENT_LIST.forEach(([eventName, handlerName]) => {
+      if (!props[handlerName]) return;
+      gesture.on(eventName, props[handlerName]);
+    });
   }
-  addEvent(shape, props);
   return shape;
 }
 

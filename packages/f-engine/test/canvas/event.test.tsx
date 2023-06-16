@@ -119,4 +119,60 @@ describe('Event', () => {
     await delay(100);
     expect(onClick.mock.calls[1][0]).toBe('rect2');
   });
+
+  it('component pass onClick event', async () => {
+    const onClickCallback = jest.fn();
+
+    const Rect = (props) => {
+      const { onClick, item } = props;
+      return (
+        <rect
+          style={{
+            width: '200px',
+            height: '200px',
+            fill: 'red',
+          }}
+          onClick={() => {
+            onClick(item);
+          }}
+        />
+      );
+    };
+
+    const { props } = (
+      <Canvas context={context}>
+        <Rect
+          item="rect1"
+          onClick={(item) => {
+            onClickCallback(item);
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(300);
+    gestureSimulator(context.canvas, 'click', { x: 10, y: 10 });
+    await delay(100);
+    expect(onClickCallback.mock.calls.length).toBe(1);
+    expect(onClickCallback.mock.calls[0][0]).toBe('rect1');
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Rect
+          item="rect2"
+          onClick={(item) => {
+            onClickCallback(item);
+          }}
+        />
+      </Canvas>
+    );
+    await canvas.update(newProps);
+    gestureSimulator(context.canvas, 'click', { x: 10, y: 10 });
+    await delay(100);
+
+    expect(onClickCallback.mock.calls.length).toBe(2);
+    expect(onClickCallback.mock.calls[1][0]).toBe('rect2');
+  });
 });

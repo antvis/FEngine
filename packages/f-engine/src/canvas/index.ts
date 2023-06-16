@@ -1,7 +1,15 @@
 import { isFunction } from '@antv/util';
 import Component from '../component';
 import equal from './equal';
-import { Group, Text, Canvas as GCanvas, CanvasLike, IRenderer, runtime } from '@antv/g-lite';
+import {
+  Group,
+  Text,
+  Canvas as GCanvas,
+  CanvasLike,
+  IRenderer,
+  runtime,
+  DataURLType,
+} from '@antv/g-lite';
 import { createMobileCanvasElement } from '@antv/g-mobile-canvas-element';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { createUpdater, Updater } from '../component/updater';
@@ -246,6 +254,22 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     canvas.resize(width, height);
     this.updateLayout({ ...this.props, width, height });
     await this.render();
+  }
+
+  async toDataURL(type?: DataURLType, encoderOptions?: number) {
+    const { canvas } = this;
+    return new Promise((resolve) => {
+      canvas.addEventListener(
+        'rerender',
+        () => {
+          canvas
+            .getContextService()
+            .toDataURL({ type, encoderOptions })
+            .then(resolve);
+        },
+        { once: true },
+      );
+    });
   }
 
   updateLayout(props) {
