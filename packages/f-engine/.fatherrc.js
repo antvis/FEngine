@@ -1,4 +1,4 @@
-export default process.env.CI
+export default process.env.CI && process.env.CI === 'true'
   ? {}
   : {
       umd: {
