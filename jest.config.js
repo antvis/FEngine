@@ -7,6 +7,7 @@ module.exports = {
     'packages/*/src/**/*.{ts,tsx,js}',
     '!packages/f-my/src/**/*.{ts,tsx,js}',
     '!packages/f-wx/src/**/*.{ts,tsx,js}',
+    '!packages/f-test-utils/src/**/*.{ts,tsx,js}',
     '!**/node_modules/**',
   ],
   modulePathIgnorePatterns: ['packages/*/dist'],
