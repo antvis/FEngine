@@ -25,7 +25,7 @@ import { ClassComponent } from './workTags';
 import '@antv/g-web-animations-api';
 
 export interface CanvasProps extends IProps {
-  context?: CanvasRenderingContext2D | WebGLRenderingContext;
+  context?: CanvasRenderingContext2D | WebGLRenderingContext | null;
   container?: HTMLElement;
   renderer?: IRenderer;
   width?: number;
@@ -258,7 +258,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
   async toDataURL(type?: DataURLType, encoderOptions?: number) {
     const { canvas } = this;
-    return new Promise((resolve) => {
+    return new Promise<string>((resolve) => {
       canvas.addEventListener(
         'rerender',
         () => {
