@@ -1,0 +1,35 @@
+import { jsx, Canvas } from '../../../src';
+import { Renderer } from '@antv/g-mobile-canvas';
+
+const canvasEl = document.createElement('canvas');
+canvasEl.style.display = 'block';
+canvasEl.style.width = '300px';
+canvasEl.style.height = '200px';
+document.body.appendChild(canvasEl);
+
+const context = canvasEl.getContext('2d');
+
+describe('canvas 2d', () => {
+  it('canvas renderer', async () => {
+    const renderer = new Renderer();
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <rect
+          style={{
+            width: '200px',
+            height: '200px',
+            fill: 'red',
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    const dataURL = await canvas.toDataURL();
+    expect(dataURL).toBe(
+      'data:image/png;base64,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',
+    );
+  });
+});

@@ -175,4 +175,57 @@ describe('Event', () => {
     expect(onClickCallback.mock.calls.length).toBe(2);
     expect(onClickCallback.mock.calls[1][0]).toBe('rect2');
   });
+
+  it('event stopPropagation', async () => {
+    const onGroupClickCallback = jest.fn();
+    const onRectClickCallback = jest.fn();
+    const Rect = (props) => {
+      const { onClick } = props;
+      return (
+        <rect
+          style={{
+            width: '200px',
+            height: '200px',
+            fill: '#000',
+            opacity: 0.5,
+          }}
+          onClick={(ev) => {
+            onClick(ev);
+          }}
+        />
+      );
+    };
+
+    const { props } = (
+      <Canvas context={context}>
+        <group
+          style={{
+            width: '200px',
+            height: '400px',
+            fill: 'red',
+          }}
+          onClick={() => {
+            onGroupClickCallback();
+          }}
+        >
+          <Rect
+            onClick={(ev) => {
+              ev.stopPropagation();
+              onRectClickCallback();
+            }}
+          />
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(300);
+
+    gestureSimulator(context.canvas, 'click', { x: 10, y: 10 });
+    await delay(100);
+
+    expect(onGroupClickCallback.mock.calls.length).toBe(0);
+    expect(onRectClickCallback.mock.calls.length).toBe(1);
+  });
 });
