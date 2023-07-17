@@ -326,4 +326,36 @@ describe('Sector', () => {
       expect(context).toMatchImageSnapshot();
     });
   });
+
+  describe('sector clip', () => {
+    it('clip', async () => {
+      const { props } = (
+        <Canvas context={context}>
+          <circle
+            style={{
+              cx: 110,
+              cy: 110,
+              r: 100,
+              fill: 'radial-gradient(circle at center, red, blue, green 100%)',
+              clip: {
+                type: 'sector',
+                style: {
+                  cx: 110,
+                  cy: 110,
+                  r: 100,
+                  startAngle: 100,
+                  endAngle: 190,
+                },
+              },
+            }}
+          />
+        </Canvas>
+      );
+
+      const canvas = new Canvas(props);
+      canvas.render();
+      await delay(500);
+      expect(context).toMatchImageSnapshot();
+    });
+  });
 });
