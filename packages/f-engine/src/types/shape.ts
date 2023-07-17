@@ -170,6 +170,8 @@ interface AnimationBase {
   property?: string[];
   start?: ShapeStyleProps;
   end?: ShapeStyleProps;
+  direction?: 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
+  iterations?: number;
   onFrame?: (t: number) => any;
   onEnd?: () => any;
 }
