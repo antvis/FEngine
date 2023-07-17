@@ -1,0 +1,8 @@
+{
+  "scripts": {},
+  "dependencies": {
+    "@antv/g-lite": "~1.2.0",
+    "@antv/g-mobile-canvas": "~0.10.0",
+    "@antv/g-mobile-canvas-element": "~0.8.0"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "enableNodeModuleBabelTransform": true,
+  "component2": true,
+  "enableAppxNg": true
+}
