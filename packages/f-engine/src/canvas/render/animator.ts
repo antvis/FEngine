@@ -42,6 +42,7 @@ class Animator extends EE {
         delay,
         iterations,
         clip,
+        direction = '',
         onFrame = () => {},
         onEnd = () => {},
       } = effect;
@@ -64,6 +65,7 @@ class Animator extends EE {
           duration,
           delay,
           iterations,
+          direction,
         });
         if (animation) {
           animation.onframe = onFrame;
@@ -96,6 +98,7 @@ class Animator extends EE {
             iterations: clipIterations,
             start: clipStart,
             end: clipEnd,
+            direction: clipDirection,
           } = clipConfig;
 
           if (clipProperty.length && (clipDuration || duration) > 0) {
@@ -125,6 +128,7 @@ class Animator extends EE {
               duration: clipDuration || duration,
               delay: clipDelay || delay,
               iterations: clipIterations || iterations,
+              direction: clipDirection || direction,
             });
 
             // 过滤无限循环的动画

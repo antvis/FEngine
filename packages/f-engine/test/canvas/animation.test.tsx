@@ -232,6 +232,46 @@ describe('动画', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  it('direction', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <arc
+          attrs={{
+            cx: 120,
+            cy: 100,
+            r: 100,
+            startAngle: 0,
+            endAngle: 200,
+            lineWidth: '4px',
+            lineCap: 'round',
+            stroke: 'white',
+            shadowColor: 'red',
+          }}
+          animation={{
+            appear: {
+              duration: 1000,
+              property: ['shadowBlur'],
+              direction: 'alternate',
+              easing: 'ease-in-out',
+              iterations: Infinity,
+              start: {
+                shadowBlur: 20,
+              },
+              end: {
+                shadowBlur: 60,
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+    canvas.destroy();
+  });
   class View extends Component {
     render() {
       const { animation } = this.props;

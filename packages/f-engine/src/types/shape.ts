@@ -170,6 +170,8 @@ interface AnimationBase {
   property?: string[];
   start?: ShapeStyleProps;
   end?: ShapeStyleProps;
+  direction?: string;
+  iterations?: number;
   onFrame?: (t: number) => any;
   onEnd?: () => any;
 }
