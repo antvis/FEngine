@@ -39,6 +39,7 @@ export interface CanvasProps extends IProps {
   style?: any;
   landscape?: boolean;
   createImage?: (src?: string) => HTMLImageElement;
+  offscreenCanvas?: CanvasLike;
 }
 
 function measureText(container: Group, px2hd, theme: ThemeType) {
@@ -125,6 +126,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
+      offscreenCanvas,
     } = props;
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
@@ -153,6 +155,7 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       requestAnimationFrame,
       cancelAnimationFrame,
       useNativeClickEvent: true,
+      offscreenCanvas,
     });
 
     const container = canvas.getRoot();

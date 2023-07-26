@@ -33,7 +33,14 @@ Component({
         size: true,
       })
       .exec((res) => {
-        const { node, width, height } = res[0];
+        const {
+          node,
+          width,
+          height,
+          createImage,
+          requestAnimationFrame,
+          cancelAnimationFrame,
+        } = res[0];
         const context = node.getContext('2d');
         const pixelRatio = wx.getSystemInfoSync().pixelRatio;
         // 高清设置
@@ -46,10 +53,15 @@ Component({
           height,
           context,
           children,
+          offscreenCanvas: node,
+          createImage,
+          requestAnimationFrame,
+          cancelAnimationFrame,
         });
-        canvas.render();
-        this.canvas = canvas;
-        this.canvasEl = canvas.getCanvasEl();
+        canvas.render().then(() => {
+          this.canvas = canvas;
+          this.canvasEl = canvas.getCanvasEl();
+        });
       });
   },
 

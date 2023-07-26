@@ -7,7 +7,10 @@ Page({
   onReady() {
     this.setData({
       onRenderCanvas: () => {
-        return this.renderCanvas();
+        return this.renderCanvas({
+          width: 100,
+          index: 1
+        });
       }
     });
 
@@ -15,14 +18,21 @@ Page({
     setTimeout(() => {
       this.setData({
         onRenderCanvas: () => {
-          return this.renderCanvas();
+          return this.renderCanvas({
+            width: 200,
+            index: 2
+          });
         }
       });
     }, 2000);
   },
-  renderCanvas() {
+  renderCanvas({
+    width,
+    index
+  }) {
     return _jsx(Rect, {
-      width: 100
+      width: width,
+      index: index
     });
     // 如果不使用 jsx, 用下面代码效果也是一样的
     // return createElement(Chart, {

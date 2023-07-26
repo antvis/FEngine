@@ -15,8 +15,8 @@ Page({
     setTimeout(() => {
       this.setData({
         data: {
-          index: 1,
-          width: 100,
+          index: 2,
+          width: 200,
         },
       });
     }, 2000);
