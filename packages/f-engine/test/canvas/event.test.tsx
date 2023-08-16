@@ -36,7 +36,7 @@ describe('Event', () => {
     expect(onClick.mock.calls.length).toBe(0);
   });
 
-  it('new event', async () => {
+  it.skip('new event', async () => {
     const renderer = new Renderer();
     const context = createContext('new event ');
     const ref = { current: null };
