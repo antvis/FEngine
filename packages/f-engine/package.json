@@ -9,7 +9,7 @@
   "dependencies": {
     "@antv/g-gesture": "~2.2.0",
     "@antv/g-lite": "~1.2.0",
-    "@antv/g-mobile-canvas": "~0.10.0",
+    "@antv/g-mobile-canvas": "~0.11.0",
     "@antv/g-mobile-canvas-element": "~0.8.0",
     "@antv/g-mobile-svg": "~0.10.0",
     "@antv/g-mobile-webgl": "~0.9.0",
