@@ -5,9 +5,12 @@ module.exports = {
   collectCoverage: false,
   collectCoverageFrom: [
     'packages/*/src/**/*.{ts,tsx,js}',
+    '!packages/f-engine/src/canvas/render/css-layout.ts',
+    '!packages/f-engine/src/canvas/timeline.ts',
     '!packages/f-my/src/**/*.{ts,tsx,js}',
     '!packages/f-wx/src/**/*.{ts,tsx,js}',
     '!packages/f-test-utils/src/**/*.{ts,tsx,js}',
+    '!packages/f-vue/src/**/*.{ts,tsx,js}',
     '!**/node_modules/**',
   ],
   modulePathIgnorePatterns: ['packages/*/dist'],

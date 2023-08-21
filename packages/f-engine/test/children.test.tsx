@@ -1,5 +1,21 @@
 import { jsx, Children } from '../src';
 
+describe('cloneElement', () => {
+  it('cloneElement', () => {
+    const element = <rect />;
+
+    const cloneElement = Children.cloneElement(element, { id: 1 });
+    expect(cloneElement.props.id).toBe(1);
+  });
+
+  it('cloneElement null', () => {
+    const element = null;
+
+    const cloneElement = Children.cloneElement(element, { id: 1 });
+    expect(cloneElement).toBeNull();
+  });
+});
+
 describe('compare', () => {
   it('compare Array', () => {
     const lastElement = (
@@ -77,5 +93,23 @@ describe('compare', () => {
     Children.compare(nextElement.props.children, lastElement.props.children, callback);
 
     expect(callback.mock.calls.length).toBe(4);
+  });
+
+  it('compare item is null', () => {
+    const callback = jest.fn();
+    const lastElement = (
+      <group>
+        {[1, 2].map((id) => (
+          <rect key={id} />
+        ))}
+      </group>
+    );
+    const nextElement = null;
+
+    debugger;
+
+    Children.compare(nextElement, lastElement, callback);
+
+    expect(callback.mock.calls.length).toBe(1);
   });
 });

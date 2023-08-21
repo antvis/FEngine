@@ -1,4 +1,4 @@
-import { isDate, isPlainObject, isNumber, isString, isArray } from '@antv/util';
+import { isPlainObject, isNumber, isString, isArray } from '@antv/util';
 import checkCSSRule from './cssRule';
 
 // 默认设置50
@@ -75,53 +75,6 @@ function batch2hd(px2hd) {
   return batchPx2hd;
 }
 
-function toTimeStamp(value) {
-  if (isString(value)) {
-    if (value.indexOf('T') > 0) {
-      value = new Date(value).getTime();
-    } else {
-      // new Date('2010/01/10') 和 new Date('2010-01-10') 的差别在于:
-      // 如果仅有年月日时，前者是带有时区的: Fri Jan 10 2020 02:40:13 GMT+0800 (中国标准时间)
-      // 后者会格式化成 Sun Jan 10 2010 08:00:00 GMT+0800 (中国标准时间)
-      value = new Date(value.replace(/-/gi, '/')).getTime();
-    }
-  }
-  if (isDate(value)) {
-    value = value.getTime();
-  }
-  return value;
-}
-
-function isInBBox(bbox, point) {
-  const { minX, maxX, minY, maxY } = bbox;
-  const { x, y } = point;
-  return minX <= x && maxX >= x && minY <= y && maxY >= y;
-}
-
-function getElementsByClassName(className: string, element) {
-  if (!element || !className) return [];
-  let rst = [];
-  if (element.get('className') === className) {
-    rst.push(element);
-  }
-  const children = element.get('children');
-  if (children && children.length) {
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      rst = rst.concat(getElementsByClassName(className, child));
-    }
-  }
-  return rst;
-}
-
 const px2hd = batch2hd(defaultPx2hd);
 
-export {
-  px2hd,
-  batch2hd,
-  parsePadding,
-  toTimeStamp,
-  isInBBox,
-  checkCSSRule,
-  getElementsByClassName,
-};
+export { px2hd, batch2hd, parsePadding, checkCSSRule };
