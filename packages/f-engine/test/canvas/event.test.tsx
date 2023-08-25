@@ -36,7 +36,7 @@ describe('Event', () => {
     expect(onClick.mock.calls.length).toBe(0);
   });
 
-  it.skip('new event', async () => {
+  it('new event', async () => {
     const renderer = new Renderer();
     const context = createContext('new event ');
     const ref = { current: null };
@@ -65,15 +65,23 @@ describe('Event', () => {
     gesture.on('press', onPress);
 
     await delay(1000);
-    // 模拟 press 事件
+    // 模拟 pan 事件
     gestureSimulator(context.canvas, 'touchstart', { x: 60, y: 70 });
     gestureSimulator(context.canvas, 'touchmove', { x: 93, y: 35 });
     // 移动出canvas外
     gestureSimulator(context.canvas, 'touchmove', { x: 500, y: 35 });
     gestureSimulator(context.canvas, 'touchend', { x: 93, y: 35 });
 
+    // 模拟 press 事件
+    gestureSimulator(context.canvas, 'touchstart', { x: 60, y: 70 });
+    await delay(300);
+    gestureSimulator(context.canvas, 'touchmove', { x: 93, y: 35 });
+    // 移动出canvas外
+    gestureSimulator(context.canvas, 'touchmove', { x: 500, y: 35 });
+    gestureSimulator(context.canvas, 'touchend', { x: 93, y: 35 });
+
     expect(onPan.mock.calls.length).toBe(2);
-    expect(onPress.mock.calls.length).toBe(2);
+    expect(onPress.mock.calls.length).toBe(3);
   });
 
   it('change data event has changed', async () => {
