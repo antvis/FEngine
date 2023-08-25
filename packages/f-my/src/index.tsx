@@ -1,6 +1,4 @@
 import { Canvas } from '@antv/f-engine';
-import { my as F2Context } from '@antv/f2-context';
-import { raf, caf } from './raf';
 
 function wrapEvent(e) {
   if (!e) return;
@@ -32,40 +30,9 @@ Component({
     this.setCanvasId();
   },
   didMount() {
-    if (isAppX2CanvasEnv()) {
-      return;
+    if (!isAppX2CanvasEnv()) {
+      console.error('当前基础库版本过低，请升级基础库版本到 2.7.0 或以上。');
     }
-    const { id } = this.data;
-    const query = my.createSelectorQuery({ page: this.$page });
-    query
-      .select(`#${id}`)
-      .boundingClientRect()
-      .exec((res) => {
-        // 获取画布实际宽高, 用props的宽高做失败兜底
-        const { width, height } = res && res[0] ? res[0] : this.props;
-        const pixelRatio = getPixelRatio();
-        // 高清解决方案
-        this.setData(
-          {
-            width: width * pixelRatio,
-            height: height * pixelRatio,
-          },
-          () => {
-            const myCtx = my.createCanvasContext(id);
-            const context = F2Context(myCtx);
-            const fCanvas = this.createCanvas({
-              width,
-              height,
-              context,
-              pixelRatio,
-              createImage: (src) => src,
-              requestAnimationFrame: raf,
-              cancelAnimationFrame: caf,
-            });
-            fCanvas.render();
-          },
-        );
-      });
   },
   didUpdate() {
     const { canvas, props } = this;
@@ -106,19 +73,28 @@ Component({
             cancelAnimationFrame,
           } = canvas;
           const pixelRatio = getPixelRatio();
-          canvas.width = width * pixelRatio;
-          canvas.height = height * pixelRatio;
-          const context = canvas.getContext('2d');
-          const fCanvas = this.createCanvas({
-            width,
-            height,
-            pixelRatio,
-            context,
-            createImage,
-            requestAnimationFrame,
-            cancelAnimationFrame,
-          });
-          fCanvas.render();
+
+          // 高清解决方案
+          this.setData(
+            {
+              width: width * pixelRatio,
+              height: height * pixelRatio,
+            },
+            () => {
+              const context = canvas.getContext('2d');
+              const fCanvas = this.createCanvas({
+                width,
+                height,
+                pixelRatio,
+                context,
+                createImage,
+                requestAnimationFrame,
+                cancelAnimationFrame,
+                offscreenCanvas: canvas,
+              });
+              fCanvas.render();
+            },
+          );
         });
     },
     createCanvas({
@@ -129,6 +105,7 @@ Component({
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
+      offscreenCanvas,
     }) {
       if (!width || !height) {
         return;
@@ -143,6 +120,7 @@ Component({
         createImage,
         requestAnimationFrame,
         cancelAnimationFrame,
+        offscreenCanvas,
       });
       this.canvas = canvas;
       this.canvasEl = canvas.getCanvasEl();
