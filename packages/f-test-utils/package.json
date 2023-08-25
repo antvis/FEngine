@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-test-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FEngine for Test",
   "main": "lib/index.js",
   "module": "es/index.js",
