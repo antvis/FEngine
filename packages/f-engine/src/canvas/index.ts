@@ -127,6 +127,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       requestAnimationFrame,
       cancelAnimationFrame,
       offscreenCanvas,
+      isTouchEvent,
+      isMouseEvent,
+      useNativeClickEvent = true,
     } = props;
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
@@ -154,8 +157,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
-      useNativeClickEvent: true,
+      useNativeClickEvent,
       offscreenCanvas,
+      isTouchEvent,
+      isMouseEvent,
     });
 
     const container = canvas.getRoot();

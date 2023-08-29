@@ -2,16 +2,21 @@ import { Component } from '@antv/f-engine';
 
 class Rect extends Component {
   render() {
-    const { index, width = 100 } = this.props;
+    const { index, width = 0 } = this.props;
     return (
-      <group>
+      <group style={{ display: 'flex' }}>
+        <text
+          style={{
+            text: `${index}`,
+            fill: '#000',
+            fontSize: '30px',
+          }}
+        />
         <rect
           style={{
-            x: 0,
-            y: 0,
             fill: 'red',
             width,
-            height: 10,
+            height: '40px',
           }}
           animation={{
             appear: {
@@ -29,14 +34,17 @@ class Rect extends Component {
               property: ['width'],
             },
           }}
-        />
-        <text
-          style={{
-            x: 0,
-            y: 30,
-            text: `${index}`,
-            fill: '#000',
-            fontSize: '30px',
+          onClick={(e) => {
+            console.log('click', e);
+          }}
+          onTouchStart={(e) => {
+            console.log('onTouchStart', e);
+          }}
+          onTouchMove={(e) => {
+            console.log('onTouchMove', e);
+          }}
+          onTouchEnd={(e) => {
+            console.log('onTouchEnd', e);
           }}
         />
       </group>
