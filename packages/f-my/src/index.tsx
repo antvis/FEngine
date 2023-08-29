@@ -1,12 +1,33 @@
 import { Canvas } from '@antv/f-engine';
 
-function wrapEvent(e) {
-  if (!e) return;
-  if (!e.preventDefault) {
-    e.preventDefault = function() {};
-  }
-  return e;
+function convertTouches(touches) {
+  if (!touches) return touches;
+  touches.forEach((touch) => {
+    touch.pageX = 0;
+    touch.pageY = 0;
+    touch.clientX = touch.x;
+    touch.clientY = touch.y;
+  });
+  return touches;
 }
+
+function dispatchEvent(el, event, type) {
+  if (!el || !event) return;
+  if (!event.preventDefault) {
+    event.preventDefault = function() {};
+  }
+  event.type = type;
+  event.target = el;
+  const { touches, changedTouches, detail } = event;
+  event.touches = convertTouches(touches);
+  event.changedTouches = convertTouches(changedTouches);
+  if (detail) {
+    event.clientX = detail.x;
+    event.clientY = detail.y;
+  }
+  el.dispatchEvent(event);
+}
+
 const getPixelRatio = () => my.getSystemInfoSync().pixelRatio;
 
 // 判断是否是新版 canvas 所支持的调用方法（AppX 2.7.0 及以上）
@@ -72,6 +93,7 @@ Component({
             requestAnimationFrame,
             cancelAnimationFrame,
           } = canvas;
+
           const pixelRatio = getPixelRatio();
 
           // 高清解决方案
@@ -90,7 +112,6 @@ Component({
                 createImage,
                 requestAnimationFrame,
                 cancelAnimationFrame,
-                offscreenCanvas: canvas,
               });
               fCanvas.render();
             },
@@ -105,7 +126,6 @@ Component({
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
-      offscreenCanvas,
     }) {
       if (!width || !height) {
         return;
@@ -120,42 +140,28 @@ Component({
         createImage,
         requestAnimationFrame,
         cancelAnimationFrame,
-        offscreenCanvas,
+        // @ts-ignore
+        offscreenCanvas: my.createOffscreenCanvas(),
+        useNativeClickEvent: false,
+        isTouchEvent: (e) => e.type.startsWith('touch'),
+        isMouseEvent: (e) => e.type.startsWith('mouse'),
       });
       this.canvas = canvas;
       this.canvasEl = canvas.getCanvasEl();
       return canvas;
     },
-    click(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      const event = wrapEvent(e);
-      // 包装成 touch 对象
-      event.touches = [e.detail];
-      canvasEl.dispatchEvent('click', event);
+    click() {
+      // 支付宝小程序的 tap 的 event 对象里没有点击的位置信息，拾取不到具体元素，所以关闭 useNativeClickEvent 用 g 里面的 click 实现
+      // dispatchEvent(this.canvasEl, e, 'touchstart');
     },
     touchStart(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchstart', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchstart');
     },
     touchMove(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchmove', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchmove');
     },
     touchEnd(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchend', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchend');
     },
   },
 });

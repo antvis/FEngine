@@ -1,11 +1,31 @@
 import { Canvas } from '@antv/f-engine';
 
-function wrapEvent(e) {
-  if (!e) return;
-  if (!e.preventDefault) {
-    e.preventDefault = function() {};
+function convertTouches(touches) {
+  if (!touches) return touches;
+  touches.forEach((touch) => {
+    touch.pageX = 0;
+    touch.pageY = 0;
+    touch.clientX = touch.x;
+    touch.clientY = touch.y;
+  });
+  return touches;
+}
+
+function dispatchEvent(el, event, type) {
+  if (!el || !event) return;
+  if (!event.preventDefault) {
+    event.preventDefault = function() {};
   }
-  return e;
+  event.type = type;
+  event.target = el;
+  const { touches, changedTouches, detail } = event;
+  event.touches = convertTouches(touches);
+  event.changedTouches = convertTouches(changedTouches);
+  if (detail) {
+    event.clientX = detail.x;
+    event.clientY = detail.y;
+  }
+  el.dispatchEvent(event);
 }
 
 Component({
@@ -33,14 +53,9 @@ Component({
         size: true,
       })
       .exec((res) => {
-        const {
-          node,
-          width,
-          height,
-          createImage,
-          requestAnimationFrame,
-          cancelAnimationFrame,
-        } = res[0];
+        const { node, width, height } = res[0];
+        const { createImage, requestAnimationFrame, cancelAnimationFrame } = node;
+
         const context = node.getContext('2d');
         const pixelRatio = wx.getSystemInfoSync().pixelRatio;
         // 高清设置
@@ -53,15 +68,17 @@ Component({
           height,
           context,
           children,
-          offscreenCanvas: node,
+          // @ts-ignore
+          offscreenCanvas: wx.createOffscreenCanvas({ type: '2d' }),
           createImage,
           requestAnimationFrame,
           cancelAnimationFrame,
+          isTouchEvent: (e) => e.type.startsWith('touch'),
+          isMouseEvent: (e) => e.type.startsWith('mouse'),
         });
-        canvas.render().then(() => {
-          this.canvas = canvas;
-          this.canvasEl = canvas.getCanvasEl();
-        });
+        this.canvas = canvas;
+        this.canvasEl = canvas.getCanvasEl();
+        canvas.render();
       });
   },
 
@@ -90,35 +107,16 @@ Component({
    */
   methods: {
     click(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      const event = wrapEvent(e);
-      // 包装成 touch 对象
-      event.touches = [e.detail];
-      canvasEl.dispatchEvent('click', event);
+      dispatchEvent(this.canvasEl, e, 'click');
     },
     touchStart(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchstart', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchstart');
     },
     touchMove(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchmove', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchmove');
     },
     touchEnd(e) {
-      const canvasEl = this.canvasEl;
-      if (!canvasEl) {
-        return;
-      }
-      canvasEl.dispatchEvent('touchend', wrapEvent(e));
+      dispatchEvent(this.canvasEl, e, 'touchend');
     },
   },
 });
