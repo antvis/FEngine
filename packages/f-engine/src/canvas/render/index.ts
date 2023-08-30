@@ -410,7 +410,7 @@ function updateComponents(components: Component[]) {
     const { timeline } = context;
 
     if (timeline) {
-      timeline.push(animator.animations);
+      // timeline.push(animator.animations);
       timeline.play.animationWillPlay();
     }
 

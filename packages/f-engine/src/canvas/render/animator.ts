@@ -164,7 +164,7 @@ class Animator extends EE {
     this.animations = animations;
 
     if (this.timeline) {
-      this.timeline.push(animations);
+      // this.timeline.push(animations);
     }
     // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
     if (vNode) {
@@ -206,7 +206,7 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.pause();
+      d.finish();
     });
   }
 
@@ -220,6 +220,10 @@ class Animator extends EE {
     finished.then(() => {
       this.emit('end');
     });
+  }
+
+  setAnimations(animations) {
+    this.animations = animations;
   }
 
   reset(shape: DisplayObject) {
