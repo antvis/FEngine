@@ -3,8 +3,6 @@ import { Canvas } from '@antv/f-engine';
 function convertTouches(touches) {
   if (!touches) return touches;
   touches.forEach((touch) => {
-    touch.pageX = 0;
-    touch.pageY = 0;
     touch.clientX = touch.x;
     touch.clientY = touch.y;
   });
@@ -142,7 +140,7 @@ Component({
         cancelAnimationFrame,
         // @ts-ignore
         offscreenCanvas: my.createOffscreenCanvas(),
-        useNativeClickEvent: false,
+        // useNativeClickEvent: false,
         isTouchEvent: (e) => e.type.startsWith('touch'),
         isMouseEvent: (e) => e.type.startsWith('mouse'),
       });
@@ -150,9 +148,8 @@ Component({
       this.canvasEl = canvas.getCanvasEl();
       return canvas;
     },
-    click() {
-      // 支付宝小程序的 tap 的 event 对象里没有点击的位置信息，拾取不到具体元素，所以关闭 useNativeClickEvent 用 g 里面的 click 实现
-      // dispatchEvent(this.canvasEl, e, 'touchstart');
+    click(e) {
+      dispatchEvent(this.canvasEl, e, 'click');
     },
     touchStart(e) {
       dispatchEvent(this.canvasEl, e, 'touchstart');
