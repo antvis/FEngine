@@ -1,3 +1,1 @@
-<view class="container">
-  <f-canvas onRender="onRenderChart" data="{{data}}"></f-canvas>
-</view>
+<canvas id="my-canvas" width="300" height="200" type="2d" onReady="onCanvasReady" onTap="onTap"/>
