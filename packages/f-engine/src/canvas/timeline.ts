@@ -45,7 +45,7 @@ class Timeline {
     const { frame } = this;
     if (this.animations[frame]) {
       animation.map((d) => d.cancel());
-      // return;
+      return;
     }
     this.animations[frame] = animation;
   }
@@ -58,7 +58,7 @@ class Timeline {
   push(animation: IAnimation[]) {
     const { frame } = this;
     if (!this.animations[frame]) return;
-    this.animations[0] = this.animations[frame].concat(animation);
+    this.animations[0] = this.animations[0].concat(animation);
   }
 
   pop() {

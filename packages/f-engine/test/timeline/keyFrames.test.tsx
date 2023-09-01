@@ -4,7 +4,13 @@ import { createContext, delay } from '../util';
 describe('player', () => {
   class View extends Component {
     render() {
-      const { width = '80px', height = '80px', opacity = 1, fill = 'red' } = this.props;
+      const {
+        width = '80px',
+        height = '80px',
+        opacity = 1,
+        fill = 'red',
+        animate = true,
+      } = this.props;
       return (
         <rect
           style={{
@@ -14,24 +20,8 @@ describe('player', () => {
             opacity,
           }}
           animation={{
-            appear: {
-              easing: 'easeOut',
-              duration: 1000,
-              property: ['width'],
-              start: {
-                width: 0,
-              },
-              end: {
-                width,
-              },
-            },
             update: {
               easing: 'linear',
-              duration: 500,
-              property: ['x', 'width', 'height'],
-            },
-            leave: {
-              easing: 'easeIn',
               duration: 500,
               property: ['x', 'width', 'height'],
             },
@@ -40,34 +30,6 @@ describe('player', () => {
       );
     }
   }
-
-  it.skip('元素未改变,只有播控props改变', async () => {
-    const context = createContext('播控props改变');
-    const { props } = (
-      <Canvas context={context}>
-        <Player state="pause">
-          <View />
-        </Player>
-      </Canvas>
-    );
-
-    const canvas = new Canvas(props);
-    await canvas.render();
-    await delay(1000);
-
-    expect(context).toMatchImageSnapshot();
-
-    await canvas.update({
-      children: (
-        <Player state="play">
-          <View />
-        </Player>
-      ),
-    });
-
-    await delay(1000);
-    expect(context).toMatchImageSnapshot();
-  });
 
   it('keyFrames', async () => {
     const context = createContext('切片动画');
@@ -90,7 +52,7 @@ describe('player', () => {
             },
           ]}
         >
-          <View key={'view'} width={'10px'} />
+          <View key={'view'} width={'5px'} />
         </Player>
       </Canvas>
     );
@@ -101,12 +63,14 @@ describe('player', () => {
     expect(context).toMatchImageSnapshot();
   });
 
-  it.only('finish', async () => {
+  it('finish', async () => {
     const context = createContext('动画 finish');
+    const ref = { current: null };
     const { props } = (
       <Canvas context={context}>
         <Player
           state="play"
+          ref={ref}
           keyFrames={[
             {
               view: {
@@ -131,6 +95,7 @@ describe('player', () => {
     await canvas.render();
     await delay(10);
 
+    // ref.current.playKeyFrame(2);
     const { props: newProps } = (
       <Canvas context={context}>
         <Player
@@ -156,65 +121,63 @@ describe('player', () => {
     );
 
     canvas.update(newProps);
-
-    await delay(1000);
+    await delay(100);
     expect(context).toMatchImageSnapshot();
   });
+  //   const context = createContext('重播');
+  //   const ref = { current: null };
+  //   const { props } = (
+  //     <Canvas context={context}>
+  //       <Player
+  //         state="finish"
+  //         keyFrames={[
+  //           {
+  //             view: {
+  //               to: 0,
+  //               key: 'opacity',
+  //             },
+  //           },
+  //           {
+  //             view: {
+  //               to: 0.5,
+  //               key: 'opacity',
+  //             },
+  //           },
+  //         ]}
+  //       >
+  //         <View key={'view'} opacity={1} />
+  //       </Player>
+  //     </Canvas>
+  //   );
 
-  it('replay', async () => {
-    const context = createContext('重播');
-    const { props } = (
-      <Canvas context={context}>
-        <Player
-          state="finish"
-          keyFrames={[
-            {
-              view: {
-                to: 0,
-                key: 'opacity',
-              },
-            },
-            {
-              view: {
-                to: 0.5,
-                key: 'opacity',
-              },
-            },
-          ]}
-        >
-          <View key={'view'} opacity={1} />
-        </Player>
-      </Canvas>
-    );
+  //   const canvas = new Canvas(props);
+  //   await canvas.render();
+  //   await delay(10);
+  //   // ref.current.replay();
+  //   // const { props: newProps } = (
+  //   //   <Canvas context={context}>
+  //   //     <Player
+  //   //       state="play"
+  //   //       keyFrames={[
+  //   //         {
+  //   //           view: {
+  //   //             to: 0,
+  //   //             key: 'opacity',
+  //   //           },
+  //   //         },
+  //   //         {
+  //   //           view: {
+  //   //             to: 0.5,
+  //   //             key: 'opacity',
+  //   //           },
+  //   //         },
+  //   //       ]}
+  //   //     >
+  //   //       <View key={'view'} opacity={1} />
+  //   //     </Player>
+  //   //   </Canvas>
+  //   // );
 
-    const canvas = new Canvas(props);
-    await canvas.render();
-    await delay(10);
-
-    const { props: newProps } = (
-      <Canvas context={context}>
-        <Player
-          state="play"
-          keyFrames={[
-            {
-              view: {
-                to: 0,
-                key: 'opacity',
-              },
-            },
-            {
-              view: {
-                to: 0.5,
-                key: 'opacity',
-              },
-            },
-          ]}
-        >
-          <View key={'view'} opacity={1} />
-        </Player>
-      </Canvas>
-    );
-
-    canvas.update(newProps);
-  });
+  //   // canvas.update(newProps);
+  // });
 });

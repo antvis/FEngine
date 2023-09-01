@@ -51,7 +51,7 @@ class Player extends Component<PlayerProps> {
     const { frame, state: playState } = props;
     const { timeline } = context;
 
-    // timeline.goTo(frame);
+    timeline.goTo(frame);
     timeline.setPlayState(playState);
   }
 
@@ -69,31 +69,32 @@ class Player extends Component<PlayerProps> {
     const { state } = props;
     const { timeline } = context;
 
-    this.playerFrames[0] = this.props.children;
-
     if (state === 'finish' && timeline.getPlayState() !== 'finish') {
       this.setState(({ count }) => ({
         index: count - 1,
       }));
     }
-
-    if (state === 'play' && timeline.getPlayState() === 'finish') {
-      this.setState(() => ({
-        index: 0,
-      }));
-      timeline.reset();
-    }
   }
 
   next = () => {
     const { index, count } = this.state;
-
     if (index < count - 1) {
       this.setState(() => ({
         index: index + 1,
       }));
     }
   };
+
+  playKeyFrame = (index) => {
+    const { context, props } = this;
+    const { state } = props;
+    const { timeline } = context;
+    this.setState(() => ({
+      index: index - 1,
+    }));
+    // timeline.setPlayState('finish');
+  };
+
   animationWillPlay() {
     const { animator, context } = this;
     // @ts-ignore
@@ -106,6 +107,7 @@ class Player extends Component<PlayerProps> {
   }
 
   render() {
+    // console.log(this.state.index);
     return this.playerFrames[this.state.index];
   }
 }
