@@ -23,11 +23,16 @@ class Timeline {
         animator.pause();
         break;
       case 'finish':
+        animator.play();
         animator.finish();
         break;
       default:
         break;
     }
+  }
+
+  getPlayState() {
+    return this.playState;
   }
 
   goTo(frame) {
@@ -40,7 +45,7 @@ class Timeline {
     const { frame } = this;
     if (this.animations[frame]) {
       animation.map((d) => d.cancel());
-      return;
+      // return;
     }
     this.animations[frame] = animation;
   }
@@ -80,6 +85,11 @@ class Timeline {
     });
 
     this.animations = newAnimation;
+  }
+
+  reset() {
+    this.animations = [];
+    this.frame = 0;
   }
 }
 

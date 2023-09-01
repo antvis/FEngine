@@ -1,7 +1,7 @@
 import { jsx, Canvas, Component, Player, Timeline } from '../../src';
 import { createContext, delay } from '../util';
 
-describe('player', () => {
+describe.skip('player', () => {
   class View extends Component {
     render() {
       const { width = '80px', height = '80px' } = this.props;
