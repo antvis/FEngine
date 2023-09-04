@@ -1,50 +1,28 @@
 <script lang="jsx">
 import { toRaw } from 'vue';
 import Canvas from '@antv/f-vue';
-import { Chart, Interval, Axis } from '@antv/f2';
-import Grahpic from './graphic';
-
-const data1 = [
-  { genre: 'Sports', sold: 275 },
-  { genre: 'Strategy', sold: 115 },
-  { genre: 'Action', sold: 120 },
-  { genre: 'Shooter', sold: 350 },
-  { genre: 'Other', sold: 150 },
-];
-
-const data2 = [
-  { genre: 'Sports', sold: 275 },
-  { genre: 'Strategy', sold: 115 },
-  { genre: 'Action', sold: 20 },
-  { genre: 'Shooter', sold: 50 },
-  { genre: 'Other', sold: 50 },
-];
+import Rect from './rect';
 
 export default {
   name: 'App',
   data() {
     return {
-      year: '2021',
-      chartData: data1,
+      index: 1,
+      width: 100,
     }
   },
   mounted() {
     setTimeout(() => {
-      this.year = '2022';
-      this.chartData = data2;
+      this.index = 2;
+      this.width = 200;
     }, 1000);
   },
   render() {
-    const { year, chartData } = this;
+    const { index, width } = this;
     return (
       <div className="container">
         <Canvas pixelRatio={ window.devicePixelRatio }>
-          <Chart data={ toRaw(chartData) }>
-            <Grahpic year={ year } />
-            <Axis field="genre"/>
-            <Axis field="sold"/>
-            <Interval x="genre" y="sold" color="genre" />
-          </Chart>
+          <Rect index={index} width={width}/>
         </Canvas>
       </div>
     );
