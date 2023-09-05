@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.7](https://github.com/antvis/f2/compare/v1.0.6...v1.0.7) (2023-09-05)
+
+**Note:** Version bump only for package @antv/f-react
+
+
+
+
+
 ## 1.0.5 (2023-08-29)
 
 **Note:** Version bump only for package @antv/f-react
