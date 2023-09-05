@@ -31,13 +31,13 @@ class Player extends Component<PlayerProps> {
   constructor(props) {
     super(props);
     const { keyFrames = [], children } = props;
+    this.playerFrames = [this.props.children];
 
-    this.playerFrames = [
-      this.props.children,
-      ...keyFrames.map((cur) => {
-        return handerFrames(cur, children);
-      }),
-    ];
+    keyFrames.forEach((cur) => {
+      const frames = handerFrames(cur, this.playerFrames[this.playerFrames.length - 1]);
+      this.playerFrames.push(frames);
+    });
+
     const count = this.playerFrames.length;
 
     this.state = {
@@ -107,7 +107,6 @@ class Player extends Component<PlayerProps> {
   }
 
   render() {
-    // console.log(this.state.index);
     return this.playerFrames[this.state.index];
   }
 }

@@ -9,8 +9,10 @@ describe('player', () => {
         height = '80px',
         opacity = 1,
         fill = 'red',
+        visible = true,
         animate = true,
       } = this.props;
+      if (!visible) return;
       return (
         <rect
           style={{
@@ -20,6 +22,11 @@ describe('player', () => {
             opacity,
           }}
           animation={{
+            appear: {
+              easing: 'linear',
+              duration: 500,
+              property: ['width'],
+            },
             update: {
               easing: 'linear',
               duration: 500,
@@ -31,8 +38,30 @@ describe('player', () => {
     }
   }
 
-  it('keyFrames', async () => {
-    const context = createContext('切片动画');
+  class View1 extends Component {
+    render() {
+      const { r = 5 } = this.props;
+      return (
+        <circle
+          style={{
+            cx: 100,
+            cy: 40,
+            r,
+            fill: 'yellow',
+          }}
+          animation={{
+            update: {
+              easing: 'linear',
+              duration: 500,
+              property: ['r'],
+            },
+          }}
+        />
+      );
+    }
+  }
+  it('子组件', async () => {
+    const context = createContext('子组件');
     const { props } = (
       <Canvas context={context}>
         <Player
@@ -43,6 +72,50 @@ describe('player', () => {
                 to: '40px',
                 key: 'width',
               },
+              view1: {
+                to: '40px',
+                key: 'r',
+              },
+            },
+            {
+              view: {
+                to: '80px',
+                key: 'width',
+              },
+              view1: {
+                to: '80px',
+                key: 'r',
+              },
+            },
+          ]}
+        >
+          <group>
+            <View key={'view'} width={'5px'} />
+            <View1 key={'view1'} r={'5px'}></View1>
+          </group>
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('keyFrames', async () => {
+    const context = createContext('切片动画');
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: true,
+                key: 'visible',
+              },
             },
             {
               view: {
@@ -52,7 +125,7 @@ describe('player', () => {
             },
           ]}
         >
-          <View key={'view'} width={'5px'} />
+          <View key={'view'} width={'5px'} visible={false} />
         </Player>
       </Canvas>
     );
@@ -124,7 +197,7 @@ describe('player', () => {
     await delay(100);
     expect(context).toMatchImageSnapshot();
   });
-  //   const context = createContext('重播');
+
   //   const ref = { current: null };
   //   const { props } = (
   //     <Canvas context={context}>
