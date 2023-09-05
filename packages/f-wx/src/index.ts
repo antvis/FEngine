@@ -54,7 +54,7 @@ Component({
       })
       .exec((res) => {
         const { node, width, height } = res[0];
-        const { createImage, requestAnimationFrame, cancelAnimationFrame } = node;
+        const { requestAnimationFrame, cancelAnimationFrame } = node;
 
         const context = node.getContext('2d');
         const pixelRatio = wx.getSystemInfoSync().pixelRatio;
@@ -70,7 +70,11 @@ Component({
           children,
           // @ts-ignore
           offscreenCanvas: wx.createOffscreenCanvas({ type: '2d' }),
-          createImage,
+          createImage: () => {
+            // 必须使用 node.createImage， 不能解构，否则会报错,
+            // https://github.com/antvis/F2/issues/1838
+            return node.createImage();
+          },
           requestAnimationFrame,
           cancelAnimationFrame,
           isTouchEvent: (e) => e.type.startsWith('touch'),
