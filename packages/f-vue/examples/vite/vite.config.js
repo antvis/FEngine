@@ -12,7 +12,7 @@ export default defineConfig({
           '@babel/plugin-transform-react-jsx',
           {
             runtime: 'automatic',
-            importSource: '@antv/f2',
+            importSource: '@antv/f-engine',
           },
         ],
       ],

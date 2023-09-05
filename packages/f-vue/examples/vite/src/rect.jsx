@@ -47,11 +47,6 @@ class Rect extends Component {
             console.log('onTouchEnd', e);
           }}
         />
-        <image style={{
-            width: 32,
-            height: 32,
-            src: 'https://f2.antv.antgroup.com/favicon-32x32.png'
-        }} />
       </group>
     );
   }
