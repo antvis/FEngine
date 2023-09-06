@@ -10,7 +10,6 @@ describe('player', () => {
         opacity = 1,
         fill = 'red',
         visible = true,
-        animate = true,
       } = this.props;
       if (!visible) return;
       return (
@@ -60,6 +59,46 @@ describe('player', () => {
       );
     }
   }
+
+  class View3 extends Component {
+    render() {
+      const {
+        width = '80px',
+        height = '80px',
+        opacity = 1,
+        fill = 'red',
+        visible = true,
+      } = this.props;
+      if (!visible) return;
+      return (
+        <group
+          animation={{
+            update: {
+              easing: 'linear',
+              duration: 500,
+              property: ['x', 'width', 'height'],
+            },
+            leave: {
+              easing: 'linear',
+              duration: 1000,
+              property: ['opacity'],
+              end: {
+                opacity: 0,
+              },
+            },
+          }}
+        >
+          <rect
+            style={{
+              width,
+              height,
+              fill,
+            }}
+          />
+        </group>
+      );
+    }
+  }
   it('子组件', async () => {
     const context = createContext('子组件');
     const { props } = (
@@ -69,22 +108,26 @@ describe('player', () => {
           keyFrames={[
             {
               view: {
-                to: '40px',
-                key: 'width',
+                to: {
+                  width: '40px',
+                },
               },
               view1: {
-                to: '40px',
-                key: 'r',
+                to: {
+                  r: '40px',
+                },
               },
             },
             {
               view: {
-                to: '80px',
-                key: 'width',
+                to: {
+                  width: '80px',
+                },
               },
               view1: {
-                to: '80px',
-                key: 'r',
+                to: {
+                  r: '80px',
+                },
               },
             },
           ]}
@@ -113,14 +156,16 @@ describe('player', () => {
             // 先出现，再变宽
             {
               view: {
-                to: true,
-                key: 'visible',
+                to: {
+                  visible: true,
+                },
               },
             },
             {
               view: {
-                to: '80px',
-                key: 'width',
+                to: {
+                  width: '80px',
+                },
               },
             },
           ]}
@@ -147,14 +192,16 @@ describe('player', () => {
           keyFrames={[
             {
               view: {
-                to: '40px',
-                key: 'width',
+                to: {
+                  width: '40px',
+                },
               },
             },
             {
               view: {
-                to: '80px',
-                key: 'width',
+                to: {
+                  width: '80px',
+                },
               },
             },
           ]}
@@ -176,14 +223,16 @@ describe('player', () => {
           keyFrames={[
             {
               view: {
-                to: '40px',
-                key: 'width',
+                to: {
+                  width: '40px',
+                },
               },
             },
             {
               view: {
-                to: '80px',
-                key: 'width',
+                to: {
+                  width: '80px',
+                },
               },
             },
           ]}
@@ -198,59 +247,32 @@ describe('player', () => {
     expect(context).toMatchImageSnapshot();
   });
 
-  //   const ref = { current: null };
-  //   const { props } = (
-  //     <Canvas context={context}>
-  //       <Player
-  //         state="finish"
-  //         keyFrames={[
-  //           {
-  //             view: {
-  //               to: 0,
-  //               key: 'opacity',
-  //             },
-  //           },
-  //           {
-  //             view: {
-  //               to: 0.5,
-  //               key: 'opacity',
-  //             },
-  //           },
-  //         ]}
-  //       >
-  //         <View key={'view'} opacity={1} />
-  //       </Player>
-  //     </Canvas>
-  //   );
+  it.skip('leave 动画', async () => {
+    const context = createContext('动画 finish');
+    const ref = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          ref={ref}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: false,
+                },
+              },
+            },
+          ]}
+        >
+          <View3 key={'view'} width={'80px'} visible={true} />
+        </Player>
+      </Canvas>
+    );
 
-  //   const canvas = new Canvas(props);
-  //   await canvas.render();
-  //   await delay(10);
-  //   // ref.current.replay();
-  //   // const { props: newProps } = (
-  //   //   <Canvas context={context}>
-  //   //     <Player
-  //   //       state="play"
-  //   //       keyFrames={[
-  //   //         {
-  //   //           view: {
-  //   //             to: 0,
-  //   //             key: 'opacity',
-  //   //           },
-  //   //         },
-  //   //         {
-  //   //           view: {
-  //   //             to: 0.5,
-  //   //             key: 'opacity',
-  //   //           },
-  //   //         },
-  //   //       ]}
-  //   //     >
-  //   //       <View key={'view'} opacity={1} />
-  //   //     </Player>
-  //   //   </Canvas>
-  //   // );
-
-  //   // canvas.update(newProps);
-  // });
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(10);
+    expect(context).toMatchImageSnapshot();
+  });
 });

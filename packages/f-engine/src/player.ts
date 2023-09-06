@@ -1,17 +1,12 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Timeline from './canvas/timeline';
-import { handerFrames, playerFrame } from './playerFrames';
-import { IContext } from './types';
+import { generateFrameElement, playerFrame } from './playerFrames';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
 
 export interface PlayerProps {
-  /**
-   * 时间帧
-   */
-  frame?: number;
   /**
    * 播放状态
    */
@@ -23,18 +18,23 @@ export interface PlayerProps {
   children?: JSX.Element | null;
 
   keyFrames?: Record<string, playerFrame>[];
+  /**
+   * 播放结束
+   */
+  onend?: Function;
 }
 
 class Player extends Component<PlayerProps> {
   playerFrames;
   index: number;
+  onend: Function;
   constructor(props) {
     super(props);
     const { keyFrames = [], children } = props;
     this.playerFrames = [this.props.children];
 
     keyFrames.forEach((cur) => {
-      const frames = handerFrames(cur, this.playerFrames[this.playerFrames.length - 1]);
+      const frames = generateFrameElement(cur, this.playerFrames[this.playerFrames.length - 1]);
       this.playerFrames.push(frames);
     });
 
@@ -48,10 +48,9 @@ class Player extends Component<PlayerProps> {
 
   private setPlayState() {
     const { props, context } = this;
-    const { frame, state: playState } = props;
+    const { state: playState } = props;
     const { timeline } = context;
 
-    timeline.goTo(frame);
     timeline.setPlayState(playState);
   }
 
@@ -78,21 +77,14 @@ class Player extends Component<PlayerProps> {
 
   next = () => {
     const { index, count } = this.state;
+    const { onend = () => {} } = this.props;
     if (index < count - 1) {
       this.setState(() => ({
         index: index + 1,
       }));
+    } else {
+      onend();
     }
-  };
-
-  playKeyFrame = (index) => {
-    const { context, props } = this;
-    const { state } = props;
-    const { timeline } = context;
-    this.setState(() => ({
-      index: index - 1,
-    }));
-    // timeline.setPlayState('finish');
   };
 
   animationWillPlay() {
@@ -102,7 +94,7 @@ class Player extends Component<PlayerProps> {
     const { animations } = animator;
     timeline.add(animations);
     animator.animations = timeline.getAnimation();
-    console.log(animator.animations);
+
     this.setPlayState();
   }
 

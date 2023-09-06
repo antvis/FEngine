@@ -58,7 +58,7 @@ class Timeline {
   push(animation: IAnimation[]) {
     const { frame } = this;
     if (!this.animations[frame]) return;
-    this.animations[0] = this.animations[0].concat(animation);
+    this.animations[0] = this.animations[frame].concat(animation);
   }
 
   pop() {
@@ -85,11 +85,6 @@ class Timeline {
     });
 
     this.animations = newAnimation;
-  }
-
-  reset() {
-    this.animations = [];
-    this.frame = 0;
   }
 }
 

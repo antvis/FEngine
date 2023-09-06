@@ -71,7 +71,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   });
 
   const { timeline } = nextNode?.context;
-  // timeline && timeline.delete(lastAnimation);
+  timeline && timeline.delete(lastAnimation);
 
   animator.once('end', () => {
     applyStyle(nextShape, endStyle);
@@ -264,7 +264,7 @@ function destroyAnimation(node: VNode) {
       const endStyle = end;
 
       animator.animate(shape, startStyle, endStyle, animationEffect);
-      // timeline && timeline.delete(animator.animations);
+      timeline && timeline.delete(animator.animations);
     }
 
     // 动画结束后，删除图形（包括子元素动画）
