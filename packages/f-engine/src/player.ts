@@ -31,15 +31,12 @@ class Player extends Component<PlayerProps> {
   constructor(props) {
     super(props);
     const { keyFrames = [], children } = props;
-    this.playerFrames = [];
 
-    keyFrames.forEach((cur) => {
-      const frames = generateFrameElement(
-        cur,
-        this.playerFrames[this.playerFrames.length - 1] || this.props.children,
-      );
-      this.playerFrames.push(frames);
-    });
+    this.playerFrames = keyFrames.reduce((array, cur) => {
+      const frames = generateFrameElement(cur, array[array.length - 1] || children);
+      array.push(frames);
+      return array;
+    }, []);
 
     const count = this.playerFrames.length;
 
