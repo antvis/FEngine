@@ -31,10 +31,13 @@ class Player extends Component<PlayerProps> {
   constructor(props) {
     super(props);
     const { keyFrames = [], children } = props;
-    this.playerFrames = [this.props.children];
+    this.playerFrames = [];
 
     keyFrames.forEach((cur) => {
-      const frames = generateFrameElement(cur, this.playerFrames[this.playerFrames.length - 1]);
+      const frames = generateFrameElement(
+        cur,
+        this.playerFrames[this.playerFrames.length - 1] || this.props.children,
+      );
       this.playerFrames.push(frames);
     });
 

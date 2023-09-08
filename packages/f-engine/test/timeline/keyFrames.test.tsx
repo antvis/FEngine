@@ -109,6 +109,18 @@ describe('player', () => {
             {
               view: {
                 to: {
+                  width: '5px',
+                },
+              },
+              view1: {
+                to: {
+                  r: '5px',
+                },
+              },
+            },
+            {
+              view: {
+                to: {
                   width: '40px',
                 },
               },
@@ -157,20 +169,22 @@ describe('player', () => {
             {
               view: {
                 to: {
-                  visible: true,
+                  visible: false,
+                  width: '5px',
                 },
               },
             },
             {
               view: {
                 to: {
+                  visible: true,
                   width: '80px',
                 },
               },
             },
           ]}
         >
-          <View key={'view'} width={'5px'} visible={false} />
+          <View key={'view'} />
         </Player>
       </Canvas>
     );
@@ -190,6 +204,13 @@ describe('player', () => {
           state="play"
           ref={ref}
           keyFrames={[
+            {
+              view: {
+                to: {
+                  width: '10px',
+                },
+              },
+            },
             {
               view: {
                 to: {
@@ -224,6 +245,13 @@ describe('player', () => {
             {
               view: {
                 to: {
+                  width: '10px',
+                },
+              },
+            },
+            {
+              view: {
+                to: {
                   width: '40px',
                 },
               },
@@ -237,7 +265,7 @@ describe('player', () => {
             },
           ]}
         >
-          <View key={'view'} width={'10px'} />
+          <View key={'view'} />
         </Player>
       </Canvas>
     );
@@ -259,13 +287,20 @@ describe('player', () => {
             {
               view: {
                 to: {
+                  visible: true,
+                },
+              },
+            },
+            {
+              view: {
+                to: {
                   visible: false,
                 },
               },
             },
           ]}
         >
-          <View3 key={'view'} width={'80px'} visible={true} />
+          <View3 key={'view'} width={'80px'} />
         </Player>
       </Canvas>
     );
