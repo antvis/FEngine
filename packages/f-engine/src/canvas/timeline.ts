@@ -23,11 +23,16 @@ class Timeline {
         animator.pause();
         break;
       case 'finish':
+        animator.play();
         animator.finish();
         break;
       default:
         break;
     }
+  }
+
+  getPlayState() {
+    return this.playState;
   }
 
   goTo(frame) {

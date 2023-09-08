@@ -206,7 +206,7 @@ class Animator extends EE {
     const { animations } = this;
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
-      d.pause();
+      d.finish();
     });
   }
 
