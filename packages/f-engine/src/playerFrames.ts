@@ -1,4 +1,4 @@
-import Children from '../src/children';
+import Children from './children';
 
 export interface playerFrame {
   to: Record<string, any>;
