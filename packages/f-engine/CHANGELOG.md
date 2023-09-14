@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.10](https://github.com/antvis/FEngine/compare/v1.0.9...v1.0.10) (2023-09-14)
+
+
+### Bug Fixes
+
+* 动画闪烁问题 ([#232](https://github.com/antvis/FEngine/issues/232)) ([d17c9eb](https://github.com/antvis/FEngine/commit/d17c9eb14c222a406d542fdcc050deb6f0128648))
+
+
+
+
+
 ## 1.0.9 (2023-09-11)
 
 **Note:** Version bump only for package @antv/f-engine
