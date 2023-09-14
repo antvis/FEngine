@@ -59,8 +59,14 @@ class Player extends Component<PlayerProps> {
   }
 
   didMount(): void {
-    const { animator } = this;
+    const { animator, props } = this;
+    const { state } = props;
     animator.on('end', this.next);
+    if (state === 'finish') {
+      this.setState(({ count }) => ({
+        index: count - 1,
+      }));
+    }
   }
 
   willUpdate(): void {
@@ -77,8 +83,9 @@ class Player extends Component<PlayerProps> {
 
   next = () => {
     const { index, count } = this.state;
-    const { onend = () => {} } = this.props;
-    if (index < count - 1) {
+    const { onend = () => {}, state } = this.props;
+
+    if (index < count - 1 && state === 'play') {
       this.setState(() => ({
         index: index + 1,
       }));
