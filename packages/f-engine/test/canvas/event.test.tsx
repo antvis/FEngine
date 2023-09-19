@@ -236,4 +236,30 @@ describe('Event', () => {
     expect(onGroupClickCallback.mock.calls.length).toBe(0);
     expect(onRectClickCallback.mock.calls.length).toBe(1);
   });
+
+  it('null event', async () => {
+    const renderer = new Renderer();
+    const context = createContext('null event ');
+    const ref = { current: null };
+    const { props } = (
+      <Canvas renderer={renderer} context={context}>
+        <group>
+          <rect
+            ref={ref}
+            style={{
+              width: '200px',
+              height: '200px',
+              fill: 'red',
+            }}
+          />
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    const gesture = new Gesture(ref.current);
+    gesture.on(null, () => {});
+  });
 });
