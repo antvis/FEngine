@@ -8,11 +8,13 @@ class Gesture {
   }
 
   on(eventName: string, listener: (...args: any[]) => void) {
+    if (!eventName) return;
     const { el } = this;
     el.addEventListener(eventName, listener);
   }
 
   off(eventName: string, listener: (...args: any[]) => void) {
+    if (!eventName) return;
     const { el } = this;
     el.removeEventListener(eventName, listener);
   }
