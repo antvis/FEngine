@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.11](https://github.com/antvis/FEngine/compare/v1.0.10...v1.0.11) (2023-10-07)
+
+
+### Bug Fixes
+
+* event 为 null ([#237](https://github.com/antvis/FEngine/issues/237)) ([98702b9](https://github.com/antvis/FEngine/commit/98702b9fe873ce7344986b4b62f32b7ab3121b5b))
+* **ts:** jsx.element key 类型和 react 保持一致 ([#238](https://github.com/antvis/FEngine/issues/238)) ([d151147](https://github.com/antvis/FEngine/commit/d151147f838ef6365b339004e7dd6df4191fc2a6))
+
+
+
+
+
 ## [1.0.10](https://github.com/antvis/FEngine/compare/v1.0.9...v1.0.10) (2023-09-14)
 
 
