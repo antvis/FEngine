@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.12](https://github.com/antvis/f2/compare/v1.0.11...v1.0.12) (2023-10-09)
+
+
+### Bug Fixes
+
+* **f-my:** 兼容未配置 component2: true 的情况 ([#241](https://github.com/antvis/f2/issues/241)) ([fd1569d](https://github.com/antvis/f2/commit/fd1569dc3319ab04181f6e9adae0bbaf7dc38a2e))
+
+
+
+
+
 ## [1.0.11](https://github.com/antvis/f2/compare/v1.0.10...v1.0.11) (2023-10-07)
 
 **Note:** Version bump only for package @antv/f-my
