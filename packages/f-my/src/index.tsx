@@ -54,6 +54,10 @@ Component({
     if (!isAppX2CanvasEnv()) {
       console.error('当前基础库版本过低，请升级基础库版本到 2.7.0 或以上。');
     }
+    // 为了兼容未配置 "component2": true 的情况
+    if (!this.data.id) {
+      this.setCanvasId();
+    }
   },
   didUpdate() {
     const { canvas, props } = this;
