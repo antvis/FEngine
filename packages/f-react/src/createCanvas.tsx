@@ -14,6 +14,7 @@ export interface CanvasProps {
   children?: React.ReactElement | React.ReactElement[] | null;
   fallback?: JSX.Element | null;
   onError?: (error: Error) => void;
+  autoFit?: boolean;
 }
 
 export interface CanvasState {
@@ -50,12 +51,21 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
   return class ReactCanvas extends Component<CanvasProps, CanvasState> {
     canvasRef: RefObject<HTMLCanvasElement>;
     canvas: Canvas;
+    parentNode: {
+      width: number;
+      height: number;
+    };
+    observer: MutationObserver;
 
     constructor(props: CanvasProps) {
       super(props);
       const { canvasRef } = props;
       this.canvasRef = canvasRef || createRef();
       this.state = { error: null };
+      this.parentNode = {
+        width: 0,
+        height: 0,
+      };
     }
 
     catchError(error) {
@@ -99,6 +109,34 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       canvas.render().catch((error) => {
         this.catchError(error);
       });
+
+      this.observeElement();
+    }
+
+    observeElement() {
+      if (!this.props?.autoFit) return;
+      const targetNode = this.canvasRef.current?.parentElement;
+      window?.addEventListener('resize', () => {
+        this.resize();
+      });
+
+      const observerConfig = { attributes: true };
+      this.observer = new MutationObserver(() => {
+        this.resize();
+      });
+      this.observer.observe(targetNode, observerConfig);
+    }
+
+    resize() {
+      const targetNode = this.canvasRef.current?.parentElement;
+      const { width: lastWidth, height: lastHeight } = targetNode.getBoundingClientRect();
+      if (lastWidth === this.parentNode.width && lastHeight === this.parentNode.height) return;
+      this.parentNode = {
+        width: lastWidth,
+        height: lastHeight,
+      };
+
+      this.canvas.resize(lastWidth, lastHeight);
     }
 
     componentDidUpdate() {
@@ -146,6 +184,10 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       if (!canvas) return;
       canvas.destroy();
       this.canvas = null;
+
+      if (!this.observer) return;
+      this.observer.disconnect();
+      this.observer = null;
     }
   };
 };
