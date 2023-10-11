@@ -6,6 +6,7 @@ import { Shape } from '../workTags';
 import findClosestShapeNode from './findClosestShapeNode';
 import Animator from './animator';
 import applyStyle from './applyStyle';
+import { isEqual } from '@antv/util';
 
 function findAllShapeNode(vNode: VNode | VNode[] | null) {
   const shapeNodes = [];
@@ -161,6 +162,11 @@ function updateAnimation(nextNode, lastNode) {
     // 组件，直接更新
     if (nextTag !== Shape) {
       applyStyle(nextShape, style);
+      return animator;
+    }
+
+    // 样式无改变，无更新
+    if (isEqual(nextStyle, lastStyle)) {
       return animator;
     }
 
