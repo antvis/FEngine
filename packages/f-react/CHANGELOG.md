@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/antvis/f2/compare/v1.0.12...v1.1.0) (2023-10-26)
+
+
+### Features
+
+* autoFit自动resize ([#243](https://github.com/antvis/f2/issues/243)) ([8391fd8](https://github.com/antvis/f2/commit/8391fd861d635407a3e0953842c0d2087d3ac6be))
+
+
+
+
+
 ## [1.0.11](https://github.com/antvis/f2/compare/v1.0.10...v1.0.11) (2023-10-07)
 
 **Note:** Version bump only for package @antv/f-react

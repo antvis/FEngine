@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/antvis/FEngine/compare/v1.0.12...v1.1.0) (2023-10-26)
+
+
+### Bug Fixes
+
+* **shape:** 修复 sector & arc 角度从非 0 到 0 不更新 ([#245](https://github.com/antvis/FEngine/issues/245)) ([13afa9f](https://github.com/antvis/FEngine/commit/13afa9f1c077af8a78158ceeb7d7e1b7032d0d06))
+* update 动画 ([#244](https://github.com/antvis/FEngine/issues/244)) ([5c64d3e](https://github.com/antvis/FEngine/commit/5c64d3ebc65d67624ff43ef9fa087eb09d55c8ed))
+
+
+
+
+
 ## [1.0.11](https://github.com/antvis/FEngine/compare/v1.0.10...v1.0.11) (2023-10-07)
 
 
