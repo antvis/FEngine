@@ -287,6 +287,33 @@ describe('动画', () => {
     }
   }
 
+  class ViewTest extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        index: 0,
+      };
+    }
+    didMount(): void {
+      this.setState({
+        index: 2,
+      });
+    }
+    render() {
+      const { animation } = this.props;
+      return (
+        <rect
+          style={{
+            width: '80px',
+            height: '80px',
+            fill: 'red',
+          }}
+          animation={animation}
+        />
+      );
+    }
+  }
+
   it('component animation', async () => {
     const { props } = (
       <Canvas context={context}>
@@ -312,6 +339,35 @@ describe('动画', () => {
     const canvas = new Canvas(props);
     await canvas.render();
     await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('component update', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <ViewTest
+          animation={{
+            update: {
+              easing: 'easeOut',
+              duration: 100,
+              property: ['width'],
+              start: {
+                width: 0,
+              },
+              // end: {
+              //   width: 80,
+              // },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    await delay(200);
+    const canvas = new Canvas(props);
+    await canvas.render();
+    // 没有动画，直接渲染完整的矩形
+    await delay(50);
     expect(context).toMatchImageSnapshot();
   });
 });
