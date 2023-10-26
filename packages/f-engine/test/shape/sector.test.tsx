@@ -358,4 +358,46 @@ describe('Sector', () => {
       expect(context).toMatchImageSnapshot();
     });
   });
+
+  it('角度从非0到0', async () => {
+    const { props } = (
+      <Canvas context={context} pixelRatio={1}>
+        <sector
+          style={{
+            cx: 150,
+            cy: 120,
+            fill: 'red',
+            startAngle: '-1.57rad',
+            endAngle: '4.36rad',
+            r0: 60,
+            r: 100,
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+
+    const update = (
+      <Canvas context={context} pixelRatio={1}>
+        <sector
+          style={{
+            cx: 150,
+            cy: 120,
+            fill: 'red',
+            startAngle: '1rad',
+            endAngle: '1rad',
+            r0: 60,
+            r: 100,
+          }}
+        />
+      </Canvas>
+    );
+    await canvas.update(update.props);
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
 });
