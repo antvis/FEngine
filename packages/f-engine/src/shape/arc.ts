@@ -62,6 +62,7 @@ export class Arc extends Path {
     const { cx = 0, cy = 0, startAngle, endAngle, r, anticlockwise } = this.parsedStyle;
 
     if (isNil(startAngle) || isNil(endAngle) || startAngle === endAngle || isNil(r) || r <= 0) {
+      super.setAttribute('path', '');
       return;
     }
 
