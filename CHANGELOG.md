@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/antvis/FEngine/compare/v1.1.0...v1.1.1) (2023-11-24)
+
+
+### Bug Fixes
+
+* 修复 morph 动画时，目标元素被删除 ([#248](https://github.com/antvis/FEngine/issues/248)) ([c017bf1](https://github.com/antvis/FEngine/commit/c017bf1373b0d6c8fe17290760f77e7d7ea0bb0e))
+
+
+
+
+
 # [1.1.0](https://github.com/antvis/FEngine/compare/v1.0.12...v1.1.0) (2023-10-26)
 
 
