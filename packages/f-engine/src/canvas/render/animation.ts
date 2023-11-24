@@ -75,6 +75,9 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   timeline && timeline.delete(lastAnimation);
 
   animator.once('end', () => {
+    if (nextShape.destroyed) {
+      return;
+    }
     applyStyle(nextShape, endStyle);
     pathShape.replaceWith(nextShape);
   });
