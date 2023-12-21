@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/antvis/FEngine/compare/v1.1.1...v1.1.2) (2023-12-21)
+
+
+### Bug Fixes
+
+* timeline 更新不生效 ([#250](https://github.com/antvis/FEngine/issues/250)) ([8671b33](https://github.com/antvis/FEngine/commit/8671b33f4fdcef6a404294d4b18c8d8373fdb883))
+
+
+
+
+
 ## [1.1.1](https://github.com/antvis/FEngine/compare/v1.1.0...v1.1.1) (2023-11-24)
 
 
