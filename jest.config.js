@@ -17,6 +17,7 @@ module.exports = {
   testPathIgnorePatterns: [],
   testRegex: '/test/.*\\.test\\.tsx?$',
   setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
+  testTimeout: 10000,
   transform: {
     '^.+\\.[tj]s$': 'ts-jest',
   },

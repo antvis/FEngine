@@ -113,5 +113,21 @@ describe('Timeline', () => {
 
     await delay(2000);
     expect(context).toMatchImageSnapshot();
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Timeline start={1} autoPlay={false}>
+          {[10, 100].map((v, index) => {
+            return <Rect ref={rectRef} index={index} width={v} />;
+          })}
+          <Cirlce transformFrom={rectRef} index={2} />
+        </Timeline>
+      </Canvas>
+    );
+
+    await delay(500);
+    await canvas.update(newProps);
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
   });
 });

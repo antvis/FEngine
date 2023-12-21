@@ -1,6 +1,7 @@
 import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Children from './children';
+import { isNumber } from '@antv/util';
 
 export interface TimelineProps {
   /**
@@ -34,22 +35,37 @@ class Timeline extends Component<TimelineProps> {
   index: number;
   delay: number;
 
+  private timer: any;
+
   constructor(props: TimelineProps) {
     super(props);
-    const { delay, start = 0, children } = props;
+    const { delay, start = 0, children, autoPlay } = props;
     const count = Children.toArray(children as JSX.Element).length;
 
     this.state = {
       delay,
       count,
       index: start,
+      autoPlay,
     };
   }
 
   didMount() {
-    const { autoPlay = true } = this.props;
-    if (autoPlay) {
-      this.animator.on('end', this.next);
+    this.animator.on('end', this.next);
+  }
+
+  willReceiveProps(nextProps: TimelineProps): void {
+    const { start: nextStart, delay: nextDelay, autoPlay: nextAutoPlay } = nextProps;
+    const { index, delay, autoPlay } = this.state;
+
+    if (isNumber(nextStart) || nextDelay !== delay || nextAutoPlay !== autoPlay) {
+      // 更新时清除 setTimeout
+      clearTimeout(this.timer);
+      this.setState({
+        delay: nextDelay,
+        index: isNumber(nextStart) ? nextStart : index,
+        autoPlay: nextAutoPlay,
+      });
     }
   }
 
@@ -59,18 +75,21 @@ class Timeline extends Component<TimelineProps> {
 
   next = () => {
     const { state, props } = this;
-    const { index, count, delay } = state;
-    const { loop, autoPlay = true } = props;
+    const { index, count, delay, autoPlay } = state;
+    const { loop } = props;
 
-    const next = loop ? (index + 1) % count : index + 1;
-
-    if (next < count && autoPlay) {
-      setTimeout(() => {
-        this.setState({
-          index: next,
-        });
-      }, delay || 0);
+    if (autoPlay === false) {
+      return;
     }
+    const next = loop ? (index + 1) % count : index + 1;
+    if (next >= count) {
+      return;
+    }
+    this.timer = setTimeout(() => {
+      this.setState({
+        index: next,
+      });
+    }, delay || 0);
   };
 
   render() {
