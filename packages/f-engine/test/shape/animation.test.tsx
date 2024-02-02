@@ -343,4 +343,41 @@ describe('Canvas', () => {
     await delay(1500);
     expect(context).toMatchImageSnapshot();
   });
+
+  it('text number', async () => {
+    const context = createContext('text-number');
+    const onFrame = jest.fn();
+    const { props } = (
+      <Canvas context={context} pixelRatio={1}>
+        <text
+          style={{
+            x: 10,
+            y: 10,
+            fill: '#000',
+            text: 'index: 100',
+          }}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 100,
+              // property: [],
+              onFrame: (t) => {
+                onFrame();
+                return {
+                  text: `index: ${(100 * t).toFixed(0)}`,
+                };
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await delay(100);
+    await canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+    expect(onFrame).toBeCalled();
+  });
 });

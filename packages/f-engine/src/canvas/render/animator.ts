@@ -43,11 +43,11 @@ class Animator extends EE {
         iterations,
         clip,
         direction = 'normal',
-        onFrame = () => {},
-        onEnd = () => {},
+        onFrame,
+        onEnd,
       } = effect;
       // shape 动画
-      if (property.length && duration > 0) {
+      if ((property.length || onFrame) && duration > 0) {
         // 应用样式
         const style = { ...omit(start, property), ...omit(end, property) };
         applyStyle(shape, style);
@@ -68,8 +68,23 @@ class Animator extends EE {
           direction,
         });
         if (animation) {
-          animation.onframe = onFrame;
-          animation.onfinish = onEnd;
+          const onframe = onFrame
+            ? (e) => {
+                const animationTarget = e.target;
+                const timing = animationTarget.effect.getTiming();
+                const duration = timing.duration;
+                const t = e.currentTime / duration;
+                applyStyle(shape, onFrame(t, e));
+              }
+            : null;
+          animation.onframe = onframe;
+          animation.onfinish =
+            onframe || onEnd
+              ? (e) => {
+                  onframe && onframe(e);
+                  onEnd && onEnd(e);
+                }
+              : null;
 
           // 过滤无限循环的动画
           if (iterations !== Infinity) {
