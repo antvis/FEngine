@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/antvis/FEngine/compare/v1.1.2...v1.2.0) (2024-02-02)
+
+
+### Features
+
+* text 支持数值变化动画 ([#253](https://github.com/antvis/FEngine/issues/253)) ([129a768](https://github.com/antvis/FEngine/commit/129a768084cc2e788a6c7060077fdc9e10d65f3b))
+
+
+
+
+
 ## [1.1.2](https://github.com/antvis/FEngine/compare/v1.1.1...v1.1.2) (2023-12-21)
 
 
