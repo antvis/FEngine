@@ -5,8 +5,8 @@ import { Canvas, CanvasProps as FCanvasProps, Children } from '@antv/f-engine';
 export interface CanvasProps {
   className?: string;
   pixelRatio?: number;
-  width?: number | string;
-  height?: number | string;
+  width?: number;
+  height?: number;
   padding?: (string | number)[];
   animate?: boolean;
   canvasRef?: RefObject<HTMLCanvasElement>;
@@ -131,12 +131,16 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       const targetNode = this.canvasRef.current?.parentElement;
       const { width: lastWidth, height: lastHeight } = targetNode.getBoundingClientRect();
       if (lastWidth === this.parentNode.width && lastHeight === this.parentNode.height) return;
+
+      // 记录父容器的宽高
       this.parentNode = {
         width: lastWidth,
         height: lastHeight,
       };
 
-      this.canvas.resize(lastWidth, lastHeight);
+      // 优先props的宽高
+      const { width: customWidth, height: customHeight } = this.props;
+      this.canvas.resize(customWidth || lastWidth, customHeight || lastHeight);
     }
 
     componentDidUpdate() {
