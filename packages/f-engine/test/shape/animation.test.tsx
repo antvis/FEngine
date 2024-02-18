@@ -348,21 +348,34 @@ describe('Canvas', () => {
     const context = createContext('text-number');
     const onFrame = jest.fn();
     const { props } = (
-      <Canvas context={context} pixelRatio={1}>
+      <Canvas context={context}>
         <text
           style={{
             x: 10,
             y: 10,
             fill: '#000',
             text: 'index: 100',
+            // @ts-ignore
+            number: 100,
           }}
           animation={{
             appear: {
               easing: 'quadraticOut',
               duration: 100,
               // property: [],
-              onFrame: (t) => {
-                onFrame();
+              onFrame: (t, animationContext) => {
+                onFrame(t, animationContext);
+                return {
+                  text: `index: ${(100 * t).toFixed(0)}`,
+                };
+              },
+            },
+            update: {
+              easing: 'quadraticOut',
+              duration: 100,
+              // property: [],
+              onFrame: (t, animationContext) => {
+                onFrame(t, animationContext);
                 return {
                   text: `index: ${(100 * t).toFixed(0)}`,
                 };
@@ -376,8 +389,65 @@ describe('Canvas', () => {
     const canvas = new Canvas(props);
     await delay(100);
     await canvas.render();
-    await delay(500);
+    await delay(1000);
     expect(context).toMatchImageSnapshot();
     expect(onFrame).toBeCalled();
+
+    const lastCall = onFrame.mock.calls[onFrame.mock.calls.length - 1];
+    expect(typeof lastCall[0]).toBe('number');
+    expect(lastCall[1].start).toBeDefined();
+    expect(lastCall[1].end).toBeDefined();
+    expect(lastCall[1].shape).toBeDefined();
+    expect(lastCall[1].animation).toBeDefined();
+
+    const { props: nextProps } = (
+      <Canvas context={context}>
+        <text
+          style={{
+            x: 10,
+            y: 10,
+            fill: '#000',
+            text: 'index: 1000',
+            // @ts-ignore
+            number: 1000,
+          }}
+          data-number={1000}
+          animation={{
+            appear: {
+              easing: 'quadraticOut',
+              duration: 100,
+              // property: [],
+              onFrame: (t, animationContext) => {
+                onFrame(t, animationContext);
+                return {
+                  text: `index: ${(100 * t).toFixed(0)}`,
+                };
+              },
+            },
+            update: {
+              easing: 'quadraticOut',
+              duration: 100,
+              // property: [],
+              onFrame: (t, animationContext) => {
+                onFrame(t, animationContext);
+                return {
+                  text: `index: ${(100 * t).toFixed(0)}`,
+                };
+              },
+            },
+          }}
+        />
+      </Canvas>
+    );
+
+    await canvas.update(nextProps);
+
+    await delay(1000);
+    const updateLastCall = onFrame.mock.calls[onFrame.mock.calls.length - 1];
+    expect(typeof updateLastCall[0]).toBe('number');
+    expect(updateLastCall[1].start).toBeDefined();
+    expect(updateLastCall[1].end).toBeDefined();
+    expect(updateLastCall[1].shape).toBeDefined();
+    expect(updateLastCall[1].animation).toBeDefined();
   });
 });

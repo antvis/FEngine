@@ -172,7 +172,7 @@ interface AnimationBase {
   end?: ShapeStyleProps;
   direction?: 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
   iterations?: number;
-  onFrame?: (t: number) => any;
+  onFrame?: (t: number, context?: any) => any;
   onEnd?: () => any;
 }
 
