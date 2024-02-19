@@ -55,7 +55,7 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       width: number;
       height: number;
     };
-    observer: MutationObserver;
+    observer: ResizeObserver;
 
     constructor(props: CanvasProps) {
       super(props);
@@ -120,17 +120,23 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
         this.resize();
       });
 
-      const observerConfig = { attributes: true };
-      this.observer = new MutationObserver(() => {
-        this.resize();
-      });
-      this.observer.observe(targetNode, observerConfig);
+      if (typeof ResizeObserver !== 'undefined') {
+        this.observer = new ResizeObserver(() => {
+          this.resize();
+        });
+        this.observer.observe(targetNode);
+      }
     }
 
     resize() {
       const targetNode = this.canvasRef.current?.parentElement;
       const { width: lastWidth, height: lastHeight } = targetNode.getBoundingClientRect();
-      if (lastWidth === this.parentNode.width && lastHeight === this.parentNode.height) return;
+      if (
+        (lastWidth === this.parentNode.width && lastHeight === this.parentNode.height) ||
+        !lastWidth ||
+        !lastHeight
+      )
+        return;
       this.parentNode = {
         width: lastWidth,
         height: lastHeight,
