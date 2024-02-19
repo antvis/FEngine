@@ -71,10 +71,20 @@ class Animator extends EE {
           const onframe = onFrame
             ? (e) => {
                 const animationTarget = e.target;
-                const timing = animationTarget.effect.getTiming();
+                const effect = animationTarget.effect;
+                const timing = effect.getTiming();
                 const duration = timing.duration;
                 const t = e.currentTime / duration;
-                applyStyle(shape, onFrame(t, e));
+                const shape = effect.target;
+                // 动画的一些上下文信息
+                const context = {
+                  t,
+                  start,
+                  end,
+                  animation: animationTarget,
+                  shape,
+                };
+                applyStyle(shape, onFrame(t, context));
               }
             : null;
           animation.onframe = onframe;
