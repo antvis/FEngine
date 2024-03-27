@@ -12,6 +12,10 @@ class Timeline {
     this.play = playComponent;
   }
 
+  clear() {
+    const { frame } = this;
+    this.animations[frame] = [];
+  }
   setPlayState(state) {
     this.playState = state;
     const { animator } = this.play;

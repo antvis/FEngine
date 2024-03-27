@@ -4,12 +4,14 @@ import { createContext, delay } from '../util';
 describe('player', () => {
   class View extends Component {
     render() {
+      
       const {
         width = '80px',
         height = '80px',
         opacity = 1,
         fill = 'red',
         visible = true,
+        fillFunc
       } = this.props;
       if (!visible) return;
       return (
@@ -17,7 +19,7 @@ describe('player', () => {
           style={{
             width,
             height,
-            fill,
+            fill: fillFunc ? fillFunc() : fill ,
             opacity,
           }}
           animation={{
@@ -29,7 +31,7 @@ describe('player', () => {
             update: {
               easing: 'linear',
               duration: 500,
-              property: ['x', 'width', 'height'],
+              property: ['x', 'fill','width', 'height'],
             },
           }}
         />
@@ -275,6 +277,135 @@ describe('player', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  it('更新子组件 props', async () => {
+    const context = createContext('更新子组件 props');
+    const ref = { current: null };
+    const callback = jest.fn();
+    let color = "red"
+    const { props } = (
+      <Canvas context={context} >
+        <Player
+          state="play"
+          ref={ref}
+          onend={callback}
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: false,
+                  width: '5px',
+                },
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+              },
+            },
+          ]}
+        >
+          <View key={'view'} fillFunc={()=>{
+            return color
+          }}/>
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(2000);
+
+    color = "yellow"
+    const { props: nextProps } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: false,
+                  width: '5px',
+                },
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+              },
+            },
+          ]}
+          onend={callback}
+        >
+          <View 
+          key={'view'} 
+          fillFunc={()=>{
+            return color
+          }}/>
+        </Player>
+      </Canvas>
+    );
+    canvas.update(nextProps)
+    await delay(2000);
+
+    expect(callback.mock.calls.length).toBe(1);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('执行完清空动画', async () => {
+    const context = createContext('清空动画');
+    const ref = {current: null}
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+        ref={ref}
+          state="play"
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+              },
+            },
+            {
+              view1: {
+                to: {
+                  visible: true,
+                },
+              },
+            },
+            {
+              view1: {
+                to: {
+                  visible: false,
+                },
+              },
+            },
+          ]}
+        >
+          <group>
+          <View key={'view'} />
+         <View1 key={'view1'}></View1>
+         </group>
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(2000);
+    expect(ref.current.context.timeline.animations[0].length).toEqual(0)
+  });
   it.skip('leave 动画', async () => {
     const context = createContext('动画 finish');
     const ref = { current: null };
