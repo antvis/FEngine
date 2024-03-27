@@ -2,6 +2,8 @@ import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Timeline from './canvas/timeline';
 import { generateFrameElement, playerFrame } from './playerFrames';
+import equal from './canvas/equal';
+import { IContext } from './types';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -19,7 +21,7 @@ export interface PlayerProps {
 
   keyFrames?: Record<string, playerFrame>[];
   /**
-   * 播放结束
+   * 协议动画播放结束
    */
   onend?: Function;
 }
@@ -28,6 +30,11 @@ class Player extends Component<PlayerProps> {
   playerFrames;
   index: number;
   onend: Function;
+  /**
+  * 协议动画状态 play pause finish
+  */
+  isEnd: boolean;
+
   constructor(props) {
     super(props);
     const { keyFrames = [], children } = props;
@@ -62,6 +69,7 @@ class Player extends Component<PlayerProps> {
     const { animator, props } = this;
     const { state } = props;
     animator.on('end', this.next);
+
     if (state === 'finish') {
       this.setState(({ count }) => ({
         index: count - 1,
@@ -81,16 +89,31 @@ class Player extends Component<PlayerProps> {
     }
   }
 
+  willReceiveProps(_nextProps: PlayerProps, _context?: IContext): void {
+    if (!equal(_nextProps, this.props)) {
+      this.playerFrames = _nextProps?.keyFrames.reduce((array, cur) => {
+        const frames = generateFrameElement(cur, array[array.length - 1] || _nextProps?.children);
+        array.push(frames);
+        return array;
+      }, []);
+    }
+  }
+
   next = () => {
     const { index, count } = this.state;
-    const { onend = () => {}, state } = this.props;
+    const { onend = () => { }, state } = this.props;
+    // @ts-ignore
+    const { timeline } = this.context;
+    timeline.clear();
 
+    if (this.isEnd) return
     if (index < count - 1 && state === 'play') {
       this.setState(() => ({
         index: index + 1,
       }));
     } else {
       onend();
+      this.isEnd = true
     }
   };
 
