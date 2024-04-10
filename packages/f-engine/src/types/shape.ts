@@ -23,6 +23,7 @@ type ArrayAttribute =
   | [string | number, string | number, string | number]
   | [string | number, string | number, string | number, string | number];
 
+type StepType = 'start' | 'middle' | 'end'
 interface StyleFlexProps {
   display?: 'flex';
   position?: 'relative' | 'absolute';
@@ -136,6 +137,7 @@ export interface PolylineStyleProps
     Omit<GPolylineStyleProps, omitStyleProps | 'points'> {
   points: [number, number][] | [string, string][] | [number, string][] | [string, number][];
   smooth?: boolean;
+  step?: StepType;
 }
 export interface ArcStyleProps
   extends StyleFlexProps,
