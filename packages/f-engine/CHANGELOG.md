@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/antvis/FEngine/compare/v1.2.2...v1.3.0) (2024-04-10)
+
+
+### Features
+
+* shape增加step类型 ([#260](https://github.com/antvis/FEngine/issues/260)) ([884424a](https://github.com/antvis/FEngine/commit/884424a8246a167454a252475038d87d724d6a01))
+
+
+
+
+
 ## [1.2.2](https://github.com/antvis/FEngine/compare/v1.2.1...v1.2.2) (2024-03-27)
 
 
