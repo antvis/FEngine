@@ -1,24 +1,78 @@
 /* animation timeline control */
-import { IAnimation } from '@antv/g-lite';
-import Player from '../player';
-class Timeline {
-  animations: IAnimation[][];
+import { Group } from '@antv/g-lite';
+import Animator from './render/animator';
+import EE from 'eventemitter3';
+
+type AnimaUnit = {
+  childrenAnimation: Animator[];
+  totalTime: number;
+  // effect: {
+  //   duration: number;
+  //   delay: number;
+  // }
+}
+class Timeline extends EE {
+  animator: Animator;
+  animators: AnimaUnit[] = [];
   frame: number = 0;
   playState: string = 'play';
-  play: Player;
+  endFrame: number;
 
-  constructor(playComponent) {
-    this.animations = [];
-    this.play = playComponent;
+  constructor(props) {
+    super();
+    const { animators, playState, root } = props;
+    this.animator = new Animator();
+    const rootShape = new Group();
+    this.animator.reset(rootShape);
+    root.appendChild(rootShape)
+
+    this.animators = animators;
+    this.playState = playState;
+    this.endFrame = animators.length - 1;
   }
 
-  clear() {
-    const { frame } = this;
-    this.animations[frame] = [];
+  start() {
+    const { animator, frame, playState, endFrame } = this;
+    if (frame < endFrame && playState === "finish") {
+      this.frame = endFrame
+    }
+    this.drawFrame();
+    animator.on('end', this.next);
+    this.run();
+    this.setPlayState(playState);
   }
+
+  next = () => {
+    const { frame, playState, endFrame, animators } = this;
+    if (playState !== "play") return
+
+    this.frame = frame + 1;
+    if (frame < endFrame) {
+      this.drawFrame();
+      this.run();
+    } else {
+      this.emit('end');
+      this.playState = "finish"
+    }
+  };
+
+  private run() {
+    const { animator, frame, animators } = this;
+    // const { effect } = animators[frame]
+    animator.run();
+  }
+
+
+  drawFrame() {
+    const { animator, animators, frame } = this;
+    const childAnimator = animators[frame].childrenAnimation;
+    animator.shape.removeChildren()
+    childAnimator.map(d => animator.shape.appendChild(d?.shape))
+    animator.children = childAnimator
+  }
+
   setPlayState(state) {
-    this.playState = state;
-    const { animator } = this.play;
+    const { animator } = this;
     switch (state) {
       case 'play':
         animator.play();
@@ -27,7 +81,6 @@ class Timeline {
         animator.pause();
         break;
       case 'finish':
-        animator.play();
         animator.finish();
         break;
       default:
@@ -35,60 +88,51 @@ class Timeline {
     }
   }
 
-  getPlayState() {
-    return this.playState;
+  getPlayerState() {
+    return this.playState
   }
 
-  goTo(frame) {
-    if (!frame) return;
-    const { animator } = this.play;
-    animator.goTo(frame);
-  }
+  updateState(nextProps) {
+    // 播放状态不同
+    const { state } = nextProps;
+    const { animator } = this;
+    if (state === "finish") {
 
-  add(animation: IAnimation[]) {
-    const { frame } = this;
-    if (this.animations[frame]) {
-      animation.map((d) => d.cancel());
-      return;
+      this.frame = this.endFrame
+      this.drawFrame();
+      this.run()
     }
-    this.animations[frame] = animation;
+    this.playState = state
+    this.setPlayState(state)
   }
 
-  getAnimation() {
-    const { frame } = this;
-    return this.animations[frame];
+  clear() {
+    this.animator = null;
+    this.animators = [];
+    this.playState = null;
+    this.endFrame = null
   }
 
-  push(animation: IAnimation[]) {
-    const { frame } = this;
-    if (!this.animations[frame]) return;
-    this.animations[0] = this.animations[frame].concat(animation);
-  }
+  goTo(time) {
+    const { frame, animators, playState } = this;
 
-  pop() {
-    const { frame } = this;
-    this.animations[frame].pop();
-  }
+    const target = animators.findIndex((cur) => {
+      if (time - cur.totalTime < 0) {
+        return true
+      } else {
+        time = time - cur?.totalTime
+        return false
+      }
+    })
 
-  delete(animation: IAnimation) {
-    const { frame } = this;
-    if (!animation || !this.animations[frame]) return;
-    this.animations[frame].filter((d) => d !== animation);
-  }
-
-  replace(next: IAnimation[]) {
-    const { frame } = this;
-    if (!this.animations[frame]) return;
-    const newAnimation = next.map((index) => {
-      return this.animations[frame].map((d) => {
-        if (index === d) {
-          return index;
-        }
-        return d;
-      });
-    });
-
-    this.animations = newAnimation;
+    if (frame !== target) {
+      this.frame = target
+      this.drawFrame()
+      this.run();
+      this.setPlayState(playState)
+    }
+    console.log(time)
+    this.animator.goTo(time)
   }
 }
 

@@ -4,7 +4,6 @@ import EE from 'eventemitter3';
 import { VNode } from '../vnode';
 import { createShape } from './createShape';
 import applyStyle from './applyStyle';
-import Timeline from '../timeline';
 
 class Animator extends EE {
   vNode: VNode;
@@ -16,12 +15,15 @@ class Animator extends EE {
   animations: IAnimation[];
   // 节点动画树
   children: Animator[];
-  timeline: Timeline;
+  // 组件下的全局effect
+  globalEffect: any;
+  time: number;
 
-  constructor(timeline) {
+  constructor(globalEffect?) {
     super();
-    this.timeline = timeline;
+    this.globalEffect = globalEffect
   }
+
   animate(shape, start, end, effect) {
     this.shape = shape;
     this.start = start;
@@ -31,10 +33,20 @@ class Animator extends EE {
 
   // 首次播放
   run() {
-    const { vNode, shape, start, end, effect, children } = this;
+    // const { vNode } = this;
+    // if (vNode) {
+    //   const { component } = vNode;
+    //   if (vNode && vNode.component) {
+    //     // @ts-ignore
+    //     component.beforAnimationPlay && component.beforAnimationPlay();
+    //   }
+    // }
+
+    const { shape, start, end, effect, children, globalEffect } = this;
 
     const animations: IAnimation[] = [];
     if (effect) {
+      const mergeEffect = { ...effect, ...globalEffect }
       const {
         property = [],
         easing,
@@ -45,7 +57,7 @@ class Animator extends EE {
         direction = 'normal',
         onFrame,
         onEnd,
-      } = effect;
+      } = mergeEffect;
       // shape 动画
       if ((property.length || onFrame) && duration > 0) {
         // 应用样式
@@ -70,30 +82,30 @@ class Animator extends EE {
         if (animation) {
           const onframe = onFrame
             ? (e) => {
-                const animationTarget = e.target;
-                const effect = animationTarget.effect;
-                const timing = effect.getTiming();
-                const duration = timing.duration;
-                const t = e.currentTime / duration;
-                const shape = effect.target;
-                // 动画的一些上下文信息
-                const context = {
-                  t,
-                  start,
-                  end,
-                  animation: animationTarget,
-                  shape,
-                };
-                applyStyle(shape, onFrame(t, context));
-              }
+              const animationTarget = e.target;
+              const effect = animationTarget.effect;
+              const timing = effect.getTiming();
+              const duration = timing.duration;
+              const t = e.currentTime / duration;
+              const shape = effect.target;
+              // 动画的一些上下文信息
+              const context = {
+                t,
+                start,
+                end,
+                animation: animationTarget,
+                shape,
+              };
+              applyStyle(shape, onFrame(t, context));
+            }
             : null;
           animation.onframe = onframe;
           animation.onfinish =
             onframe || onEnd
               ? (e) => {
-                  onframe && onframe(e);
-                  onEnd && onEnd(e);
-                }
+                onframe && onframe(e);
+                onEnd && onEnd(e);
+              }
               : null;
 
           // 过滤无限循环的动画
@@ -188,17 +200,14 @@ class Animator extends EE {
     }
     this.animations = animations;
 
-    if (this.timeline) {
-      this.timeline.push(animations);
-    }
     // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
-    if (vNode) {
-      const { component } = vNode;
-      if (vNode && vNode.component) {
-        // @ts-ignore
-        component.animationWillPlay && component.animationWillPlay();
-      }
-    }
+    // if (vNode) {
+    //   const { component } = vNode;
+    //   if (vNode && vNode.component) {
+    //     // @ts-ignore
+    //     component.animationWillPlay && component.animationWillPlay();
+    //   }
+    // }
     this.endEmit(animations);
     return animations;
   }
@@ -252,7 +261,7 @@ class Animator extends EE {
     this.start = null;
     this.end = null;
     this.effect = null;
-    this.children = null;
+    this.children = null
   }
 }
 

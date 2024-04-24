@@ -73,14 +73,14 @@ function readComponentContext(vNodeType: ElementType, vNodeContext) {
 }
 
 function createVNode(parent: VNode, vNode: VNode) {
-  const { canvas, context: parentContext, updater, animate: parentAnimate } = parent;
+  const { canvas, context: parentContext, updater, animate: parentAnimate, animator: parentAnimator } = parent;
 
   const { ref, type, props: originProps } = vNode;
-  const { animate, transformFrom, ...props } = originProps;
+  const { animate, transformFrom, effect, ...props } = originProps;
 
   const tag = getWorkTag(type);
   const context = readVNodeContext(type, parentContext);
-  const animator = new Animator(context.timeline);
+  const animator = new Animator({ ...effect, ...parentAnimator?.globalEffect });
   const style = getStyle(tag, props, context);
 
   animator.vNode = vNode;
@@ -96,6 +96,7 @@ function createVNode(parent: VNode, vNode: VNode) {
 
   // shape 标签
   if (tag === Shape) {
+
     const shape = createShape(type as string, { ...props, style });
     if (ref) {
       ref.current = shape;
@@ -104,6 +105,7 @@ function createVNode(parent: VNode, vNode: VNode) {
     // @ts-ignore
     shape._vNode = vNode; // shape 保留 vNode 的引用
     vNode.shape = shape;
+
   } else {
     const componentContext = readComponentContext(type, context);
     // 组件
@@ -113,12 +115,13 @@ function createVNode(parent: VNode, vNode: VNode) {
       component = new type(props, componentContext, updater);
     } else {
       component = new Component(props, componentContext, updater);
-      component.render = function() {
+      component.render = function () {
         // @ts-ignore
         return type(this.props, componentContext, updater);
       };
     }
     const group = new Group();
+
     component.container = group;
 
     // 设置ref
@@ -145,25 +148,28 @@ function createVNode(parent: VNode, vNode: VNode) {
   return vNode;
 }
 
-function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
-  const { canvas, context, updater, animate: parentAnimate } = parent;
+function updateVNode(parent, nextNode: VNode, lastNode: VNode, mode?: string) {
+  const { canvas, context, updater, animate: parentAnimate, animator: parentAnimator } = parent;
   const { tag, animator, component, shape, children, props: lastProps } = lastNode;
   const { type, props } = nextNode;
-  const { animate } = props;
+  const { animate, effect } = props;
 
-  animator.vNode = nextNode;
-
+  // animator.vNode = nextNode;  
   nextNode.parent = parent;
   nextNode.tag = tag;
   nextNode.canvas = canvas;
   nextNode.context = readVNodeContext(type, context);
   nextNode.updater = updater;
   nextNode.component = component;
-  nextNode.shape = updateShape(shape, props, lastProps);
+
+  nextNode.shape = updateShape(mode === "pre" ? shape.cloneNode(true) : shape, props, lastProps);
+
   nextNode.parent = parent;
   nextNode.children = children;
   nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
-  nextNode.animator = animator;
+  nextNode.animator = new Animator({ ...effect, ...parentAnimator?.globalEffect });
+
+  nextNode.animator.vNode = nextNode;
   nextNode.style = getStyle(tag, props, context);
 
   // 更新 component
@@ -200,12 +206,12 @@ function destroyElement(vNode: VNode | VNode[] | null) {
   });
 }
 
-function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNode) {
+function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNode, mode?: string) {
   const { type: nextType, props: nextProps } = nextElement;
   const { type: lastType, props: lastProps } = lastElement;
 
   if (nextType === lastType) {
-    const nextVNode = updateVNode(parent, nextElement as VNode, lastElement);
+    const nextVNode = updateVNode(parent, nextElement as VNode, lastElement, mode);
     // props 无变化 和 context 都无变化
     if (equal(nextProps, lastProps) && parent.context === lastElement.context) {
       return null;
@@ -222,6 +228,7 @@ function diffElement(
   parent: VNode,
   nextElement: JSX.Element,
   lastElement: JSX.Element,
+  mode?: string
 ): VNode | VNode[] | null {
   if (!nextElement && !lastElement) {
     return null;
@@ -239,7 +246,7 @@ function diffElement(
   }
 
   // 更新
-  return updateElement(parent, nextElement, lastElement as VNode);
+  return updateElement(parent, nextElement, lastElement as VNode, mode);
 }
 
 function renderComponentNodes(componentNodes: VNode[] | null) {
@@ -301,6 +308,7 @@ function renderVNode(
   vNode: VNode,
   nextChildren: VNode | VNode[] | null,
   lastChildren: VNode | VNode[] | null,
+  mode?: string
 ) {
   const { component } = vNode;
 
@@ -318,7 +326,7 @@ function renderVNode(
   let componentNodeChildren: VNode[] = [];
 
   Children.compare(newChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
-    const element = diffElement(vNode, next, last);
+    const element = diffElement(vNode, next, last, mode);
 
     Children.map(element, (child: VNode) => {
       if (!child) return;
@@ -341,9 +349,10 @@ function renderChildren(
   parent: VNode,
   nextChildren: VNode | VNode[] | null,
   lastChildren: VNode | VNode[] | null,
+  mode?: string
 ) {
   // 返回的都是 classComponent 的节点
-  const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);
+  const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren, mode);
 
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
@@ -370,7 +379,8 @@ function render(vNode: VNode) {
 
   // 创建动画
   const childrenAnimation = createAnimation(vNode, children, lastChildren);
-  // 执行动画
+
+  // // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
       animator.run();
@@ -391,7 +401,9 @@ function updateComponents(components: Component[]) {
     }
     component.willUpdate();
     const { canvas, context } = vNode;
+
     const newChildren = canvas.toRawChildren(component.render());
+
     const nextChildren = renderChildren(vNode, newChildren as VNode, lastChildren);
 
     // 更新 children
@@ -407,14 +419,32 @@ function updateComponents(components: Component[]) {
 
     // 执行动画
     animator.run();
-    const { timeline } = context;
-
-    if (timeline) {
-      timeline.play.animationWillPlay();
-    }
 
     component.didUpdate();
   });
 }
 
-export { render, renderChildren, updateComponents, computeLayout, destroyElement };
+
+function getUpdateAnimation(component, newChildren) {
+  const { preNode } = component;
+  const { children: lastChildren, props } = preNode
+  // 是否需要更新
+  if (component.shouldUpdate(props) === false) {
+    return false;
+  }
+  component.willUpdate();
+
+  const nextChildren = renderChildren(preNode, newChildren as VNode, lastChildren, 'pre');
+
+  // 更新 children
+  component.preNode.children = nextChildren
+
+  // 创建动画
+  const childrenAnimation = createAnimation(preNode, nextChildren, lastChildren, 'pre');
+
+  component.didUpdate();
+
+  return childrenAnimation
+}
+
+export { render, renderChildren, updateComponents, computeLayout, destroyElement, getUpdateAnimation };

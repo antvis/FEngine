@@ -37,7 +37,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
     return animator;
   }
 
-  animator = animator || new Animator(context.timeline);
+  animator = animator || new Animator();
   // shape 形变
   const { start, end, property = [] } = animationEffect;
   const { parsedStyle: nextParsedStyle } = nextShape;
@@ -85,14 +85,15 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   return animator;
 }
 
-function appearAnimation(vNode: VNode | VNode[] | null) {
+function appearAnimation(vNode: VNode | VNode[] | null, mode?: string) {
   return Children.map(vNode, (node) => {
     if (!node) return;
-    const { tag, shape, style, children, animate, props, animator } = node;
+    const { tag, shape, style, children, animate, props } = node;
+    const animator = mode === "pre" ? new Animator() : node.animator
     animator.reset(shape);
-
+    animator.globalEffect = node.animator.globalEffect
     // 有叶子节点，先执行叶子节点
-    animator.children = children ? createAnimation(node, children, null) : null;
+    animator.children = children ? createAnimation(node, children, null, mode) : null;
 
     // 不需要执行动画
     if (animate === false || tag !== Shape) {
@@ -120,7 +121,7 @@ function appearAnimation(vNode: VNode | VNode[] | null) {
   });
 }
 
-function updateAnimation(nextNode, lastNode) {
+function updateAnimation(nextNode, lastNode, mode?: string) {
   const {
     tag: nextTag,
     type: nextType,
@@ -128,7 +129,7 @@ function updateAnimation(nextNode, lastNode) {
     children: nextChildren,
     props: nextProps,
     shape: nextShape,
-    animator,
+    // animator,
     animate,
   } = nextNode;
   const {
@@ -136,12 +137,13 @@ function updateAnimation(nextNode, lastNode) {
     type: lastType,
     style: lastStyle,
     children: lastChildren,
-    shape: lastShape,
+    shape: lastShape
   } = lastNode;
+  const animator = mode === "pre" ? new Animator() : nextNode.animator
   animator.reset(nextShape);
-
+  animator.globalEffect = nextNode.animator.globalEffect
   // 先处理叶子节点
-  animator.children = createAnimation(nextNode, nextChildren, lastChildren);
+  animator.children = createAnimation(nextNode, nextChildren, lastChildren, mode);
 
   const { animation } = nextProps;
   const animationEffect = animation ? animation.update : null;
@@ -151,9 +153,9 @@ function updateAnimation(nextNode, lastNode) {
     // 清除之前的样式
     const resetStyle = lastStyle
       ? Object.keys(lastStyle).reduce((prev, cur) => {
-          prev[cur] = '';
-          return prev;
-        }, {})
+        prev[cur] = '';
+        return prev;
+      }, {})
       : null;
 
     // 需要更新的样式
@@ -227,22 +229,23 @@ function updateAnimation(nextNode, lastNode) {
 function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
-    const { tag, shape, children, animate, style, props, animator, context } = vNode;
+    const { tag, shape, children, animate, style, props, context } = vNode;
     const { timeline } = context;
 
     if (shape.destroyed) {
       return null;
     }
     // 重置
+    const animator = new Animator()
     animator.reset(shape);
 
     // 先处理叶子节点
     const childrenAnimation = children
       ? Children.toArray(children)
-          .map((child) => {
-            return destroyAnimation(child);
-          })
-          .filter(Boolean)
+        .map((child) => {
+          return destroyAnimation(child);
+        })
+        .filter(Boolean)
       : null;
 
     // 不需要动画直接删除
@@ -285,7 +288,7 @@ function destroyAnimation(node: VNode) {
   });
 }
 
-function createAnimator(nextNode, lastNode) {
+function createAnimator(nextNode, lastNode, mode?: string) {
   if (!nextNode && !lastNode) {
     return null;
   }
@@ -312,11 +315,11 @@ function createAnimator(nextNode, lastNode) {
 
   // appear 动画
   if (nextNode && !lastNode) {
-    return appearAnimation(nextNode);
+    return appearAnimation(nextNode, mode);
   }
 
   // update 动画
-  return updateAnimation(nextNode, lastNode);
+  return updateAnimation(nextNode, lastNode, mode);
 }
 
 function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: IChildNode) {
@@ -332,6 +335,7 @@ function createAnimation(
   parent: VNode,
   nextChildren: VNode | VNode[],
   lastChildren: VNode | VNode[],
+  mode?: string
 ) {
   if (!nextChildren && !lastChildren) {
     return [];
@@ -344,7 +348,7 @@ function createAnimation(
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
     // shape 层才执行动画
-    const animator = createAnimator(nextNode, lastNode);
+    const animator = createAnimator(nextNode, lastNode, mode);
     Children.map(animator, (item: Animator) => {
       if (!item) return;
       childrenAnimator.push(item);

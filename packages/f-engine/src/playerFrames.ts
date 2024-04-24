@@ -1,7 +1,10 @@
+import { isUndefined } from '@antv/util';
 import Children from './children';
 
 export interface playerFrame {
   to: Record<string, any>;
+  duration?: number;
+  delay?: number;
 }
 
 export function generateFrameElement(cur: Record<string, playerFrame>, element) {
@@ -9,8 +12,15 @@ export function generateFrameElement(cur: Record<string, playerFrame>, element) 
   return Children.map(element, (child) => {
     const { key, props } = child;
 
-    const newProps = cur[key] ? cur[key].to : {};
+    let newProps = {};
+    if (cur[key]) {
+      const { to, ...effect } = cur[key]
+      newProps = { ...to, effect }
+    }
+
     const children = generateFrameElement(cur, props.children);
-    return Children.cloneElement(child, { ...newProps, children });
+    return Children.cloneElement(child, {
+      ...newProps, children
+    })
   });
 }
