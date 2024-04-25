@@ -148,7 +148,7 @@ function createVNode(parent: VNode, vNode: VNode) {
   return vNode;
 }
 
-function updateVNode(parent, nextNode: VNode, lastNode: VNode, mode?: string) {
+function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   const { canvas, context, updater, animate: parentAnimate, animator: parentAnimator } = parent;
   const { tag, animator, component, shape, children, props: lastProps } = lastNode;
   const { type, props } = nextNode;
@@ -162,7 +162,7 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode, mode?: string) {
   nextNode.updater = updater;
   nextNode.component = component;
 
-  nextNode.shape = updateShape(mode === "pre" ? shape.cloneNode(true) : shape, props, lastProps);
+  nextNode.shape = updateShape(shape, props, lastProps);
 
   nextNode.parent = parent;
   nextNode.children = children;
@@ -211,7 +211,7 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
   const { type: lastType, props: lastProps } = lastElement;
 
   if (nextType === lastType) {
-    const nextVNode = updateVNode(parent, nextElement as VNode, lastElement, mode);
+    const nextVNode = updateVNode(parent, nextElement as VNode, lastElement);
     // props 无变化 和 context 都无变化
     if (equal(nextProps, lastProps) && parent.context === lastElement.context) {
       return null;
@@ -228,7 +228,6 @@ function diffElement(
   parent: VNode,
   nextElement: JSX.Element,
   lastElement: JSX.Element,
-  mode?: string
 ): VNode | VNode[] | null {
   if (!nextElement && !lastElement) {
     return null;
@@ -246,7 +245,7 @@ function diffElement(
   }
 
   // 更新
-  return updateElement(parent, nextElement, lastElement as VNode, mode);
+  return updateElement(parent, nextElement, lastElement as VNode);
 }
 
 function renderComponentNodes(componentNodes: VNode[] | null) {
@@ -307,8 +306,7 @@ function renderComponentNodes(componentNodes: VNode[] | null) {
 function renderVNode(
   vNode: VNode,
   nextChildren: VNode | VNode[] | null,
-  lastChildren: VNode | VNode[] | null,
-  mode?: string
+  lastChildren: VNode | VNode[] | null
 ) {
   const { component } = vNode;
 
@@ -326,7 +324,7 @@ function renderVNode(
   let componentNodeChildren: VNode[] = [];
 
   Children.compare(newChildren, lastChildren, (next: JSX.Element, last: JSX.Element) => {
-    const element = diffElement(vNode, next, last, mode);
+    const element = diffElement(vNode, next, last);
 
     Children.map(element, (child: VNode) => {
       if (!child) return;
@@ -348,11 +346,10 @@ function renderVNode(
 function renderChildren(
   parent: VNode,
   nextChildren: VNode | VNode[] | null,
-  lastChildren: VNode | VNode[] | null,
-  mode?: string
+  lastChildren: VNode | VNode[] | null
 ) {
   // 返回的都是 classComponent 的节点
-  const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren, mode);
+  const componentNodeChildren = renderVNode(parent, nextChildren, lastChildren);
 
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
@@ -434,7 +431,7 @@ function getUpdateAnimation(component, newChildren) {
   }
   component.willUpdate();
 
-  const nextChildren = renderChildren(preNode, newChildren as VNode, lastChildren, 'pre');
+  const nextChildren = renderChildren(preNode, newChildren as VNode, lastChildren);
 
   // 更新 children
   component.preNode.children = nextChildren
