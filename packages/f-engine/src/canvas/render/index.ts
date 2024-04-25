@@ -7,7 +7,7 @@ import { VNode } from '../vnode';
 import { createShape, updateShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
-import { createAnimation } from './animation';
+import { createAnimation, createPreAnimation } from './animation';
 import Animator from './animator';
 import { getWorkTag, ClassComponent, Shape, WorkTag } from '../workTags';
 import {
@@ -80,7 +80,7 @@ function createVNode(parent: VNode, vNode: VNode) {
 
   const tag = getWorkTag(type);
   const context = readVNodeContext(type, parentContext);
-  const animator = new Animator({ ...effect, ...parentAnimator?.globalEffect });
+  const animator = new Animator();
   const style = getStyle(tag, props, context);
 
   animator.vNode = vNode;
@@ -167,7 +167,7 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   nextNode.parent = parent;
   nextNode.children = children;
   nextNode.animate = isBoolean(animate) ? animate : parentAnimate;
-  nextNode.animator = new Animator({ ...effect, ...parentAnimator?.globalEffect });
+  nextNode.animator = new Animator();
 
   nextNode.animator.vNode = nextNode;
   nextNode.style = getStyle(tag, props, context);
@@ -422,9 +422,10 @@ function updateComponents(components: Component[]) {
 }
 
 
-function getUpdateAnimation(component, newChildren) {
+function getUpdateAnimation(component, newChildren, keyFrame) {
   const { preNode } = component;
   const { children: lastChildren, props } = preNode
+
   // 是否需要更新
   if (component.shouldUpdate(props) === false) {
     return false;
@@ -437,7 +438,7 @@ function getUpdateAnimation(component, newChildren) {
   component.preNode.children = nextChildren
 
   // 创建动画
-  const childrenAnimation = createAnimation(preNode, nextChildren, lastChildren, 'pre');
+  const childrenAnimation = createPreAnimation(preNode, nextChildren, lastChildren, keyFrame);
 
   component.didUpdate();
 

@@ -85,15 +85,19 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   return animator;
 }
 
-function appearAnimation(vNode: VNode | VNode[] | null, mode?: string) {
+function appearAnimation(vNode: VNode | VNode[] | null, keyFrame?: string) {
   return Children.map(vNode, (node) => {
     if (!node) return;
     const { tag, shape, style, children, animate, props } = node;
-    const animator = mode === "pre" ? new Animator() : node.animator
+    const animator = keyFrame ? new Animator() : node.animator
     animator.reset(shape);
-    animator.globalEffect = node.animator.globalEffect
+
     // 有叶子节点，先执行叶子节点
-    animator.children = children ? createAnimation(node, children, null, mode) : null;
+    if (children) {
+      animator.children = keyFrame ? createPreAnimation(node, children, null, keyFrame) : createAnimation(node, children, null)
+    } else {
+      animator.children = null
+    }
 
     // 不需要执行动画
     if (animate === false || tag !== Shape) {
@@ -121,7 +125,7 @@ function appearAnimation(vNode: VNode | VNode[] | null, mode?: string) {
   });
 }
 
-function updateAnimation(nextNode, lastNode, mode?: string) {
+function updateAnimation(nextNode, lastNode, keyFrame?: any) {
   const {
     tag: nextTag,
     type: nextType,
@@ -139,11 +143,10 @@ function updateAnimation(nextNode, lastNode, mode?: string) {
     children: lastChildren,
     shape: lastShape
   } = lastNode;
-  const animator = mode === "pre" ? new Animator() : nextNode.animator
+  const animator = keyFrame ? new Animator() : nextNode.animator
   animator.reset(nextShape);
-  animator.globalEffect = nextNode.animator.globalEffect
   // 先处理叶子节点
-  animator.children = createAnimation(nextNode, nextChildren, lastChildren, mode);
+  animator.children = keyFrame ? createPreAnimation(nextNode, nextChildren, lastChildren, keyFrame) : createAnimation(nextNode, nextChildren, lastChildren)
 
   const { animation } = nextProps;
   const animationEffect = animation ? animation.update : null;
@@ -288,7 +291,7 @@ function destroyAnimation(node: VNode) {
   });
 }
 
-function createAnimator(nextNode, lastNode, mode?: string) {
+function createAnimator(nextNode, lastNode, keyFrame?: any) {
   if (!nextNode && !lastNode) {
     return null;
   }
@@ -315,11 +318,11 @@ function createAnimator(nextNode, lastNode, mode?: string) {
 
   // appear 动画
   if (nextNode && !lastNode) {
-    return appearAnimation(nextNode, mode);
+    return appearAnimation(nextNode, keyFrame);
   }
 
   // update 动画
-  return updateAnimation(nextNode, lastNode, mode);
+  return updateAnimation(nextNode, lastNode, keyFrame);
 }
 
 function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: IChildNode) {
@@ -334,8 +337,7 @@ function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: I
 function createAnimation(
   parent: VNode,
   nextChildren: VNode | VNode[],
-  lastChildren: VNode | VNode[],
-  mode?: string
+  lastChildren: VNode | VNode[]
 ) {
   if (!nextChildren && !lastChildren) {
     return [];
@@ -348,7 +350,7 @@ function createAnimation(
 
   Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
     // shape 层才执行动画
-    const animator = createAnimator(nextNode, lastNode, mode);
+    const animator = createAnimator(nextNode, lastNode);
     Children.map(animator, (item: Animator) => {
       if (!item) return;
       childrenAnimator.push(item);
@@ -373,4 +375,55 @@ function createAnimation(
   return childrenAnimator;
 }
 
-export { createAnimation };
+function createPreAnimation(
+  parent: VNode,
+  nextChildren: VNode | VNode[],
+  lastChildren: VNode | VNode[],
+  keyFrame: any
+) {
+  if (!nextChildren && !lastChildren) {
+    return [];
+  }
+  const { shape: parentShape, animator } = parent;
+
+  const { key } = parent;
+  const { duration, delay } = keyFrame[key] || {}
+  const globalEffect = { duration, delay }
+  animator.globalEffect = globalEffect
+
+  // 上一个处理的元素
+  let prevSibling: IChildNode;
+  const childrenAnimator: Animator[] = [];
+
+  Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
+    // shape 层才执行动画
+    const animator = createAnimator(nextNode, lastNode, keyFrame);
+
+    animator.globalEffect = globalEffect
+
+    Children.map(animator, (item: Animator) => {
+      if (!item) return;
+      childrenAnimator.push(item);
+      const { shape } = item;
+      if (!shape || shape.destroyed) return;
+
+      const cloneShape = shape.cloneNode()
+      let nextSibling: IChildNode;
+
+      // 更新文档流
+      if (!prevSibling) {
+        nextSibling = parentShape.firstChild;
+      } else {
+        nextSibling = prevSibling.nextSibling;
+      }
+      if (nextSibling !== shape) {
+        insertShape(parentShape, shape, nextSibling);
+      }
+      prevSibling = shape;
+    });
+  });
+
+  return childrenAnimator;
+}
+
+export { createAnimation, createPreAnimation };

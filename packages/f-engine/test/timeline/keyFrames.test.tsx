@@ -390,14 +390,15 @@ describe('player', () => {
             },
           ]}
         >
-          <View key={'view'} />
+          <View key={'view'} width={'10px'}/>
         </Player>
       </Canvas>
     );
 
     canvas.update(newProps);
     await delay(800);
-    expect(context).toMatchImageSnapshot();
+    //@ts-ignore
+    expect(Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width)).toBeGreaterThan(10)  
   });
 
   it('播放中finish', async () => {

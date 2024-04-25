@@ -54,8 +54,7 @@ describe('player', () => {
                   visible: true,
                   width: '40px',
                 },
-                duration: 300,
-                delay:300
+                duration: 300
               },
             },
             {

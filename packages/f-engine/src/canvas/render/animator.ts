@@ -19,9 +19,8 @@ class Animator extends EE {
   globalEffect: any;
   time: number;
 
-  constructor(globalEffect?) {
+  constructor() {
     super();
-    this.globalEffect = globalEffect
   }
 
   animate(shape, start, end, effect) {
@@ -33,20 +32,15 @@ class Animator extends EE {
 
   // 首次播放
   run() {
-    // const { vNode } = this;
-    // if (vNode) {
-    //   const { component } = vNode;
-    //   if (vNode && vNode.component) {
-    //     // @ts-ignore
-    //     component.beforAnimationPlay && component.beforAnimationPlay();
-    //   }
-    // }
-
     const { shape, start, end, effect, children, globalEffect } = this;
 
     const animations: IAnimation[] = [];
     if (effect) {
-      const mergeEffect = { ...effect, ...globalEffect }
+      const merged = {
+        duration: globalEffect?.duration || effect?.duration,
+        delay: globalEffect?.delay || effect?.delay
+      };
+      const mergeEffect = { ...effect, ...merged }
       const {
         property = [],
         easing,
