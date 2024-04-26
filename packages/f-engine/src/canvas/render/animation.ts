@@ -24,7 +24,7 @@ function findAllShapeNode(vNode: VNode | VNode[] | null) {
 }
 
 function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
-  const { props: nextProps, shape: nextShape, style: nextStyle, context } = nextNode;
+  const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
   const { shape: lastShape, style: lastStyle, animator: lastAnimation } = lastNode;
 
   // 形变动画之前先把原 shape 销毁
@@ -89,14 +89,16 @@ function appearAnimation(vNode: VNode | VNode[] | null, keyFrame?: string) {
   return Children.map(vNode, (node) => {
     if (!node) return;
     const { tag, shape, style, children, animate, props } = node;
-    const animator = keyFrame ? new Animator() : node.animator
+    const animator = keyFrame ? new Animator() : node.animator;
     animator.reset(shape);
 
     // 有叶子节点，先执行叶子节点
     if (children) {
-      animator.children = keyFrame ? createPreAnimation(node, children, null, keyFrame) : createAnimation(node, children, null)
+      animator.children = keyFrame
+        ? createPreAnimation(node, children, null, keyFrame)
+        : createAnimation(node, children, null);
     } else {
-      animator.children = null
+      animator.children = null;
     }
 
     // 不需要执行动画
@@ -133,7 +135,6 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
     children: nextChildren,
     props: nextProps,
     shape: nextShape,
-    // animator,
     animate,
   } = nextNode;
   const {
@@ -141,12 +142,14 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
     type: lastType,
     style: lastStyle,
     children: lastChildren,
-    shape: lastShape
+    shape: lastShape,
   } = lastNode;
-  const animator = keyFrame ? new Animator() : nextNode.animator
+  const animator = keyFrame ? new Animator() : nextNode.animator;
   animator.reset(nextShape);
   // 先处理叶子节点
-  animator.children = keyFrame ? createPreAnimation(nextNode, nextChildren, lastChildren, keyFrame) : createAnimation(nextNode, nextChildren, lastChildren)
+  animator.children = keyFrame
+    ? createPreAnimation(nextNode, nextChildren, lastChildren, keyFrame)
+    : createAnimation(nextNode, nextChildren, lastChildren);
 
   const { animation } = nextProps;
   const animationEffect = animation ? animation.update : null;
@@ -156,9 +159,9 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
     // 清除之前的样式
     const resetStyle = lastStyle
       ? Object.keys(lastStyle).reduce((prev, cur) => {
-        prev[cur] = '';
-        return prev;
-      }, {})
+          prev[cur] = '';
+          return prev;
+        }, {})
       : null;
 
     // 需要更新的样式
@@ -239,16 +242,16 @@ function destroyAnimation(node: VNode) {
       return null;
     }
     // 重置
-    const animator = new Animator()
+    const animator = new Animator();
     animator.reset(shape);
 
     // 先处理叶子节点
     const childrenAnimation = children
       ? Children.toArray(children)
-        .map((child) => {
-          return destroyAnimation(child);
-        })
-        .filter(Boolean)
+          .map((child) => {
+            return destroyAnimation(child);
+          })
+          .filter(Boolean)
       : null;
 
     // 不需要动画直接删除
@@ -337,7 +340,7 @@ function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: I
 function createAnimation(
   parent: VNode,
   nextChildren: VNode | VNode[],
-  lastChildren: VNode | VNode[]
+  lastChildren: VNode | VNode[],
 ) {
   if (!nextChildren && !lastChildren) {
     return [];
@@ -379,7 +382,7 @@ function createPreAnimation(
   parent: VNode,
   nextChildren: VNode | VNode[],
   lastChildren: VNode | VNode[],
-  keyFrame: any
+  keyFrame: any,
 ) {
   if (!nextChildren && !lastChildren) {
     return [];
@@ -387,9 +390,9 @@ function createPreAnimation(
   const { shape: parentShape, animator } = parent;
 
   const { key } = parent;
-  const { duration, delay } = keyFrame[key] || {}
-  const globalEffect = { duration, delay }
-  animator.globalEffect = globalEffect
+  const { duration, delay } = keyFrame[key] || {};
+  const globalEffect = { duration, delay };
+  animator.globalEffect = globalEffect;
 
   // 上一个处理的元素
   let prevSibling: IChildNode;
@@ -399,7 +402,7 @@ function createPreAnimation(
     // shape 层才执行动画
     const animator = createAnimator(nextNode, lastNode, keyFrame);
 
-    animator.globalEffect = globalEffect
+    animator.globalEffect = globalEffect;
 
     Children.map(animator, (item: Animator) => {
       if (!item) return;
@@ -407,7 +410,6 @@ function createPreAnimation(
       const { shape } = item;
       if (!shape || shape.destroyed) return;
 
-      const cloneShape = shape.cloneNode()
       let nextSibling: IChildNode;
 
       // 更新文档流

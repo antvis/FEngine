@@ -10,7 +10,7 @@ describe('player', () => {
         opacity = 1,
         fill = 'red',
         visible = true,
-        fillFunc
+        fillFunc,
       } = this.props;
       if (!visible) return;
       return (
@@ -18,7 +18,7 @@ describe('player', () => {
           style={{
             width,
             height,
-            fill: fillFunc ? fillFunc() : fill ,
+            fill: fillFunc ? fillFunc() : fill,
             opacity,
           }}
           animation={{
@@ -30,7 +30,7 @@ describe('player', () => {
             update: {
               easing: 'linear',
               duration: 500,
-              property: ['x', 'fill','width', 'height'],
+              property: ['x', 'fill', 'width', 'height'],
             },
           }}
         />
@@ -177,13 +177,12 @@ describe('player', () => {
                 to: {
                   visible: true,
                 },
-              }
+              },
             },
-            {
-            }
+            {},
           ]}
         >
-            <View key={'view'} visible={false} opacity={0.5}  fill={'#1677FF'}/>
+          <View key={'view'} visible={false} opacity={0.5} fill={'#1677FF'} />
         </Player>
       </Canvas>
     );
@@ -191,8 +190,8 @@ describe('player', () => {
     const canvas = new Canvas(props);
     await canvas.render();
     await delay(2000);
-    expect( canvas.container.childNodes[1].childNodes[0].nodeName).toBe("g")
-    expect( canvas.container.childNodes[1].childNodes[0].childNodes[0].nodeName).toBe("rect")
+    expect(canvas.container.childNodes[1].childNodes[0].nodeName).toBe('g');
+    expect(canvas.container.childNodes[1].childNodes[0].childNodes[0].nodeName).toBe('rect');
     expect(context).toMatchImageSnapshot();
   });
 
@@ -275,7 +274,6 @@ describe('player', () => {
     await delay(100);
     expect(context).toMatchImageSnapshot();
   });
-
 
   it('finish', async () => {
     const context = createContext('动画播放结束');
@@ -390,7 +388,7 @@ describe('player', () => {
             },
           ]}
         >
-          <View key={'view'} width={'10px'}/>
+          <View key={'view'} width={'10px'} />
         </Player>
       </Canvas>
     );
@@ -398,7 +396,9 @@ describe('player', () => {
     canvas.update(newProps);
     await delay(800);
     //@ts-ignore
-    expect(Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width)).toBeGreaterThan(10)  
+    expect(
+      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width),
+    ).toBeGreaterThan(10);
   });
 
   it('播放中finish', async () => {

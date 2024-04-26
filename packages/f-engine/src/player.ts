@@ -2,7 +2,7 @@ import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Timeline from './canvas/timeline';
 import { generateFrameElement, playerFrame } from './playerFrames';
-import { getUpdateAnimation } from './canvas/render/index'
+import { getUpdateAnimation } from './canvas/render/index';
 import Children from './children';
 import { IContext } from './types';
 import { VNode } from './canvas/vnode';
@@ -30,7 +30,7 @@ export interface PlayerProps {
   /**
    * 时间
    */
-  goTo?: number
+  goTo?: number;
 }
 
 function cloneNode(vnode) {
@@ -38,12 +38,12 @@ function cloneNode(vnode) {
     if (!child) {
       return;
     }
-    const { shape, children } = child
+    const { shape, children } = child;
     return {
       ...child,
       shape: shape.cloneNode(),
-      children: cloneNode(children)
-    }
+      children: cloneNode(children),
+    };
   });
 }
 
@@ -54,8 +54,8 @@ class Player extends Component<PlayerProps> {
   onend: Function;
   preNode: VNode;
   /**
-  * 内部播放真实状态 play pause finish
-  */
+   * 内部播放真实状态 play pause finish
+   */
   playState;
 
   constructor(props) {
@@ -63,58 +63,58 @@ class Player extends Component<PlayerProps> {
   }
 
   didMount(): void {
-    const { keyFrames, children, state, onend, goTo } = this.props
+    const { keyFrames, children, state, onend, goTo } = this.props;
 
     this.playerFrames = keyFrames.reduce((array, cur) => {
       const frames = generateFrameElement(cur, array[array.length - 1] || children);
       array.push(frames);
-      return array
+      return array;
     }, []);
 
-    this.preNode = cloneNode(this._vNode)
+    this.preNode = cloneNode(this._vNode);
     const array = this.playerFrames.map((cur, index) => {
       const keyFrame = keyFrames[index];
       const childrenAnimation = getUpdateAnimation(this, cur, keyFrame);
-      this.preNode = cloneNode(this.preNode)
+      this.preNode = cloneNode(this.preNode);
       return {
         childrenAnimation,
-        totalTime: 0
-      }
+        totalTime: 0,
+      };
     });
 
     this.timeline = new Timeline({
       animators: array,
       playState: state,
-      root: this.context.canvas
+      root: this.context.canvas,
     });
 
-    this.timeline.start()
+    this.timeline.start();
     onend && this.timeline.on('end', onend);
-    goTo && this.goTo(goTo)
+    goTo && this.goTo(goTo);
   }
 
   willReceiveProps(nextProps: PlayerProps, _context?: IContext) {
     const { props: lastProps, timeline } = this;
     const { state, goTo: nextTime } = nextProps;
-    const { goTo } = lastProps
+    const { goTo } = lastProps;
 
     // state 更新
-    if (!isEqual(state, timeline.getPlayerState())) {
-      timeline.updateState({ state })
+    if (!isEqual(state, timeline.getPlayState())) {
+      timeline.updateState({ state });
     }
 
     if (!isEqual(nextTime, goTo)) {
-      this.goTo(nextTime)
+      this.goTo(nextTime);
     }
   }
 
   goTo(time) {
     const { timeline } = this;
-    timeline.goTo(time)
+    timeline.goTo(time);
   }
 
   render() {
-    return null
+    return null;
   }
 }
 

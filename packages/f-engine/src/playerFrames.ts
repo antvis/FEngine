@@ -15,7 +15,8 @@ export function generateFrameElement(cur: Record<string, playerFrame>, element) 
 
     const children = generateFrameElement(cur, props.children);
     return Children.cloneElement(child, {
-      ...newProps, children
-    })
+      ...newProps,
+      children,
+    });
   });
 }

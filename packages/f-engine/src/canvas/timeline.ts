@@ -6,10 +6,6 @@ import EE from 'eventemitter3';
 type AnimaUnit = {
   childrenAnimation: Animator[];
   totalTime: number;
-  // effect: {
-  //   duration: number;
-  //   delay: number;
-  // }
 }
 class Timeline extends EE {
   animator: Animator;
@@ -38,29 +34,23 @@ class Timeline extends EE {
     }
     this.drawFrame();
     animator.on('end', this.next);
-    this.run();
+    this.animator.run();
     this.setPlayState(playState);
   }
 
   next = () => {
-    const { frame, playState, endFrame, animators } = this;
+    const { frame, playState, endFrame } = this;
     if (playState !== "play") return
 
     this.frame = frame + 1;
     if (frame < endFrame) {
       this.drawFrame();
-      this.run();
+      this.animator.run();
     } else {
       this.emit('end');
       this.playState = "finish"
     }
   };
-
-  private run() {
-    const { animator, frame, animators } = this;
-    // const { effect } = animators[frame]
-    animator.run();
-  }
 
 
   drawFrame() {
@@ -88,19 +78,18 @@ class Timeline extends EE {
     }
   }
 
-  getPlayerState() {
+  getPlayState() {
     return this.playState
   }
 
   updateState(nextProps) {
     // 播放状态不同
     const { state } = nextProps;
-    const { animator } = this;
     if (state === "finish") {
 
       this.frame = this.endFrame
       this.drawFrame();
-      this.run()
+      this.animator.run()
     }
     this.playState = state
     this.setPlayState(state)
@@ -128,7 +117,7 @@ class Timeline extends EE {
     if (frame !== target) {
       this.frame = target
       this.drawFrame()
-      this.run();
+      this.animator.run();
       this.setPlayState(playState)
     }
     console.log(time)
