@@ -74,6 +74,7 @@ class Player extends Component<PlayerProps> {
     this.preNode = cloneNode(this._vNode);
     const array = this.playerFrames.map((cur, index) => {
       const keyFrame = keyFrames[index];
+
       const childrenAnimation = getUpdateAnimation(this, cur, keyFrame);
       this.preNode = cloneNode(this.preNode);
       return {

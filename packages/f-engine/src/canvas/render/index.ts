@@ -7,7 +7,7 @@ import { VNode } from '../vnode';
 import { createShape, updateShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
-import { createAnimation, createPreAnimation } from './animation';
+import { createAnimation, calAnimationTime } from './animation';
 import Animator from './animator';
 import { getWorkTag, ClassComponent, Shape, WorkTag } from '../workTags';
 import {
@@ -429,11 +429,13 @@ function getUpdateAnimation(component, newChildren, keyFrame) {
   component.preNode.children = nextChildren;
 
   // 创建动画
-  const childrenAnimation = createPreAnimation(preNode, nextChildren, lastChildren, keyFrame);
-
+  const childrenAnimation = createAnimation(preNode, nextChildren, lastChildren);
   component.didUpdate();
 
-  return childrenAnimation;
+  // 处理 animator
+  const cloneChildrenAinmation = calAnimationTime(childrenAnimation, keyFrame);
+
+  return cloneChildrenAinmation;
 }
 
 export {

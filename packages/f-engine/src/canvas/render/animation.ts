@@ -6,7 +6,8 @@ import { Shape } from '../workTags';
 import findClosestShapeNode from './findClosestShapeNode';
 import Animator from './animator';
 import applyStyle from './applyStyle';
-import { isEqual } from '@antv/util';
+import { playerFrame } from '../../playerFrames';
+import { isEqual, mix } from '@antv/util';
 
 function findAllShapeNode(vNode: VNode | VNode[] | null) {
   const shapeNodes = [];
@@ -85,21 +86,14 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   return animator;
 }
 
-function appearAnimation(vNode: VNode | VNode[] | null, keyFrame?: string) {
+function appearAnimation(vNode: VNode | VNode[] | null) {
   return Children.map(vNode, (node) => {
     if (!node) return;
-    const { tag, shape, style, children, animate, props } = node;
-    const animator = keyFrame ? new Animator() : node.animator;
+    const { tag, shape, style, children, animate, props, animator } = node;
     animator.reset(shape);
 
     // 有叶子节点，先执行叶子节点
-    if (children) {
-      animator.children = keyFrame
-        ? createPreAnimation(node, children, null, keyFrame)
-        : createAnimation(node, children, null);
-    } else {
-      animator.children = null;
-    }
+    animator.children = children ? createAnimation(node, children, null) : null;
 
     // 不需要执行动画
     if (animate === false || tag !== Shape) {
@@ -127,7 +121,7 @@ function appearAnimation(vNode: VNode | VNode[] | null, keyFrame?: string) {
   });
 }
 
-function updateAnimation(nextNode, lastNode, keyFrame?: any) {
+function updateAnimation(nextNode, lastNode) {
   const {
     tag: nextTag,
     type: nextType,
@@ -135,6 +129,7 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
     children: nextChildren,
     props: nextProps,
     shape: nextShape,
+    animator,
     animate,
   } = nextNode;
   const {
@@ -144,12 +139,9 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
     children: lastChildren,
     shape: lastShape,
   } = lastNode;
-  const animator = keyFrame ? new Animator() : nextNode.animator;
   animator.reset(nextShape);
   // 先处理叶子节点
-  animator.children = keyFrame
-    ? createPreAnimation(nextNode, nextChildren, lastChildren, keyFrame)
-    : createAnimation(nextNode, nextChildren, lastChildren);
+  animator.children = createAnimation(nextNode, nextChildren, lastChildren);
 
   const { animation } = nextProps;
   const animationEffect = animation ? animation.update : null;
@@ -235,14 +227,13 @@ function updateAnimation(nextNode, lastNode, keyFrame?: any) {
 function destroyAnimation(node: VNode) {
   return Children.map(node, (vNode) => {
     if (!vNode) return null;
-    const { tag, shape, children, animate, style, props, context } = vNode;
+    const { tag, shape, children, animate, style, props, animator, context } = vNode;
     const { timeline } = context;
 
     if (shape.destroyed) {
       return null;
     }
     // 重置
-    const animator = new Animator();
     animator.reset(shape);
 
     // 先处理叶子节点
@@ -294,7 +285,7 @@ function destroyAnimation(node: VNode) {
   });
 }
 
-function createAnimator(nextNode, lastNode, keyFrame?: any) {
+function createAnimator(nextNode, lastNode) {
   if (!nextNode && !lastNode) {
     return null;
   }
@@ -321,11 +312,11 @@ function createAnimator(nextNode, lastNode, keyFrame?: any) {
 
   // appear 动画
   if (nextNode && !lastNode) {
-    return appearAnimation(nextNode, keyFrame);
+    return appearAnimation(nextNode);
   }
 
   // update 动画
-  return updateAnimation(nextNode, lastNode, keyFrame);
+  return updateAnimation(nextNode, lastNode);
 }
 
 function insertShape(parent: DisplayObject, shape: DisplayObject, nextSibling: IChildNode) {
@@ -378,54 +369,26 @@ function createAnimation(
   return childrenAnimator;
 }
 
-function createPreAnimation(
-  parent: VNode,
-  nextChildren: VNode | VNode[],
-  lastChildren: VNode | VNode[],
-  keyFrame: any,
+function calAnimationTime(
+  childrenAnimation: Animator[],
+  keyFrame: Record<string, playerFrame>,
+  parentEffect?: any,
 ) {
-  if (!nextChildren && !lastChildren) {
-    return [];
-  }
-  const { shape: parentShape, animator } = parent;
+  if (!childrenAnimation) return;
+  const animations = [];
+  Children.map(childrenAnimation, (item: Animator) => {
+    if (!item) return;
+    const animator = item.clone();
+    const { vNode, children } = animator;
+    const { duration, delay } = keyFrame[vNode?.key] || {};
 
-  const { key } = parent;
-  const { duration, delay } = keyFrame[key] || {};
-  const globalEffect = { duration, delay };
-  animator.globalEffect = globalEffect;
-
-  // 上一个处理的元素
-  let prevSibling: IChildNode;
-  const childrenAnimator: Animator[] = [];
-
-  Children.compare(nextChildren, lastChildren, (nextNode, lastNode) => {
-    // shape 层才执行动画
-    const animator = createAnimator(nextNode, lastNode, keyFrame);
-
+    const globalEffect = mix(parentEffect, { duration, delay }) || {};
     animator.globalEffect = globalEffect;
+    animator.children = calAnimationTime(children, keyFrame, globalEffect);
 
-    Children.map(animator, (item: Animator) => {
-      if (!item) return;
-      childrenAnimator.push(item);
-      const { shape } = item;
-      if (!shape || shape.destroyed) return;
-
-      let nextSibling: IChildNode;
-
-      // 更新文档流
-      if (!prevSibling) {
-        nextSibling = parentShape.firstChild;
-      } else {
-        nextSibling = prevSibling.nextSibling;
-      }
-      if (nextSibling !== shape) {
-        insertShape(parentShape, shape, nextSibling);
-      }
-      prevSibling = shape;
-    });
+    animations.push(animator);
   });
-
-  return childrenAnimator;
+  return animations;
 }
 
-export { createAnimation, createPreAnimation };
+export { createAnimation, calAnimationTime };

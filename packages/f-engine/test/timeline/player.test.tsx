@@ -9,7 +9,7 @@ describe('player', () => {
         height = '80px',
         opacity = 1,
         fill = 'red',
-        visible = false
+        visible = false,
       } = this.props;
       if (!visible) return;
       return (
@@ -29,7 +29,7 @@ describe('player', () => {
             update: {
               easing: 'linear',
               duration: 10,
-              property: ['x', 'fill','width', 'height'],
+              property: ['x', 'fill', 'width', 'height'],
             },
           }}
         />
@@ -54,7 +54,7 @@ describe('player', () => {
                   visible: true,
                   width: '40px',
                 },
-                duration: 300
+                duration: 500,
               },
             },
             {
@@ -64,13 +64,13 @@ describe('player', () => {
                   width: '80px',
                 },
                 duration: 500,
-                delay:500
+                delay: 500,
               },
             },
           ]}
         >
           <group>
-          <View key={'view'}/>
+            <View key={'view'} width={'5px'} />
           </group>
         </Player>
       </Canvas>
@@ -79,10 +79,12 @@ describe('player', () => {
     const canvas = new Canvas(props);
     await canvas.render();
     await delay(100);
-    
+
     // 传入动画时间生效
-    //@ts-ignore
-    expect(Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width)).toBeLessThan(10)    
+    expect(
+      //@ts-ignore
+      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width),
+    ).toBeLessThan(10);
     expect(callback.mock.calls.length).toBe(0);
     await delay(1500);
     expect(callback.mock.calls.length).toBe(1);
@@ -105,7 +107,7 @@ describe('player', () => {
                   visible: true,
                   width: '40px',
                 },
-                duration: 500
+                duration: 500,
               },
             },
             {
@@ -114,12 +116,12 @@ describe('player', () => {
                   visible: true,
                   width: '80px',
                 },
-                duration: 500
+                duration: 500,
               },
             },
           ]}
         >
-          <View key={'view'}/>
+          <View key={'view'} />
         </Player>
       </Canvas>
     );
@@ -127,7 +129,7 @@ describe('player', () => {
     const canvas = new Canvas(props);
     await canvas.render();
     await delay(100);
-    
+
     expect(context).toMatchImageSnapshot();
   });
-})
+});

@@ -36,11 +36,7 @@ class Animator extends EE {
 
     const animations: IAnimation[] = [];
     if (effect) {
-      const merged = {
-        duration: globalEffect?.duration || effect?.duration,
-        delay: globalEffect?.delay || effect?.delay,
-      };
-      const mergeEffect = { ...effect, ...merged };
+      const mergeEffect = { ...effect, ...globalEffect };
       const {
         property = [],
         easing,
@@ -261,6 +257,18 @@ class Animator extends EE {
     this.end = null;
     this.effect = null;
     this.children = null;
+  }
+
+  clone() {
+    // 浅拷贝
+    const animator = new Animator();
+    animator.shape = this.shape;
+    animator.start = this.start;
+    animator.end = this.end;
+    animator.effect = this.effect;
+    animator.children = this.children;
+    animator.vNode = this.vNode;
+    return animator;
   }
 }
 

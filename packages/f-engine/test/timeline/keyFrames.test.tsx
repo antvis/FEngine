@@ -395,10 +395,10 @@ describe('player', () => {
 
     canvas.update(newProps);
     await delay(800);
+
+    const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0];
     //@ts-ignore
-    expect(
-      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width),
-    ).toBeGreaterThan(10);
+    expect(Number(shape.style.width)).toBeGreaterThan(10);
   });
 
   it('播放中finish', async () => {

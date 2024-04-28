@@ -48,6 +48,7 @@
     "lint": "eslint ./",
     "lint-fix": "eslint --fix ./",
     "release": "lerna publish --yes --summary-file",
+    "canary": "npm run build && npm run test && lerna publish --canary --dist-tag next",
     "ci": "npm run lint && npm run build && npm run test",
     "prettier": "prettier --write './packages/**/*.{ts,tsx}'"
   },
