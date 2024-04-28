@@ -4,7 +4,6 @@ import EE from 'eventemitter3';
 import { VNode } from '../vnode';
 import { createShape } from './createShape';
 import applyStyle from './applyStyle';
-import Timeline from '../timeline';
 
 class Animator extends EE {
   vNode: VNode;
@@ -16,12 +15,14 @@ class Animator extends EE {
   animations: IAnimation[];
   // 节点动画树
   children: Animator[];
-  timeline: Timeline;
+  // 组件下的全局effect
+  globalEffect: any;
+  time: number;
 
-  constructor(timeline) {
+  constructor() {
     super();
-    this.timeline = timeline;
   }
+
   animate(shape, start, end, effect) {
     this.shape = shape;
     this.start = start;
@@ -31,10 +32,11 @@ class Animator extends EE {
 
   // 首次播放
   run() {
-    const { vNode, shape, start, end, effect, children } = this;
+    const { vNode, shape, start, end, effect, children, globalEffect } = this;
 
     const animations: IAnimation[] = [];
     if (effect) {
+      const mergeEffect = { ...effect, ...globalEffect };
       const {
         property = [],
         easing,
@@ -45,11 +47,14 @@ class Animator extends EE {
         direction = 'normal',
         onFrame,
         onEnd,
-      } = effect;
+      } = mergeEffect;
       // shape 动画
       if ((property.length || onFrame) && duration > 0) {
         // 应用样式
-        const style = { ...omit(start, property), ...omit(end, property) };
+        const style = {
+          ...omit(start, property),
+          ...omit(end, property),
+        };
         applyStyle(shape, style);
         // 开始帧
         const keyframeStart = property.reduce((prev, cur: string) => {
@@ -142,7 +147,9 @@ class Animator extends EE {
             }, {});
             // 结束帧
             const clipKeyframeEnd = pick(clipEndStyle, clipProperty);
-            const clipShape = createShape(clipType, { style: clipStartStyle });
+            const clipShape = createShape(clipType, {
+              style: clipStartStyle,
+            });
             shape.setAttribute('clipPath', clipShape);
 
             // g 中 clip 为全局，且如果要在 clip上加动画，需要手动加到canvas上
@@ -188,9 +195,6 @@ class Animator extends EE {
     }
     this.animations = animations;
 
-    if (this.timeline) {
-      this.timeline.push(animations);
-    }
     // TODO：这段代码放这个位置感觉挺奇怪，看看是否有更合适的地方
     if (vNode) {
       const { component } = vNode;
@@ -253,6 +257,18 @@ class Animator extends EE {
     this.end = null;
     this.effect = null;
     this.children = null;
+  }
+
+  clone() {
+    // 浅拷贝
+    const animator = new Animator();
+    animator.shape = this.shape;
+    animator.start = this.start;
+    animator.end = this.end;
+    animator.effect = this.effect;
+    animator.children = this.children;
+    animator.vNode = this.vNode;
+    return animator;
   }
 }
 
