@@ -114,8 +114,8 @@ function createVNode(parent: VNode, vNode: VNode) {
     } else {
       component = new Component(props, componentContext, updater);
       component.render = function() {
-        // @ts-ignore
-        return type(this.props, componentContext, updater);
+        // @ts-ignore update的时候用最新的context
+        return type(this.props, this.context, updater);
       };
     }
     const group = new Group();
