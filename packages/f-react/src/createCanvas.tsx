@@ -62,10 +62,6 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       const { canvasRef } = props;
       this.canvasRef = canvasRef || createRef();
       this.state = { error: null };
-      this.parentNode = {
-        width: 0,
-        height: 0,
-      };
     }
 
     catchError(error) {
@@ -110,6 +106,13 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
         this.catchError(error);
       });
 
+      const targetNode = this.canvasRef.current?.parentElement;
+      const { width, height } = targetNode.getBoundingClientRect();
+      this.parentNode = {
+        width: Math.round(width),
+        height: Math.round(height),
+      };
+
       this.observeElement();
     }
 
@@ -130,7 +133,9 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
 
     resize() {
       const targetNode = this.canvasRef.current?.parentElement;
-      const { width: lastWidth, height: lastHeight } = targetNode.getBoundingClientRect();
+      const { width, height } = targetNode.getBoundingClientRect();
+      const lastWidth = Math.round(width);
+      const lastHeight = Math.round(height);
       if (
         (lastWidth === this.parentNode.width && lastHeight === this.parentNode.height) ||
         !lastWidth ||
