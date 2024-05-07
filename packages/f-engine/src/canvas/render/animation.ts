@@ -374,13 +374,10 @@ function calAnimationTime(
   keyFrame: Record<string, playerFrame>,
   parentEffect?: any,
 ) {
-  if (!childrenAnimation)
-    return {
-      animations: null,
-      time: 0,
-    };
-  const animations = [];
-  let maxTime = 0;
+  if (!childrenAnimation) return { animators: null, time: 0 };
+
+  const animators = [];
+  let time = 0;
 
   Children.map(childrenAnimation, (item: Animator) => {
     if (!item) return;
@@ -388,23 +385,20 @@ function calAnimationTime(
     const { vNode, children } = animator;
     const { duration, delay } = keyFrame[vNode?.key] || {};
 
-    const globalEffect = mix(parentEffect || {}, { duration, delay }) || {};
-    animator.globalEffect = globalEffect;
+    const globalEffect = mix(parentEffect || {}, { duration, delay });
+    const effect = { ...animator.effect, ...globalEffect };
+    animator.effect = effect;
 
     // computed time
-    const { duration: gDuration = 0, delay: gDelay = 0 } = { ...animator.effect, ...globalEffect };
-    if (gDuration + gDelay > maxTime) maxTime = gDuration + gDelay;
+    const { duration: gDuration = 0, delay: gDelay = 0 } = effect;
+    const animUnits = calAnimationTime(children, keyFrame, globalEffect);
+    time = Math.max(time, gDuration + gDelay, animUnits.time);
 
-    const childAnimations = calAnimationTime(children, keyFrame, globalEffect);
-    if (childAnimations.time > maxTime) maxTime = childAnimations.time;
-
-    animator.children = childAnimations?.animations;
-    animations.push(animator);
+    animator.children = animUnits.animators;
+    animators.push(animator);
   });
-  return {
-    animations,
-    time: maxTime,
-  };
+
+  return { animators, time };
 }
 
 export { createAnimation, calAnimationTime };

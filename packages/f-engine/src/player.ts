@@ -19,7 +19,7 @@ export interface PlayerProps {
   /**
    * 播放速率，默认为 1
    */
-  // speed?: number;
+  speed?: number;
   children?: JSX.Element | null;
 
   keyFrames?: Record<string, playerFrame>[];
@@ -63,7 +63,7 @@ class Player extends Component<PlayerProps> {
   }
 
   didMount(): void {
-    const { keyFrames, children, state, onend, goTo } = this.props;
+    const { keyFrames, children, state, onend, goTo, speed } = this.props;
 
     this.playerFrames = keyFrames.reduce((array, cur) => {
       const frames = generateFrameElement(cur, array[array.length - 1] || children);
@@ -74,45 +74,51 @@ class Player extends Component<PlayerProps> {
     const array = this.playerFrames.map((cur, index) => {
       const keyFrame = keyFrames[index];
       this.preNode = cloneNode(this.preNode || this._vNode);
-      const { animations, time } = getUpdateAnimation(this, cur, keyFrame) || {};
+      const animUnits = getUpdateAnimation(this, cur, keyFrame) || {};
 
-      return {
-        childrenAnimation: animations,
-        totalTime: time,
-      };
+      return animUnits;
     });
 
     this.timeline = new Timeline({
-      animators: array,
+      animUnits: array,
       playState: state,
       root: this.context.canvas,
+      speed: speed,
+      time: goTo,
     });
 
     this.timeline.start();
     onend && this.timeline.on('end', onend);
-    setTimeout(() => {
-      goTo && this.goTo(goTo);
-    }, 0);
   }
 
   willReceiveProps(nextProps: PlayerProps, _context?: IContext) {
     const { props: lastProps, timeline } = this;
-    const { state, goTo: nextTime } = nextProps;
-    const { goTo } = lastProps;
+    const { state, goTo: nextTime, speed: newSpeed } = nextProps;
+    const { goTo: lastTime, speed: lastSpeed } = lastProps;
 
     // state 更新
     if (!isEqual(state, timeline.getPlayState())) {
       timeline.updateState({ state });
     }
 
-    if (!isEqual(nextTime, goTo)) {
-      this.goTo(nextTime);
+    if (!isEqual(nextTime, lastTime)) {
+      timeline.goTo(nextTime);
+    }
+
+    // 播放速度
+    if (!isEqual(newSpeed, lastSpeed)) {
+      timeline.setPlaybackRate(newSpeed);
     }
   }
 
   goTo(time) {
     const { timeline } = this;
     timeline.goTo(time);
+  }
+
+  setPlaybackRate(speed) {
+    const { timeline } = this;
+    timeline.setPlaybackRate(speed);
   }
 
   render() {

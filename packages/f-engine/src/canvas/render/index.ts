@@ -427,15 +427,15 @@ function getUpdateAnimation(component, newChildren, keyFrame) {
 
   // 更新 children
   component.preNode.children = nextChildren;
-  debugger;
+
   // 创建动画
   const childrenAnimation = createAnimation(preNode, nextChildren, lastChildren);
   component.didUpdate();
-  debugger;
-  // 处理 animator
-  const cloneChildrenAinmation = calAnimationTime(childrenAnimation, keyFrame);
 
-  return cloneChildrenAinmation;
+  // 处理 animator
+  const animUnits = calAnimationTime(childrenAnimation, keyFrame);
+
+  return animUnits;
 }
 
 export {

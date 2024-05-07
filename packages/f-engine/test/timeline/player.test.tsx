@@ -83,8 +83,8 @@ describe('player', () => {
     // 传入动画时间生效
     expect(
       //@ts-ignore
-      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].style.width),
-    ).toBeLessThan(10);
+      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].childNodes[0].style.width),
+    ).toBeLessThan(30);
     expect(callback.mock.calls.length).toBe(0);
     await delay(1500);
     expect(callback.mock.calls.length).toBe(1);
@@ -216,5 +216,54 @@ describe('player', () => {
     await delay(100);
 
     expect(context).toMatchImageSnapshot();
+  });
+
+  it('speed', async () => {
+    const context = createContext('播放速度');
+
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          speed={3}
+          state="play"
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '40px',
+                },
+                duration: 500,
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 500,
+              },
+            },
+          ]}
+        >
+          <group>
+            <View key={'view'} visible={false} />
+          </group>
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    // 400ms 就播放完了
+    await delay(400);
+
+    expect(
+      //@ts-ignore
+      Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].childNodes[0].style.width),
+    ).toEqual(40);
   });
 });

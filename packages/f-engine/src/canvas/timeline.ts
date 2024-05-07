@@ -3,32 +3,36 @@ import { Group } from '@antv/g-lite';
 import Animator from './render/animator';
 import EE from 'eventemitter3';
 
-type AnimaUnit = {
-  childrenAnimation: Animator[];
-  totalTime: number;
+type AnimUnit = {
+  animators: Animator[];
+  time: number;
 };
 class Timeline extends EE {
   animator: Animator;
-  animators: AnimaUnit[] = [];
+  animUnits: AnimUnit[] = [];
   frame: number = 0;
   playState: string = 'play';
   endFrame: number;
+  speed: number;
+  time: number;
 
   constructor(props) {
     super();
-    const { animators, playState, root } = props;
+    const { animUnits, playState, root, speed = 1, goto } = props;
     this.animator = new Animator();
     const rootShape = new Group();
     this.animator.reset(rootShape);
     root.appendChild(rootShape);
 
-    this.animators = animators;
+    this.animUnits = animUnits;
     this.playState = playState;
-    this.endFrame = animators.length - 1;
+    this.endFrame = animUnits.length - 1;
+    this.speed = speed;
+    this.time = goto;
   }
 
   start() {
-    const { animator, frame, playState, endFrame } = this;
+    const { animator, frame, playState, endFrame, time, speed } = this;
     if (frame < endFrame && playState === 'finish') {
       this.frame = endFrame;
     }
@@ -36,16 +40,19 @@ class Timeline extends EE {
     animator.on('end', this.next);
     this.animator.run();
     this.setPlayState(playState);
+    time && this.goTo(time);
+    this.setPlaybackRate(speed);
   }
 
   next = () => {
-    const { frame, playState, endFrame } = this;
+    const { frame, playState, endFrame, speed } = this;
     if (playState !== 'play') return;
 
     this.frame = frame + 1;
     if (frame < endFrame) {
       this.drawFrame();
       this.animator.run();
+      this.setPlaybackRate(speed);
     } else {
       this.emit('end');
       this.playState = 'finish';
@@ -53,8 +60,8 @@ class Timeline extends EE {
   };
 
   drawFrame() {
-    const { animator, animators, frame } = this;
-    const childAnimator = animators[frame].childrenAnimation;
+    const { animator, animUnits, frame } = this;
+    const childAnimator = animUnits[frame].animators;
     animator.shape.removeChildren();
     childAnimator.map((d) => {
       animator.shape.appendChild(d?.shape);
@@ -79,6 +86,12 @@ class Timeline extends EE {
     }
   }
 
+  setPlaybackRate(speed) {
+    const { animator } = this;
+    this.speed = speed;
+    animator.setPlaybackRate(speed);
+  }
+
   getPlayState() {
     return this.playState;
   }
@@ -97,20 +110,20 @@ class Timeline extends EE {
 
   clear() {
     this.animator = null;
-    this.animators = [];
+    this.animUnits = [];
     this.playState = null;
     this.endFrame = null;
   }
 
   goTo(time) {
-    const { frame, animators, playState } = this;
+    const { frame, animUnits, playState } = this;
     let target;
 
-    for (let i = 0; i < animators.length; i++) {
-      const cur = animators[i];
+    for (let i = 0; i < animUnits.length; i++) {
+      const cur = animUnits[i];
       target = i;
-      if (time > cur.totalTime) {
-        time -= cur.totalTime; // 计算剩余时间
+      if (time > cur.time) {
+        time -= cur.time; // 计算剩余时间
       } else {
         break;
       }
