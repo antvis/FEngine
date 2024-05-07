@@ -17,6 +17,7 @@ class Animator extends EE {
   children: Animator[];
   // 组件下的全局effect
   globalEffect: any;
+  // 动画时长
   time: number;
 
   constructor() {

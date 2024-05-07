@@ -90,44 +90,129 @@ describe('player', () => {
     expect(callback.mock.calls.length).toBe(1);
   });
 
-  it.skip('goTo', async () => {
+  it('goTo', async () => {
     const context = createContext('跳转至某时间');
     const callback = jest.fn();
 
+    // 第一帧结束
     const { props } = (
       <Canvas context={context}>
         <Player
           state="pause"
-          goTo={490}
+          goTo={1100}
           keyFrames={[
             // 先出现，再变宽
             {
               view: {
                 to: {
                   visible: true,
-                  width: '40px',
+                  width: '80px',
                 },
-                duration: 500,
+                duration: 1000,
+                delay: 100,
               },
             },
             {
               view: {
                 to: {
                   visible: true,
-                  width: '80px',
+                  width: '160px',
                 },
-                duration: 500,
+                duration: 800,
+                delay: 100,
               },
             },
           ]}
         >
-          <View key={'view'} />
+          <group>
+            <View key={'view'} visible={false} />
+          </group>
         </Player>
       </Canvas>
     );
 
     const canvas = new Canvas(props);
     await canvas.render();
+    await delay(100);
+
+    expect(context).toMatchImageSnapshot();
+
+    // 第一和二帧中间
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={1500}
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 1000,
+                delay: 100,
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '160px',
+                },
+                duration: 800,
+                delay: 100,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps);
+    await delay(100);
+
+    expect(context).toMatchImageSnapshot();
+
+    // 第一帧
+    const { props: new2Props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={110}
+          keyFrames={[
+            // 先出现，再变宽
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 1000,
+                delay: 100,
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '160px',
+                },
+                duration: 800,
+                delay: 100,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(new2Props);
     await delay(100);
 
     expect(context).toMatchImageSnapshot();

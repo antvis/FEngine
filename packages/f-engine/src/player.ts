@@ -71,15 +71,14 @@ class Player extends Component<PlayerProps> {
       return array;
     }, []);
 
-    this.preNode = cloneNode(this._vNode);
     const array = this.playerFrames.map((cur, index) => {
       const keyFrame = keyFrames[index];
+      this.preNode = cloneNode(this.preNode || this._vNode);
+      const { animations, time } = getUpdateAnimation(this, cur, keyFrame) || {};
 
-      const childrenAnimation = getUpdateAnimation(this, cur, keyFrame);
-      this.preNode = cloneNode(this.preNode);
       return {
-        childrenAnimation,
-        totalTime: 0,
+        childrenAnimation: animations,
+        totalTime: time,
       };
     });
 
@@ -91,7 +90,9 @@ class Player extends Component<PlayerProps> {
 
     this.timeline.start();
     onend && this.timeline.on('end', onend);
-    goTo && this.goTo(goTo);
+    setTimeout(() => {
+      goTo && this.goTo(goTo);
+    }, 0);
   }
 
   willReceiveProps(nextProps: PlayerProps, _context?: IContext) {

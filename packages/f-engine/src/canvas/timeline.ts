@@ -56,7 +56,9 @@ class Timeline extends EE {
     const { animator, animators, frame } = this;
     const childAnimator = animators[frame].childrenAnimation;
     animator.shape.removeChildren();
-    childAnimator.map((d) => animator.shape.appendChild(d?.shape));
+    childAnimator.map((d) => {
+      animator.shape.appendChild(d?.shape);
+    });
     animator.children = childAnimator;
   }
 
@@ -102,15 +104,17 @@ class Timeline extends EE {
 
   goTo(time) {
     const { frame, animators, playState } = this;
+    let target;
 
-    const target = animators.findIndex((cur) => {
-      if (time - cur.totalTime < 0) {
-        return true;
+    for (let i = 0; i < animators.length; i++) {
+      const cur = animators[i];
+      target = i;
+      if (time > cur.totalTime) {
+        time -= cur.totalTime; // 计算剩余时间
       } else {
-        time = time - cur?.totalTime;
-        return false;
+        break;
       }
-    });
+    }
 
     if (frame !== target) {
       this.frame = target;
