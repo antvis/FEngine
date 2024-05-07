@@ -433,9 +433,9 @@ function getUpdateAnimation(component, newChildren, keyFrame) {
   component.didUpdate();
 
   // 处理 animator
-  const cloneChildrenAinmation = calAnimationTime(childrenAnimation, keyFrame);
+  const animUnits = calAnimationTime(childrenAnimation, keyFrame);
 
-  return cloneChildrenAinmation;
+  return animUnits;
 }
 
 export {

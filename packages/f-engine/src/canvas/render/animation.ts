@@ -374,21 +374,31 @@ function calAnimationTime(
   keyFrame: Record<string, playerFrame>,
   parentEffect?: any,
 ) {
-  if (!childrenAnimation) return;
-  const animations = [];
+  if (!childrenAnimation) return { animators: null, time: 0 };
+
+  const animators = [];
+  let time = 0;
+
   Children.map(childrenAnimation, (item: Animator) => {
     if (!item) return;
     const animator = item.clone();
     const { vNode, children } = animator;
     const { duration, delay } = keyFrame[vNode?.key] || {};
 
-    const globalEffect = mix(parentEffect, { duration, delay }) || {};
-    animator.globalEffect = globalEffect;
-    animator.children = calAnimationTime(children, keyFrame, globalEffect);
+    const globalEffect = mix(parentEffect || {}, { duration, delay });
+    const effect = { ...animator.effect, ...globalEffect };
+    animator.effect = effect;
 
-    animations.push(animator);
+    // computed time
+    const { duration: gDuration = 0, delay: gDelay = 0 } = effect;
+    const animUnits = calAnimationTime(children, keyFrame, globalEffect);
+    time = Math.max(time, gDuration + gDelay, animUnits.time);
+
+    animator.children = animUnits.animators;
+    animators.push(animator);
   });
-  return animations;
+
+  return { animators, time };
 }
 
 export { createAnimation, calAnimationTime };

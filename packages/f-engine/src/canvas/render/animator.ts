@@ -15,9 +15,6 @@ class Animator extends EE {
   animations: IAnimation[];
   // 节点动画树
   children: Animator[];
-  // 组件下的全局effect
-  globalEffect: any;
-  time: number;
 
   constructor() {
     super();
@@ -32,11 +29,10 @@ class Animator extends EE {
 
   // 首次播放
   run() {
-    const { vNode, shape, start, end, effect, children, globalEffect } = this;
+    const { vNode, shape, start, end, effect, children } = this;
 
     const animations: IAnimation[] = [];
     if (effect) {
-      const mergeEffect = { ...effect, ...globalEffect };
       const {
         property = [],
         easing,
@@ -47,7 +43,7 @@ class Animator extends EE {
         direction = 'normal',
         onFrame,
         onEnd,
-      } = mergeEffect;
+      } = effect;
       // shape 动画
       if ((property.length || onFrame) && duration > 0) {
         // 应用样式
@@ -236,6 +232,14 @@ class Animator extends EE {
     if (!animations || !animations.length) return;
     animations.forEach((d) => {
       d.finish();
+    });
+  }
+
+  setPlaybackRate(speed) {
+    const { animations } = this;
+    if (!animations || !animations.length) return;
+    animations.forEach((d) => {
+      d.playbackRate = speed;
     });
   }
 
