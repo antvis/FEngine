@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/antvis/f2/compare/v1.3.0...v1.3.1) (2024-05-13)
+
+
+### Bug Fixes
+
+* resize精度 ([#265](https://github.com/antvis/f2/issues/265)) ([65b7ed5](https://github.com/antvis/f2/commit/65b7ed5fecffafd4877a9ec8c2f1ee6e6a74fb20))
+
+
+
+
+
 # [1.3.0](https://github.com/antvis/f2/compare/v1.2.2...v1.3.0) (2024-04-10)
 
 **Note:** Version bump only for package @antv/f-react

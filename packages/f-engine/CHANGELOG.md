@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/antvis/FEngine/compare/v1.3.0...v1.3.1) (2024-05-13)
+
+
+### Bug Fixes
+
+* resize时component 挂在最新context ([#266](https://github.com/antvis/FEngine/issues/266)) ([1c33297](https://github.com/antvis/FEngine/commit/1c33297c889c35143555818beb144c60df2fede6))
+
+
+
+
+
 # [1.3.0](https://github.com/antvis/FEngine/compare/v1.2.2...v1.3.0) (2024-04-10)
 
 

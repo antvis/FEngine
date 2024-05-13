@@ -1,6 +1,6 @@
 {
   "name": "@antv/f-lottie",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "FEngine for Lottie",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -15,7 +15,7 @@
     "lottie"
   ],
   "dependencies": {
-    "@antv/f-engine": "1.3.0",
+    "@antv/f-engine": "1.3.1",
     "@antv/g-lottie-player": "~0.2.0",
     "@babel/runtime": "^7.12.5",
     "tslib": "^2.3.1"
