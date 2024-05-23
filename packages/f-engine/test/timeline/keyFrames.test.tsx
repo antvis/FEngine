@@ -479,6 +479,44 @@ describe('player', () => {
     expect(context).toMatchImageSnapshot();
   });
 
+  it('keyFrames-连续变化', async () => {
+    const context = createContext('连续变化');
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          keyFrames={[
+            // 变宽
+            {
+              view: {
+                to: {
+                  width: '10px',
+                },
+              },
+            },
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 500,
+              },
+            },
+            {},
+          ]}
+        >
+          <View key={'view'} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
+  });
+
   it.skip('leave 动画', async () => {
     const context = createContext('动画 finish');
     const ref = { current: null };

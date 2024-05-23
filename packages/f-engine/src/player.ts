@@ -7,6 +7,7 @@ import Children from './children';
 import { IContext } from './types';
 import { VNode } from './canvas/vnode';
 import { isEqual } from '@antv/util';
+import applyStyle from './canvas/render/applyStyle';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -38,10 +39,16 @@ function cloneNode(vnode) {
     if (!child) {
       return;
     }
-    const { shape, children } = child;
+    const { shape, children, animator } = child;
+    const { end = {} } = animator;
+
+    // 拿到上一帧的snapshot
+    const snapshot = shape.cloneNode();
+    applyStyle(snapshot, end);
+
     return {
       ...child,
-      shape: shape.cloneNode(),
+      shape: snapshot,
       children: cloneNode(children),
     };
   });
