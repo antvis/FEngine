@@ -1,9 +1,10 @@
 export default (layout) => {
   const { left, top, width, height } = layout;
   return {
-    x: left,
-    y: top,
+    // x: left,
+    // y: top,
     width,
     height,
+    transform: `translate(${left}, ${top})`,
   };
 };

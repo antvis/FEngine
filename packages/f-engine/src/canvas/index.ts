@@ -294,8 +294,9 @@ class Canvas<P extends CanvasProps = CanvasProps> {
     const layout = computeLayout(style);
     const { left, top } = layout;
     // 设置 container 的位置
-    this.container.setAttribute('x', left);
-    this.container.setAttribute('y', top);
+    // this.container.setAttribute('x', left);
+    // this.container.setAttribute('y', top);
+    this.container.setAttribute('transform', `translate(${left}, ${top})`);
 
     this.context = {
       ...this.context,

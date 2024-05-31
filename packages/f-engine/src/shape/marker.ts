@@ -62,6 +62,6 @@ export class Marker extends Path {
 
     const path = method(x, y, radius);
 
-    super.setAttribute('path', path);
+    super.setAttribute('d', path);
   }
 }

@@ -135,7 +135,7 @@ export class Sector extends Path {
     const { cx, cy, startAngle, endAngle, r, r0, radius, anticlockwise = false } = this.parsedStyle;
 
     if (isNil(startAngle) || isNil(endAngle) || startAngle === endAngle || isNil(r) || r <= 0) {
-      super.setAttribute('path', '');
+      super.setAttribute('d', '');
       return;
     }
 
@@ -149,7 +149,7 @@ export class Sector extends Path {
       radius ? radius : [0, 0, 0, 0],
       anticlockwise,
     );
-    super.setAttribute('path', path);
+    super.setAttribute('d', path);
   }
 
   private createPath(

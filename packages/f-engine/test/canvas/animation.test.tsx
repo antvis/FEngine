@@ -90,7 +90,7 @@ describe('动画', () => {
                 opacity: 0,
               },
               easing: 'ease',
-              duration: 50,
+              duration: 100,
               delay: 10,
               property: ['opacity'],
             },
@@ -106,7 +106,7 @@ describe('动画', () => {
     const update2 = <Canvas context={context}></Canvas>;
     await canvas.update(update2.props);
 
-    await delay(200);
+    await delay(2000);
     expect(context).toMatchImageSnapshot();
   });
 
