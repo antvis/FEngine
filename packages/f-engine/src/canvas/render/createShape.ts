@@ -10,6 +10,7 @@ import {
   DisplayObject,
   CSS,
   PropertySyntax,
+  runtime,
 } from '@antv/g-lite';
 import { Arc, Marker, Sector, SmoothPolyline } from '../../shape';
 import Gesture from '../../gesture';
@@ -90,6 +91,9 @@ const SECTOR_CSS_PROPERTY = [
 SECTOR_CSS_PROPERTY.forEach((property) => {
   CSS.registerProperty(property);
 });
+
+// https://github.com/antvis/G/releases/tag/%40antv%2Fg%406.0.0
+runtime.enableCSSParsing = true;
 
 function createShape(type: string, props) {
   if (!type) return null;

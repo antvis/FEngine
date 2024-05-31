@@ -38,7 +38,7 @@ export class SmoothPolyline extends Path {
           };
         }),
         false,
-        constaint
+        constaint,
       );
 
       for (let i = 0, n = sps.length; i < n; i++) {
@@ -82,6 +82,6 @@ export class SmoothPolyline extends Path {
       }
       d.push(['L', pos[l][0], pos[l][1]]);
     }
-    super.setAttribute('path', d);
+    super.setAttribute('d', d);
   }
 }

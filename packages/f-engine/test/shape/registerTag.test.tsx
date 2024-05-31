@@ -16,7 +16,7 @@ describe('自定义标签', () => {
       <Canvas renderer={renderer} context={context}>
         <customTag
           style={{
-            path: [
+            d: [
               ['M', 10, 10],
               ['L', 100, 10],
             ],
@@ -28,7 +28,7 @@ describe('自定义标签', () => {
     );
 
     const canvas = new Canvas(props);
-    canvas.render();
+    await canvas.render();
     await delay(200);
     expect(context).toMatchImageSnapshot();
   });

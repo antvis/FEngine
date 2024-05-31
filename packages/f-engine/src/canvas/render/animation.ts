@@ -49,22 +49,22 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
   const startStyle = {
     ...lastStyle,
     ...start,
-    path: lastPath,
+    d: lastPath,
   };
   const endStyle = {
     ...nextStyle,
     ...end,
-    path: nextPath,
+    d: nextPath,
   };
 
-  const pathShape = createShape('path', { style: { ...startStyle, path: '' } });
+  const pathShape = createShape('path', { style: { ...startStyle, d: '' } });
 
   // 形变双方都有的属性才能动画
   const animateProperty = property
     .filter((key) => {
       return nextParsedStyle.hasOwnProperty(key) && lastParsedStyle.hasOwnProperty(key);
     })
-    .concat('path');
+    .concat(['d']);
 
   animator.animate(pathShape, startStyle, endStyle, {
     ...animationEffect,

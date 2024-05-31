@@ -1,4 +1,4 @@
-import { Canvas, CanvasEvent, Circle, convertToPath, Path, Rect } from '@antv/g-lite';
+import { Canvas, CanvasEvent, Circle, convertToPath, Path, Rect, Text } from '@antv/g-lite';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import '@antv/g-web-animations-api';
 import { createContext, delay } from './util';
@@ -19,55 +19,42 @@ describe('G 的测试使用', () => {
 
     await delay(1000);
 
-    /**
-     * Path -> Circle
-     */
-    const circle = new Circle({
-      style: {
-        cx: 50,
-        cy: 50,
-        r: 20,
-        fill: 'red',
-      },
-    });
-    const circlePathStr = convertToPath(circle);
+    // const text = new Text({
+    //   style: {
+    //     x: 20,
+    //     y: 20,
+    //     text: 'Hello World',
+    //     fill: 'red',
+    //   },
+    // });
+    // const container = canvas.getRoot();
+    // container.setAttribute('fontSize', 30);
 
-    /**
-     * Rect -> Circle
-     */
+    // canvas.appendChild(text);
+
+    // console.log(text);
+
     const rect = new Rect({
       style: {
         x: 10,
-        y: 10,
-        width: 60,
-        height: 50,
+        y: 20,
+        width: 50,
+        height: 100,
         fill: 'red',
       },
     });
+
+    const rect1 = new Rect({
+      style: {
+        x: 10,
+        y: 20,
+        width: 50,
+        height: 100,
+        fill: '#1890FF',
+      },
+    });
+    rect.appendChild(rect1);
 
     canvas.appendChild(rect);
-    const rectPathStr = convertToPath(rect);
-
-    const path = new Path({
-      style: {
-        fill: 'red',
-      },
-    });
-    rect.replaceWith(path);
-
-    path.style.fill = 'red';
-    path.style.path = rectPathStr;
-
-    // canvas.appendChild(pathF);
-
-    path.animate([{ path: rectPathStr }, { path: circlePathStr }], {
-      duration: 2500,
-      easing: 'ease',
-      // iterations: Infinity,
-      // direction: 'alternate',
-      fill: 'both',
-    });
-
-    await delay(1000);
   });
 });

@@ -106,6 +106,7 @@ class View1 extends Component {
             x: 150,
             y: 100,
             symbol: 'arrow',
+            transformOrigin: 'left top',
             transform: 'rotate(90deg)',
           }}
         />
