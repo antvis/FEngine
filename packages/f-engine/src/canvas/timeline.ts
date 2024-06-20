@@ -96,14 +96,14 @@ class Timeline extends EE {
     return this.playState;
   }
 
-  updateState(nextProps) {
+  updateState(state) {
     // 播放状态不同
-    const { state } = nextProps;
     if (state === 'finish') {
       this.frame = this.endFrame;
       this.drawFrame();
       this.animator.run();
     }
+
     this.playState = state;
     this.setPlayState(state);
   }

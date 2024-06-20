@@ -105,7 +105,7 @@ class Player extends Component<PlayerProps> {
 
     // state 更新
     if (!isEqual(state, timeline.getPlayState())) {
-      timeline.updateState({ state });
+      timeline.updateState(state);
     }
 
     if (!isEqual(nextTime, lastTime)) {
@@ -116,6 +116,11 @@ class Player extends Component<PlayerProps> {
     if (!isEqual(newSpeed, lastSpeed)) {
       timeline.setPlaybackRate(newSpeed);
     }
+  }
+
+  setPlayState(state) {
+    const { timeline } = this;
+    timeline.updateState(state);
   }
 
   goTo(time) {
