@@ -119,14 +119,20 @@ class Timeline extends EE {
     const { frame, animUnits, playState } = this;
     let target;
 
-    for (let i = 0; i < animUnits.length; i++) {
-      const cur = animUnits[i];
-      target = i;
-      if (time > cur.time) {
+    for (target = 0; target < animUnits.length; target++) {
+      const cur = animUnits[target];
+      if (time >= cur.time) {
         time -= cur.time; // 计算剩余时间
       } else {
         break;
       }
+    }
+
+    // 超出了总时长
+    const threshold = 0.0001;
+    if (target === animUnits.length && Math.abs(time - threshold) >= 0) {
+      this.setPlayState('finish');
+      return;
     }
 
     if (frame !== target) {
@@ -135,6 +141,7 @@ class Timeline extends EE {
       this.animator.run();
       this.setPlayState(playState);
     }
+
     this.animator.goTo(time);
   }
 }

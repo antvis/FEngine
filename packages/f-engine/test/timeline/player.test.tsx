@@ -372,4 +372,58 @@ describe('clip animation', () => {
 
     expect(context).toMatchImageSnapshot();
   });
+
+  it('跳转超出总时长', async () => {
+    const context = createContext('跳转超出总时长');
+
+    //结束后重播
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="finish"
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={1200}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps);
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+  });
 });
