@@ -23,7 +23,7 @@ type ArrayAttribute =
   | [string | number, string | number, string | number]
   | [string | number, string | number, string | number, string | number];
 
-type StepType = 'start' | 'middle' | 'end'
+type StepType = 'start' | 'middle' | 'end';
 interface StyleFlexProps {
   display?: 'flex';
   position?: 'relative' | 'absolute';
@@ -185,6 +185,7 @@ interface Animation extends AnimationBase {
 interface ClipAnimation extends AnimationBase {
   type: string;
   style: ShapeStyleProps;
+  deleteAfterComplete?: boolean;
 }
 
 export interface AnimationProps {

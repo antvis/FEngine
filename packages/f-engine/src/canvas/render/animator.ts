@@ -116,6 +116,7 @@ class Animator extends EE {
         if (clipConfig) {
           const {
             type: clipType,
+            deleteAfterComplete = true,
             style: clipStyle,
             property: clipProperty = [],
             easing: clipEasing,
@@ -162,11 +163,12 @@ class Animator extends EE {
             // 过滤无限循环的动画
             if (clipAnimation) {
               const clipFinished = clipAnimation.finished;
-              clipFinished.then(() => {
-                // 删掉 clip
-                shape.setAttribute('clipPath', null);
-                clipShape.destroy();
-              });
+              deleteAfterComplete &&
+                clipFinished.then(() => {
+                  // 删掉 clip
+                  shape.setAttribute('clipPath', null);
+                  clipShape.destroy();
+                });
               if ((clipIterations || iterations) !== Infinity) {
                 animations.push(clipAnimation);
               }

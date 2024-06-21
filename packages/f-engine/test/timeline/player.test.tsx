@@ -267,3 +267,109 @@ describe('player', () => {
     ).toEqual(40);
   });
 });
+
+describe('clip animation', () => {
+  class View extends Component {
+    render() {
+      const {
+        width = '80px',
+        height = '80px',
+        opacity = 1,
+        fill = 'red',
+        visible = false,
+      } = this.props;
+      if (!visible) return;
+      return (
+        <rect
+          style={{
+            width,
+            height,
+            fill,
+            opacity,
+          }}
+          animation={{
+            appear: {
+              easing: 'linear',
+              duration: 200,
+              clip: {
+                type: 'rect',
+                property: ['width'],
+                style: {
+                  width,
+                  height,
+                },
+                deleteAfterComplete: false,
+                start: {
+                  width: 0,
+                },
+                end: {
+                  width,
+                },
+              },
+            },
+            update: {
+              easing: 'linear',
+              duration: 10,
+              property: ['x', 'fill', 'width', 'height'],
+            },
+          }}
+        />
+      );
+    }
+  }
+
+  it('clip 增加 deleteAfterComplete', async () => {
+    const context = createContext('deleteAfterComplete');
+
+    //结束后重播
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="finish"
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={10}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps);
+    await delay(100);
+
+    expect(context).toMatchImageSnapshot();
+  });
+});
