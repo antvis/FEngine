@@ -18,7 +18,7 @@ class Timeline extends EE {
 
   constructor(props) {
     super();
-    const { animUnits, playState, root, speed = 1, goto } = props;
+    const { animUnits, playState, root, speed = 1, time } = props;
     this.animator = new Animator();
     const rootShape = new Group();
     this.animator.reset(rootShape);
@@ -28,7 +28,7 @@ class Timeline extends EE {
     this.playState = playState;
     this.endFrame = animUnits.length - 1;
     this.speed = speed;
-    this.time = goto;
+    this.time = time;
   }
 
   start() {
