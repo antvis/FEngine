@@ -1,24 +1,76 @@
 /* animation timeline control */
-import { IAnimation } from '@antv/g-lite';
-import Player from '../player';
-class Timeline {
-  animations: IAnimation[][];
+import { Group } from '@antv/g-lite';
+import Animator from './render/animator';
+import EE from 'eventemitter3';
+
+type AnimUnit = {
+  animators: Animator[];
+  time: number;
+};
+class Timeline extends EE {
+  animator: Animator;
+  animUnits: AnimUnit[] = [];
   frame: number = 0;
   playState: string = 'play';
-  play: Player;
+  endFrame: number;
+  speed: number;
+  time: number;
 
-  constructor(playComponent) {
-    this.animations = [];
-    this.play = playComponent;
+  constructor(props) {
+    super();
+    const { animUnits, playState, root, speed = 1, time } = props;
+    this.animator = new Animator();
+    const rootShape = new Group();
+    this.animator.reset(rootShape);
+    root.appendChild(rootShape);
+
+    this.animUnits = animUnits;
+    this.playState = playState;
+    this.endFrame = animUnits.length - 1;
+    this.speed = speed;
+    this.time = time;
   }
 
-  clear() {
-    const { frame } = this;
-    this.animations[frame] = [];
+  start() {
+    const { animator, frame, playState, endFrame, time, speed } = this;
+    if (frame < endFrame && playState === 'finish') {
+      this.frame = endFrame;
+    }
+    this.drawFrame();
+    animator.on('end', this.next);
+    this.animator.run();
+    this.setPlayState(playState);
+    time && this.goTo(time);
+    this.setPlaybackRate(speed);
   }
+
+  next = () => {
+    const { frame, playState, endFrame, speed } = this;
+    if (playState !== 'play') return;
+
+    this.frame = frame + 1;
+    if (frame < endFrame) {
+      this.drawFrame();
+      this.animator.run();
+      this.setPlaybackRate(speed);
+    } else {
+      this.emit('end');
+      this.playState = 'finish';
+    }
+  };
+
+  drawFrame() {
+    const { animator, animUnits, frame } = this;
+    const childAnimator = animUnits[frame].animators;
+    animator.shape.removeChildren();
+    childAnimator.map((d) => {
+      animator.shape.appendChild(d?.shape);
+    });
+    animator.children = childAnimator;
+  }
+
   setPlayState(state) {
-    this.playState = state;
-    const { animator } = this.play;
+    const { animator } = this;
     switch (state) {
       case 'play':
         animator.play();
@@ -27,7 +79,6 @@ class Timeline {
         animator.pause();
         break;
       case 'finish':
-        animator.play();
         animator.finish();
         break;
       default:
@@ -35,60 +86,63 @@ class Timeline {
     }
   }
 
+  setPlaybackRate(speed) {
+    const { animator } = this;
+    this.speed = speed;
+    animator.setPlaybackRate(speed);
+  }
+
   getPlayState() {
     return this.playState;
   }
 
-  goTo(frame) {
-    if (!frame) return;
-    const { animator } = this.play;
-    animator.goTo(frame);
+  updateState(state) {
+    // 播放状态不同
+    if (state === 'finish') {
+      this.frame = this.endFrame;
+      this.drawFrame();
+      this.animator.run();
+    }
+
+    this.playState = state;
+    this.setPlayState(state);
   }
 
-  add(animation: IAnimation[]) {
-    const { frame } = this;
-    if (this.animations[frame]) {
-      animation.map((d) => d.cancel());
+  clear() {
+    this.animator = null;
+    this.animUnits = [];
+    this.playState = null;
+    this.endFrame = null;
+  }
+
+  goTo(time) {
+    const { frame, animUnits, playState } = this;
+    let target;
+
+    for (target = 0; target < animUnits.length; target++) {
+      const cur = animUnits[target];
+      if (time >= cur.time) {
+        time -= cur.time; // 计算剩余时间
+      } else {
+        break;
+      }
+    }
+
+    // 超出了总时长
+    const threshold = 0.0001;
+    if (target === animUnits.length && Math.abs(time - threshold) >= 0) {
+      this.setPlayState('finish');
       return;
     }
-    this.animations[frame] = animation;
-  }
 
-  getAnimation() {
-    const { frame } = this;
-    return this.animations[frame];
-  }
+    if (frame !== target) {
+      this.frame = target;
+      this.drawFrame();
+      this.animator.run();
+      this.setPlayState(playState);
+    }
 
-  push(animation: IAnimation[]) {
-    const { frame } = this;
-    if (!this.animations[frame]) return;
-    this.animations[0] = this.animations[frame].concat(animation);
-  }
-
-  pop() {
-    const { frame } = this;
-    this.animations[frame].pop();
-  }
-
-  delete(animation: IAnimation) {
-    const { frame } = this;
-    if (!animation || !this.animations[frame]) return;
-    this.animations[frame].filter((d) => d !== animation);
-  }
-
-  replace(next: IAnimation[]) {
-    const { frame } = this;
-    if (!this.animations[frame]) return;
-    const newAnimation = next.map((index) => {
-      return this.animations[frame].map((d) => {
-        if (index === d) {
-          return index;
-        }
-        return d;
-      });
-    });
-
-    this.animations = newAnimation;
+    this.animator.goTo(time);
   }
 }
 

@@ -7,7 +7,7 @@ import { VNode } from '../vnode';
 import { createShape, updateShape } from './createShape';
 import { Group } from '@antv/g-lite';
 import equal from '../equal';
-import { createAnimation } from './animation';
+import { createAnimation, calAnimationTime } from './animation';
 import Animator from './animator';
 import { getWorkTag, ClassComponent, Shape, WorkTag } from '../workTags';
 import {
@@ -80,7 +80,7 @@ function createVNode(parent: VNode, vNode: VNode) {
 
   const tag = getWorkTag(type);
   const context = readVNodeContext(type, parentContext);
-  const animator = new Animator(context.timeline);
+  const animator = new Animator();
   const style = getStyle(tag, props, context);
 
   animator.vNode = vNode;
@@ -119,6 +119,7 @@ function createVNode(parent: VNode, vNode: VNode) {
       };
     }
     const group = new Group();
+
     component.container = group;
 
     // 设置ref
@@ -152,7 +153,6 @@ function updateVNode(parent, nextNode: VNode, lastNode: VNode) {
   const { animate } = props;
 
   animator.vNode = nextNode;
-
   nextNode.parent = parent;
   nextNode.tag = tag;
   nextNode.canvas = canvas;
@@ -370,6 +370,7 @@ function render(vNode: VNode) {
 
   // 创建动画
   const childrenAnimation = createAnimation(vNode, children, lastChildren);
+
   // 执行动画
   if (childrenAnimation.length) {
     childrenAnimation.forEach((animator) => {
@@ -390,7 +391,7 @@ function updateComponents(components: Component[]) {
       return false;
     }
     component.willUpdate();
-    const { canvas, context } = vNode;
+    const { canvas } = vNode;
     const newChildren = canvas.toRawChildren(component.render());
     const nextChildren = renderChildren(vNode, newChildren as VNode, lastChildren);
 
@@ -407,14 +408,41 @@ function updateComponents(components: Component[]) {
 
     // 执行动画
     animator.run();
-    const { timeline } = context;
-
-    if (timeline) {
-      timeline.play.animationWillPlay();
-    }
 
     component.didUpdate();
   });
 }
 
-export { render, renderChildren, updateComponents, computeLayout, destroyElement };
+function getUpdateAnimation(component, newChildren, keyFrame) {
+  const { preNode } = component;
+  const { children: lastChildren, props } = preNode;
+
+  // 是否需要更新
+  if (component.shouldUpdate(props) === false) {
+    return false;
+  }
+  component.willUpdate();
+
+  const nextChildren = renderChildren(preNode, newChildren as VNode, lastChildren);
+
+  // 更新 children
+  component.preNode.children = nextChildren;
+
+  // 创建动画
+  const childrenAnimation = createAnimation(preNode, nextChildren, lastChildren);
+  component.didUpdate();
+
+  // 处理 animator
+  const animUnits = calAnimationTime(childrenAnimation, keyFrame);
+
+  return animUnits;
+}
+
+export {
+  render,
+  renderChildren,
+  updateComponents,
+  computeLayout,
+  destroyElement,
+  getUpdateAnimation,
+};

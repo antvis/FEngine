@@ -2,8 +2,12 @@ import { JSX } from './jsx/jsx-namespace';
 import Component from './component';
 import Timeline from './canvas/timeline';
 import { generateFrameElement, playerFrame } from './playerFrames';
-import equal from './canvas/equal';
+import { getUpdateAnimation } from './canvas/render/index';
+import Children from './children';
 import { IContext } from './types';
+import { VNode } from './canvas/vnode';
+import { isEqual } from '@antv/util';
+import applyStyle from './canvas/render/applyStyle';
 
 // 播放状态
 type playState = 'play' | 'pause' | 'finish';
@@ -16,7 +20,7 @@ export interface PlayerProps {
   /**
    * 播放速率，默认为 1
    */
-  // speed?: number;
+  speed?: number;
   children?: JSX.Element | null;
 
   keyFrames?: Record<string, playerFrame>[];
@@ -24,20 +28,49 @@ export interface PlayerProps {
    * 协议动画播放结束
    */
   onend?: Function;
+  /**
+   * 时间
+   */
+  goTo?: number;
+}
+
+function cloneNode(vnode) {
+  return Children.map(vnode, (child) => {
+    if (!child) {
+      return;
+    }
+    const { shape, children, animator } = child;
+    const { end = {} } = animator;
+
+    // 拿到上一帧的snapshot
+    const snapshot = shape.cloneNode();
+    applyStyle(snapshot, end);
+
+    return {
+      ...child,
+      shape: snapshot,
+      children: cloneNode(children),
+    };
+  });
 }
 
 class Player extends Component<PlayerProps> {
   playerFrames;
+  timeline;
   index: number;
   onend: Function;
+  preNode: VNode;
   /**
-  * 协议动画状态 play pause finish
-  */
-  isEnd: boolean;
+   * 内部播放真实状态 play pause finish
+   */
+  playState;
 
   constructor(props) {
     super(props);
-    const { keyFrames = [], children } = props;
+  }
+
+  didMount(): void {
+    const { keyFrames, children, state, onend, goTo, speed } = this.props;
 
     this.playerFrames = keyFrames.reduce((array, cur) => {
       const frames = generateFrameElement(cur, array[array.length - 1] || children);
@@ -45,91 +78,63 @@ class Player extends Component<PlayerProps> {
       return array;
     }, []);
 
-    const count = this.playerFrames.length;
+    const array = this.playerFrames.map((cur, index) => {
+      const keyFrame = keyFrames[index];
+      this.preNode = cloneNode(this.preNode || this._vNode);
+      const animUnits = getUpdateAnimation(this, cur, keyFrame) || {};
 
-    this.state = {
-      count,
-      index: 0,
-    };
+      return animUnits;
+    });
+
+    this.timeline = new Timeline({
+      animUnits: array,
+      playState: state,
+      root: this.context.canvas,
+      speed: speed,
+      time: goTo,
+    });
+
+    this.timeline.start();
+    onend && this.timeline.on('end', onend);
   }
 
-  private setPlayState() {
-    const { props, context } = this;
-    const { state: playState } = props;
-    const { timeline } = context;
+  willReceiveProps(nextProps: PlayerProps, _context?: IContext) {
+    const { props: lastProps, timeline } = this;
+    const { state, goTo: nextTime, speed: newSpeed } = nextProps;
+    const { goTo: lastTime, speed: lastSpeed } = lastProps;
 
-    timeline.setPlayState(playState);
-  }
+    // state 更新
+    if (!isEqual(state, timeline.getPlayState())) {
+      timeline.updateState(state);
+    }
 
-  willMount(): void {
-    this.context.timeline = new Timeline(this);
-  }
+    if (!isEqual(nextTime, lastTime)) {
+      timeline.goTo(nextTime);
+    }
 
-  didMount(): void {
-    const { animator, props } = this;
-    const { state } = props;
-    animator.on('end', this.next);
-
-    if (state === 'finish') {
-      this.setState(({ count }) => ({
-        index: count - 1,
-      }));
+    // 播放速度
+    if (!isEqual(newSpeed, lastSpeed)) {
+      timeline.setPlaybackRate(newSpeed);
     }
   }
 
-  willUpdate(): void {
-    const { context, props } = this;
-    const { state } = props;
-    const { timeline } = context;
-
-    if (state === 'finish' && timeline.getPlayState() !== 'finish') {
-      this.setState(({ count }) => ({
-        index: count - 1,
-      }));
-    }
+  setPlayState(state) {
+    const { timeline } = this;
+    timeline.updateState(state);
   }
 
-  willReceiveProps(_nextProps: PlayerProps, _context?: IContext): void {
-    if (!equal(_nextProps, this.props)) {
-      this.playerFrames = _nextProps?.keyFrames.reduce((array, cur) => {
-        const frames = generateFrameElement(cur, array[array.length - 1] || _nextProps?.children);
-        array.push(frames);
-        return array;
-      }, []);
-    }
+  goTo(time) {
+    const { timeline } = this;
+    timeline.goTo(time);
   }
 
-  next = () => {
-    const { index, count } = this.state;
-    const { onend = () => { }, state } = this.props;
-    // @ts-ignore
-    const { timeline } = this.context;
-    timeline.clear();
-
-    if (this.isEnd) return
-    if (index < count - 1 && state === 'play') {
-      this.setState(() => ({
-        index: index + 1,
-      }));
-    } else {
-      onend();
-      this.isEnd = true
-    }
-  };
-
-  animationWillPlay() {
-    const { animator, context } = this;
-    // @ts-ignore
-    const { timeline } = context;
-    const { animations } = animator;
-    timeline.add(animations);
-    animator.animations = timeline.getAnimation();
-
-    this.setPlayState();
+  setPlaybackRate(speed) {
+    const { timeline } = this;
+    timeline.setPlaybackRate(speed);
   }
 
   render() {
-    return this.playerFrames[this.state.index];
+    return null;
   }
 }
 

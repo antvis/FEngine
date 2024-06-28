@@ -6,7 +6,8 @@ import { Shape } from '../workTags';
 import findClosestShapeNode from './findClosestShapeNode';
 import Animator from './animator';
 import applyStyle from './applyStyle';
-import { isEqual } from '@antv/util';
+import { playerFrame } from '../../playerFrames';
+import { isEqual, mix } from '@antv/util';
 
 function findAllShapeNode(vNode: VNode | VNode[] | null) {
   const shapeNodes = [];
@@ -24,7 +25,7 @@ function findAllShapeNode(vNode: VNode | VNode[] | null) {
 }
 
 function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
-  const { props: nextProps, shape: nextShape, style: nextStyle, context } = nextNode;
+  const { props: nextProps, shape: nextShape, style: nextStyle } = nextNode;
   const { shape: lastShape, style: lastStyle, animator: lastAnimation } = lastNode;
 
   // 形变动画之前先把原 shape 销毁
@@ -37,7 +38,7 @@ function morphShape(lastNode: VNode, nextNode: VNode, animator?: Animator) {
     return animator;
   }
 
-  animator = animator || new Animator(context.timeline);
+  animator = animator || new Animator();
   // shape 形变
   const { start, end, property = [] } = animationEffect;
   const { parsedStyle: nextParsedStyle } = nextShape;
@@ -139,7 +140,6 @@ function updateAnimation(nextNode, lastNode) {
     shape: lastShape,
   } = lastNode;
   animator.reset(nextShape);
-
   // 先处理叶子节点
   animator.children = createAnimation(nextNode, nextChildren, lastChildren);
 
@@ -369,4 +369,36 @@ function createAnimation(
   return childrenAnimator;
 }
 
-export { createAnimation };
+function calAnimationTime(
+  childrenAnimation: Animator[],
+  keyFrame: Record<string, playerFrame>,
+  parentEffect?: any,
+) {
+  if (!childrenAnimation) return { animators: null, time: 0 };
+
+  const animators = [];
+  let time = 0;
+
+  Children.map(childrenAnimation, (item: Animator) => {
+    if (!item) return;
+    const animator = item.clone();
+    const { vNode, children } = animator;
+    const { duration, delay } = keyFrame[vNode?.key] || {};
+
+    const globalEffect = mix(parentEffect || {}, { duration, delay });
+    const effect = { ...animator.effect, ...globalEffect };
+    animator.effect = effect;
+
+    // computed time
+    const { duration: gDuration = 0, delay: gDelay = 0 } = effect;
+    const animUnits = calAnimationTime(children, keyFrame, globalEffect);
+    time = Math.max(time, gDuration + gDelay, animUnits.time);
+
+    animator.children = animUnits.animators;
+    animators.push(animator);
+  });
+
+  return { animators, time };
+}
+
+export { createAnimation, calAnimationTime };
