@@ -426,4 +426,35 @@ describe('clip animation', () => {
     await delay(100);
     expect(context).toMatchImageSnapshot();
   });
+
+  it('暂停', async () => {
+    const context = createContext('暂停');
+
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={200}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+
+    expect(context).toMatchImageSnapshot();
+  });
 });
