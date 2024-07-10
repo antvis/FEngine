@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.3](https://github.com/antvis/FEngine/compare/v1.3.2...v1.3.3) (2024-07-10)
+
+
+### Bug Fixes
+
+* export parseColor 方法 ([#276](https://github.com/antvis/FEngine/issues/276)) ([837ade4](https://github.com/antvis/FEngine/commit/837ade4368316700ad246f7ca3299836c4fc14ab))
+* onframe处理delay ([#277](https://github.com/antvis/FEngine/issues/277)) ([5dc205f](https://github.com/antvis/FEngine/commit/5dc205f306dbd3ebe1f90559ccd7c0fa6f9ee551))
+
+
+
+
+
 ## [1.3.2](https://github.com/antvis/FEngine/compare/v1.3.1...v1.3.2) (2024-06-28)
 
 **Note:** Version bump only for package f-engine
