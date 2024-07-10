@@ -397,8 +397,8 @@ describe('player', () => {
     await delay(800);
 
     const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0];
-    //@ts-ignore
-    expect(Number(shape.style.width)).toBeGreaterThan(10);
+    //@ts-ignore 初始状态10px = 5
+    expect(Number(shape.style.width)).toBeGreaterThan(5);
   });
 
   it('播放中finish', async () => {

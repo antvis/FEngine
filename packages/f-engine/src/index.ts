@@ -1,5 +1,6 @@
 import { computeLayout } from './canvas/render';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
+import { parseColor } from '@antv/g-lite';
 import * as Smooth from './shape/util/smooth';
 
 export { JSX } from './jsx/jsx-namespace';
@@ -13,7 +14,7 @@ export { default as createRef } from './createRef';
 export { default as createContext } from './createContext';
 export { default as Timeline, TimelineProps } from './timeline';
 export { default as Gesture } from './gesture';
-export { CanvasRenderer, computeLayout, Smooth };
+export { CanvasRenderer, computeLayout, Smooth, parseColor };
 export { default as isEqual } from './canvas/equal';
 export { default as Player, PlayerProps } from './player';
 
