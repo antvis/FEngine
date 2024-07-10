@@ -75,7 +75,8 @@ class Animator extends EE {
                 const effect = animationTarget.effect;
                 const timing = effect.getTiming();
                 const duration = timing.duration;
-                const t = e.currentTime / duration;
+                const delay = timing.delay;
+                const t = e.currentTime > delay ? (e.currentTime - delay) / duration : 0;
                 const shape = effect.target;
                 // 动画的一些上下文信息
                 const context = {

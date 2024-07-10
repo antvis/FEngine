@@ -427,6 +427,7 @@ describe('Canvas', () => {
             update: {
               easing: 'quadraticOut',
               duration: 100,
+              delay: 200,
               // property: [],
               onFrame: (t, animationContext) => {
                 onFrame(t, animationContext);
@@ -449,5 +450,6 @@ describe('Canvas', () => {
     expect(updateLastCall[1].end).toBeDefined();
     expect(updateLastCall[1].shape).toBeDefined();
     expect(updateLastCall[1].animation).toBeDefined();
+    expect(context).toMatchImageSnapshot();
   });
 });
