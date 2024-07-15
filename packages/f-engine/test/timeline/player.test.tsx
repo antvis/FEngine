@@ -457,4 +457,84 @@ describe('clip animation', () => {
 
     expect(context).toMatchImageSnapshot();
   });
+
+  it('结束后从头暂停再播放', async () => {
+    const context = createContext('结束后从头播放');
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={2000}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={0}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps);
+    await delay(100);
+
+    const { props: newProps2 } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          goTo={0}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps2);
+    await delay(100);
+    //@ts-ignore
+    const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0].style.clipPath;
+
+    expect(Number(shape.style.width)).toBeLessThan(40);
+  });
 });
