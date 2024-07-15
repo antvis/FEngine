@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.4](https://github.com/antvis/FEngine/compare/v1.3.3...v1.3.4) (2024-07-15)
+
+
+### Bug Fixes
+
+* 修复重播暂停播放情况 ([#279](https://github.com/antvis/FEngine/issues/279)) ([9a5fbbb](https://github.com/antvis/FEngine/commit/9a5fbbb1b11ad3cdab7820bc23aa05860d281515))
+
+
+
+
+
 ## [1.3.3](https://github.com/antvis/FEngine/compare/v1.3.2...v1.3.3) (2024-07-10)
 
 
