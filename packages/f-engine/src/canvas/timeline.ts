@@ -33,11 +33,13 @@ class Timeline extends EE {
 
   start() {
     const { animator, frame, playState, endFrame, time, speed } = this;
-    if (frame < endFrame && playState === 'finish') {
-      this.frame = endFrame;
-    }
-    this.drawFrame();
     animator.on('end', this.next);
+    if (frame < endFrame && playState === 'finish') {
+      this.setFinishState();
+      return;
+    }
+
+    this.drawFrame();
     this.animator.run();
     this.setPlayState(playState);
     time && this.goTo(time);
@@ -99,9 +101,8 @@ class Timeline extends EE {
   updateState(state) {
     // 播放状态不同
     if (state === 'finish') {
-      this.frame = this.endFrame;
-      this.drawFrame();
-      this.animator.run();
+      this.setFinishState();
+      return;
     }
 
     this.playState = state;
@@ -131,7 +132,7 @@ class Timeline extends EE {
     // 超出了总时长
     const threshold = 0.0001;
     if (target === animUnits.length && Math.abs(time - threshold) >= 0) {
-      this.setPlayState('finish');
+      this.setFinishState();
       return;
     }
 
@@ -143,6 +144,16 @@ class Timeline extends EE {
     }
 
     this.animator.goTo(time);
+  }
+
+  setFinishState() {
+    const { endFrame } = this;
+    this.frame = endFrame;
+    this.drawFrame();
+    this.animator.run();
+    this.setPlayState('finish');
+    this.playState = 'finish';
+    this.frame = endFrame + 1;
   }
 }
 
