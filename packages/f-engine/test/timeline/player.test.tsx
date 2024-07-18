@@ -86,7 +86,7 @@ describe('player', () => {
       Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].childNodes[0].style.width),
     ).toBeLessThan(30);
     expect(callback.mock.calls.length).toBe(0);
-    await delay(1500);
+    await delay(1800);
     expect(callback.mock.calls.length).toBe(1);
   });
 
@@ -532,6 +532,88 @@ describe('clip animation', () => {
 
     await canvas.update(newProps2);
     await delay(100);
+    //@ts-ignore
+    const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0].style.clipPath;
+
+    expect(Number(shape.style.width)).toBeLessThan(40);
+  });
+
+  it('结束后播放', async () => {
+    const context = createContext('结束后播放');
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={2000}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(100);
+
+    // 无动画
+    const { props: newProps2 } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          goTo={2000}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps2);
+    await delay(100);
+    expect(context).toMatchImageSnapshot();
+
+    // 有动画
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          goTo={0}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 1000,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    await canvas.update(newProps);
     //@ts-ignore
     const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0].style.clipPath;
 
