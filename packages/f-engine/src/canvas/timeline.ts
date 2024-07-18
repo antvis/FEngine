@@ -154,6 +154,7 @@ class Timeline extends EE {
     this.setPlayState('finish');
     this.playState = 'finish';
     this.frame = endFrame + 1;
+    this.animator.animations = [];
   }
 }
 
