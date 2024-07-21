@@ -105,7 +105,13 @@ class Player extends Component<PlayerProps> {
 
     // state 更新
     if (!isEqual(state, timeline.getPlayState())) {
-      timeline.updateState(state);
+      // 重播状态
+      if (timeline.getPlayState() === 'finish') {
+        timeline.updateState(state);
+        timeline.goTo(nextTime);
+      } else {
+        timeline.updateState(state);
+      }
     }
 
     if (!isEqual(nextTime, lastTime)) {
