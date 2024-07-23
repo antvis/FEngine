@@ -261,8 +261,8 @@ describe('player', () => {
     const canvas = new Canvas(props);
     await canvas.render();
 
-    // 400ms 就播放完了
-    await delay(400);
+    // 600ms 就播放完了
+    await delay(600);
 
     expect(
       //@ts-ignore
