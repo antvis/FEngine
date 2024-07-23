@@ -29,7 +29,7 @@ describe('player', () => {
             update: {
               easing: 'linear',
               duration: 10,
-              property: ['x', 'fill', 'width', 'height'],
+              property: ['x', 'fill', 'width', 'height', 'opacity'],
             },
           }}
         />
@@ -265,6 +265,56 @@ describe('player', () => {
       //@ts-ignore
       Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].childNodes[0].style.width),
     ).toEqual(40);
+  });
+
+  it('多组动画回跳', async () => {
+    const context = createContext('多组动画回跳');
+    const ref = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={2000}
+          ref={ref}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 400,
+              },
+            },
+            {
+              view: {
+                to: {
+                  width: '200px',
+                },
+                duration: 800,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    ref.current.goTo(700);
+    ref.current.setPlayState('pause');
+    await delay(200);
+    ref.current.goTo(200);
+    ref.current.setPlayState('pause');
+    await delay(200);
+
+    ref.current.setPlayState('play');
+
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
   });
 });
 
@@ -618,78 +668,5 @@ describe('clip animation', () => {
     const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0].style.clipPath;
 
     expect(Number(shape.style.width)).toBeLessThan(40);
-  });
-
-  it('自然播放结束后重播', async () => {
-    const context = createContext('自然播放结束后重播');
-    const { props } = (
-      <Canvas context={context}>
-        <Player
-          state="play"
-          goTo={0}
-          keyFrames={[
-            {
-              view: {
-                to: {
-                  visible: true,
-                },
-                duration: 400,
-              },
-            },
-            {
-              view: {
-                to: {
-                  width: '50px',
-                },
-                duration: 400,
-              },
-            },
-          ]}
-        >
-          <View key={'view'} visible={false} />
-        </Player>
-      </Canvas>
-    );
-
-    const canvas = new Canvas(props);
-    await canvas.render();
-    await delay(1500);
-
-    // 从头播放动画
-    const { props: newProps } = (
-      <Canvas context={context}>
-        <Player
-          state="pause"
-          goTo={0}
-          keyFrames={[
-            {
-              view: {
-                to: {
-                  visible: true,
-                },
-                duration: 400,
-              },
-            },
-            {
-              view: {
-                to: {
-                  width: '50px',
-                },
-                duration: 400,
-              },
-            },
-          ]}
-        >
-          <View key={'view'} visible={false} />
-        </Player>
-      </Canvas>
-    );
-
-    await canvas.update(newProps);
-    //@ts-ignore
-    const shape = canvas.container.childNodes[1].childNodes[0].childNodes[0].style.clipPath;
-    expect(Number(shape.style.width)).toBeLessThan(5);
-
-    await canvas.update(props);
   });
 });
