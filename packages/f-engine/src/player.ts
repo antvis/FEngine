@@ -103,6 +103,16 @@ class Player extends Component<PlayerProps> {
     const { state, goTo: nextTime, speed: newSpeed } = nextProps;
     const { goTo: lastTime, speed: lastSpeed } = lastProps;
 
+    if (!isEqual(state, timeline.getPlayState()) && timeline.getPlayState() === 'finish') {
+      // 重播
+      if (nextTime < timeline.totalDuration) {
+        timeline.updateState(state);
+        timeline.goTo(nextTime);
+      }
+      //保持结束播放状态
+      return;
+    }
+
     // state 更新
     if (!isEqual(state, timeline.getPlayState())) {
       timeline.updateState(state);

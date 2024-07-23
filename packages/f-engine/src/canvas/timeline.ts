@@ -15,6 +15,7 @@ class Timeline extends EE {
   endFrame: number;
   speed: number;
   time: number;
+  totalDuration: number;
 
   constructor(props) {
     super();
@@ -29,6 +30,8 @@ class Timeline extends EE {
     this.endFrame = animUnits.length - 1;
     this.speed = speed;
     this.time = time;
+
+    this.totalDuration = animUnits.reduce((accumulator, current) => accumulator + current.time, 0);
   }
 
   start() {
@@ -117,9 +120,14 @@ class Timeline extends EE {
   }
 
   goTo(time) {
-    const { frame, animUnits, playState } = this;
-    let target;
+    const { frame, animUnits, playState, totalDuration } = this;
+    // 超出了总时长
+    if (time > totalDuration && playState !== 'finish') {
+      this.setFinishState();
+      return;
+    }
 
+    let target;
     for (target = 0; target < animUnits.length; target++) {
       const cur = animUnits[target];
       if (time >= cur.time) {
@@ -129,16 +137,11 @@ class Timeline extends EE {
       }
     }
 
-    // 超出了总时长
-    const threshold = 0.0001;
-    if (target === animUnits.length && Math.abs(time - threshold) >= 0) {
-      this.setFinishState();
-      return;
-    }
-
     if (frame !== target) {
       this.frame = target;
       this.drawFrame();
+      // 结束当前动画
+      this.setPlayState('finish');
       this.animator.run();
       this.setPlayState(playState);
     }

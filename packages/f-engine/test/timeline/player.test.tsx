@@ -25,11 +25,14 @@ describe('player', () => {
               easing: 'linear',
               duration: 10,
               property: ['width'],
+              start: {
+                width: 5,
+              },
             },
             update: {
               easing: 'linear',
               duration: 10,
-              property: ['x', 'fill', 'width', 'height'],
+              property: ['x', 'fill', 'width', 'height', 'opacity'],
             },
           }}
         />
@@ -265,6 +268,133 @@ describe('player', () => {
       //@ts-ignore
       Number(canvas.container.childNodes[1].childNodes[0].childNodes[0].childNodes[0].style.width),
     ).toEqual(40);
+  });
+
+  it('多组动画回跳', async () => {
+    const context = createContext('多组动画回跳');
+    const ref = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={2000}
+          ref={ref}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                  width: '80px',
+                },
+                duration: 400,
+              },
+            },
+            {
+              view: {
+                to: {
+                  width: '200px',
+                },
+                duration: 800,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    ref.current.goTo(700);
+    ref.current.setPlayState('pause');
+    await delay(200);
+    ref.current.goTo(200);
+    ref.current.setPlayState('pause');
+    await delay(200);
+
+    ref.current.setPlayState('play');
+
+    await delay(2000);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('自然播放结束后重播', async () => {
+    const context = createContext('自然播放结束后重播');
+    const ref = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <Player
+          state="play"
+          goTo={0}
+          ref={ref}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 200,
+              },
+            },
+            {
+              view: {
+                to: {
+                  width: '200px',
+                },
+                duration: 200,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+    await delay(1000);
+
+    const { props: newProps } = (
+      <Canvas context={context}>
+        <Player
+          state="pause"
+          goTo={0}
+          ref={ref}
+          keyFrames={[
+            {
+              view: {
+                to: {
+                  visible: true,
+                },
+                duration: 200,
+              },
+            },
+            {
+              view: {
+                to: {
+                  width: '200px',
+                },
+                duration: 200,
+              },
+            },
+          ]}
+        >
+          <View key={'view'} visible={false} />
+        </Player>
+      </Canvas>
+    );
+    await canvas.update(newProps);
+    // 重播
+    await canvas.update(props);
+    await delay(10);
+
+    expect(
+      //@ts-ignore
+      Number(canvas.container.getElementsByTagName('rect')[0].style.width),
+    ).toBeLessThan(10);
   });
 });
 
