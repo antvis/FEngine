@@ -26,7 +26,7 @@ describe('player', () => {
               duration: 10,
               property: ['width'],
               start: {
-                width: 5,
+                width: 0,
               },
             },
             update: {
