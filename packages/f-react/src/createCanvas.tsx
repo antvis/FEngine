@@ -107,7 +107,7 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       });
 
       const targetNode = this.canvasRef.current?.parentElement;
-      if (targetNode) return;
+      if (!targetNode) return;
       const { width, height } = targetNode.getBoundingClientRect();
       this.parentNode = {
         width: Math.round(width),
@@ -134,7 +134,7 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
 
     resize() {
       const targetNode = this.canvasRef.current?.parentElement;
-      if (targetNode) return;
+      if (!targetNode) return;
       const { width, height } = targetNode.getBoundingClientRect();
       const lastWidth = Math.round(width);
       const lastHeight = Math.round(height);
