@@ -130,7 +130,7 @@ class Timeline extends EE {
     let target;
     for (target = 0; target < animUnits.length; target++) {
       const cur = animUnits[target];
-      if (time >= cur.time) {
+      if (time > cur.time) {
         time -= cur.time; // 计算剩余时间
       } else {
         break;
