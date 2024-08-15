@@ -128,8 +128,10 @@ class Player extends Component<PlayerProps> {
     }
   }
 
+  /*外部ref调用方式 */
   setPlayState(state) {
     const { timeline } = this;
+
     timeline.updateState(state);
   }
 
