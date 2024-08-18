@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.7](https://github.com/antvis/f2/compare/v1.3.6...v1.3.7) (2024-08-18)
+
+**Note:** Version bump only for package @antv/f-vue
+
+
+
+
+
 ## [1.3.6](https://github.com/antvis/f2/compare/v1.3.5...v1.3.6) (2024-07-24)
 
 **Note:** Version bump only for package @antv/f-vue

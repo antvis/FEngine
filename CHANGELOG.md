@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.7](https://github.com/antvis/FEngine/compare/v1.3.6...v1.3.7) (2024-08-18)
+
+
+### Bug Fixes
+
+* parentElement不存在 ([#292](https://github.com/antvis/FEngine/issues/292)) ([dcb6e94](https://github.com/antvis/FEngine/commit/dcb6e9480047a5bd0cb14273307b7087692dc19f))
+* parentElement不存在的情况 ([#289](https://github.com/antvis/FEngine/issues/289)) ([7331de0](https://github.com/antvis/FEngine/commit/7331de0567374846ab9e60924cb7bfe8d3f0a818))
+* ref调用goto边界情况 ([#290](https://github.com/antvis/FEngine/issues/290)) ([be0b831](https://github.com/antvis/FEngine/commit/be0b831747064850bd640e11b888ce48fe3bab55))
+* 锁cheerio版本修复ci ([#293](https://github.com/antvis/FEngine/issues/293)) ([52e6084](https://github.com/antvis/FEngine/commit/52e6084729061b37b5840963efcaf99e80599063))
+
+
+
+
+
 ## [1.3.6](https://github.com/antvis/FEngine/compare/v1.3.5...v1.3.6) (2024-07-24)
 
 

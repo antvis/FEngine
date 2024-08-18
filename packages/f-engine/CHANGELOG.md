@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.7](https://github.com/antvis/FEngine/compare/v1.3.6...v1.3.7) (2024-08-18)
+
+
+### Bug Fixes
+
+* ref调用goto边界情况 ([#290](https://github.com/antvis/FEngine/issues/290)) ([be0b831](https://github.com/antvis/FEngine/commit/be0b831747064850bd640e11b888ce48fe3bab55))
+
+
+
+
+
 ## [1.3.6](https://github.com/antvis/FEngine/compare/v1.3.5...v1.3.6) (2024-07-24)
 
 
