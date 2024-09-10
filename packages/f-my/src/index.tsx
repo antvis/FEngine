@@ -62,8 +62,10 @@ Component({
   didUpdate() {
     const { canvas, props } = this;
     if (!canvas) return;
+    const { theme } = props;
     const children = props.onRender(props);
     canvas.update({
+      theme,
       children,
     });
   },
@@ -134,11 +136,13 @@ Component({
       if (!width || !height) {
         return;
       }
+      const { theme } = this.props;
       const children = this.props.onRender(this.props);
       const canvas = new Canvas({
         pixelRatio,
         width,
         height,
+        theme,
         context,
         children,
         createImage,
