@@ -33,6 +33,10 @@ Component({
    * 组件的属性列表
    */
   properties: {
+    theme: {
+      type: Object,
+      value: {},
+    },
     onRender: {
       type: null,
       value: () => {},
@@ -61,11 +65,13 @@ Component({
         // 高清设置
         node.width = width * pixelRatio;
         node.height = height * pixelRatio;
+        const { theme } = this.data;
         const children = this.data.onRender(this.data);
         const canvas = new Canvas({
           pixelRatio,
           width,
           height,
+          theme,
           context,
           children,
           // @ts-ignore
@@ -91,8 +97,10 @@ Component({
     '**': function() {
       const { canvas, data } = this;
       if (!canvas) return;
+      const { theme } = data;
       const children = data.onRender(data);
       canvas.update({
+        theme,
         children,
       });
     },
