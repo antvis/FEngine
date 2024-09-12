@@ -40,6 +40,7 @@ Component({
     // width height 会作为元素兜底的宽高使用
     width: null,
     height: null,
+    onError: () => {},
     type: '2d', // canvas 2d, 基础库 2.7 以上支持
   },
   /**
@@ -90,6 +91,11 @@ Component({
             return;
           }
           const canvas = res[0].node;
+          if (!canvas) {
+            this.catchError('获取canvas失败');
+            return;
+          }
+
           const {
             width,
             height,
@@ -117,11 +123,23 @@ Component({
                 requestAnimationFrame,
                 cancelAnimationFrame,
               });
-              fCanvas.render();
+              fCanvas.render().catch((error) => {
+                this.catchError(error);
+              });
             },
           );
         });
     },
+
+    catchError(error) {
+      console.error('图表渲染失败: ', error);
+      const { onError } = this.props;
+      if (typeof onError === 'function') {
+        onError(error);
+      }
+      throw error;
+    },
+
     createCanvas({
       width,
       height,
