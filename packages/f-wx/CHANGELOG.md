@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/antvis/f2/compare/v1.3.7...v1.4.0) (2024-09-19)
+
+
+### Bug Fixes
+
+* 小程序主题设置不生效 ([#295](https://github.com/antvis/f2/issues/295)) ([49990b5](https://github.com/antvis/f2/commit/49990b575053311abf8421431edcd54c86342bc8))
+
+
+
+
+
 ## [1.3.7](https://github.com/antvis/f2/compare/v1.3.6...v1.3.7) (2024-08-18)
 
 **Note:** Version bump only for package @antv/f-wx

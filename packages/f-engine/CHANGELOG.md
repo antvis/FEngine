@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/antvis/FEngine/compare/v1.3.7...v1.4.0) (2024-09-19)
+
+
+### Features
+
+* 增加ready口子 ([#300](https://github.com/antvis/FEngine/issues/300)) ([f4c4697](https://github.com/antvis/FEngine/commit/f4c4697af25654f2f2ecd99dd35a8a73873a4369))
+
+
+
+
+
 ## [1.3.7](https://github.com/antvis/FEngine/compare/v1.3.6...v1.3.7) (2024-08-18)
 
 

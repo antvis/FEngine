@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/antvis/FEngine/compare/v1.3.7...v1.4.0) (2024-09-19)
+
+
+### Bug Fixes
+
+* 升级action-artifact ([#297](https://github.com/antvis/FEngine/issues/297)) ([18db5e4](https://github.com/antvis/FEngine/commit/18db5e4c687d9b37696c5ba13661a7714a8ebfe9))
+* 小程序主题设置不生效 ([#295](https://github.com/antvis/FEngine/issues/295)) ([49990b5](https://github.com/antvis/FEngine/commit/49990b575053311abf8421431edcd54c86342bc8))
+
+
+### Features
+
+* 增加ready口子 ([#300](https://github.com/antvis/FEngine/issues/300)) ([f4c4697](https://github.com/antvis/FEngine/commit/f4c4697af25654f2f2ecd99dd35a8a73873a4369))
+* 增加小程序px2hd ([#298](https://github.com/antvis/FEngine/issues/298)) ([d60181a](https://github.com/antvis/FEngine/commit/d60181a38230839de24f6749d0b318f0ed9fce48))
+
+
+
+
+
 ## [1.3.7](https://github.com/antvis/FEngine/compare/v1.3.6...v1.3.7) (2024-08-18)
 
 
