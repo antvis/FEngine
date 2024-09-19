@@ -192,6 +192,11 @@ const createCanvas = (CanvasClass: typeof Canvas) => {
       this.destroy();
     }
 
+    async ready() {
+      //@ts-ignore
+      await this.canvas.canvas.ready;
+    }
+
     destroy() {
       const { canvas } = this;
       if (!canvas) return;
