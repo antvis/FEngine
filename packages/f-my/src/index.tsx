@@ -99,13 +99,7 @@ Component({
             return;
           }
 
-          const {
-            width,
-            height,
-            createImage,
-            requestAnimationFrame,
-            cancelAnimationFrame,
-          } = canvas;
+          const { width, height } = canvas;
 
           const pixelRatio = getPixelRatio();
 
@@ -122,9 +116,9 @@ Component({
                 height,
                 pixelRatio,
                 context,
-                createImage,
-                requestAnimationFrame,
-                cancelAnimationFrame,
+                createImage: canvas.createImage.bind(canvas),
+                requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
+                cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
               });
               fCanvas.render().catch((error) => {
                 this.catchError(error);
