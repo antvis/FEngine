@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/antvis/f2/compare/v1.4.0...v1.4.1) (2024-09-24)
+
+
+### Bug Fixes
+
+* this丢失问题 ([#302](https://github.com/antvis/f2/issues/302)) ([e37dcbc](https://github.com/antvis/f2/commit/e37dcbc0e973f66ea55606625cdc96c0c62311dd))
+
+
+
+
+
 # [1.4.0](https://github.com/antvis/f2/compare/v1.3.7...v1.4.0) (2024-09-19)
 
 
