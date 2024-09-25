@@ -130,7 +130,6 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       isTouchEvent,
       isMouseEvent,
       useNativeClickEvent = true,
-      onRender,
     } = props;
 
     const px2hd = isFunction(customPx2hd) ? batch2hd(customPx2hd) : defaultPx2hd;
@@ -163,8 +162,6 @@ class Canvas<P extends CanvasProps = CanvasProps> {
       isTouchEvent,
       isMouseEvent,
     });
-
-    onRender && canvas.addEventListener('rerender', () => onRender(canvas), { once: true });
 
     const container = canvas.getRoot();
     const { width: canvasWidth, height: canvasHeight } = canvas.getConfig();
@@ -238,8 +235,10 @@ class Canvas<P extends CanvasProps = CanvasProps> {
   }
 
   async render() {
-    const { canvas, vNode } = this;
+    const { canvas, vNode, props } = this;
+    const { onRender } = props;
     await canvas.ready;
+    onRender && canvas.addEventListener('rerender', () => onRender(canvas), { once: true });
     render(vNode);
   }
 
