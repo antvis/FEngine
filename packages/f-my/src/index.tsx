@@ -41,6 +41,8 @@ Component({
     width: null,
     height: null,
     onError: () => {},
+    onCanvasReady: () => {},
+    onCanvasRender: () => {},
     type: '2d', // canvas 2d, 基础库 2.7 以上支持
   },
   /**
@@ -83,6 +85,8 @@ Component({
       this.setData({ id });
     },
     onCanvasReady() {
+      const { onCanvasReady } = this.props;
+      onCanvasReady && onCanvasReady();
       const { id } = this.data;
       const query = my.createSelectorQuery();
       query
@@ -149,7 +153,7 @@ Component({
       if (!width || !height) {
         return;
       }
-      const { theme, px2hd } = this.props;
+      const { theme, px2hd, onCanvasRender } = this.props;
       const children = this.props.onRender(this.props);
       const canvas = new Canvas({
         pixelRatio,
@@ -162,6 +166,7 @@ Component({
         createImage,
         requestAnimationFrame,
         cancelAnimationFrame,
+        onRender: onCanvasRender,
         // @ts-ignore
         offscreenCanvas: my.createOffscreenCanvas(),
         useNativeClickEvent: false,
