@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/antvis/f2/compare/v1.4.1...v1.5.0) (2024-09-26)
+
+**Note:** Version bump only for package @antv/f-lottie
+
+
+
+
+
 # [1.4.0](https://github.com/antvis/f2/compare/v1.3.7...v1.4.0) (2024-09-19)
 
 **Note:** Version bump only for package @antv/f-lottie

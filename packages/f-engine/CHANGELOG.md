@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/antvis/FEngine/compare/v1.4.1...v1.5.0) (2024-09-26)
+
+
+### Features
+
+* my增加canvasReady&reRender ([#304](https://github.com/antvis/FEngine/issues/304)) ([6898167](https://github.com/antvis/FEngine/commit/6898167c88d3821912ffee1f7a72fcbc8ed8dd08))
+
+
+
+
+
 # [1.4.0](https://github.com/antvis/FEngine/compare/v1.3.7...v1.4.0) (2024-09-19)
 
 
