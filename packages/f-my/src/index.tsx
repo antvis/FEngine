@@ -105,7 +105,7 @@ Component({
 
           const { width, height } = canvas;
 
-          const pixelRatio = getPixelRatio();
+          const pixelRatio = Math.ceil(getPixelRatio());
 
           // 高清解决方案
           this.setData(
