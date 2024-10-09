@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/antvis/FEngine/compare/v1.5.0...v1.5.1) (2024-10-09)
+
+
+### Bug Fixes
+
+* 小程序中保持和g一致的dpr处理 ([#306](https://github.com/antvis/FEngine/issues/306)) ([0854a46](https://github.com/antvis/FEngine/commit/0854a4607a03b8213f90ef2eb945adf859112089))
+
+
+
+
+
 # [1.5.0](https://github.com/antvis/FEngine/compare/v1.4.1...v1.5.0) (2024-09-26)
 
 
