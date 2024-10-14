@@ -17,6 +17,7 @@
     "alipay"
   ],
   "dependencies": {
+    "@antv/util": "^3.0.6",
     "@antv/f-engine": "1.5.0",
     "@antv/f2-context": "~0.0.1",
     "@babel/runtime": "^7.12.5",

@@ -1,7 +1,6 @@
 <canvas
-  a:if="{{id}}"
   type="{{type}}"
-  id="{{id}}"
+  id="f-canvas-{{$id}}"
   class="f-canvas"
   width="{{width}}"
   height="{{height}}"

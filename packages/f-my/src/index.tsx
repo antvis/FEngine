@@ -50,16 +50,9 @@ Component({
    * 注意：
    *    使用该生命周期，项目配置需启用："component2": true
    */
-  onInit() {
-    this.setCanvasId();
-  },
   didMount() {
     if (!isAppX2CanvasEnv()) {
       console.error('当前基础库版本过低，请升级基础库版本到 2.7.0 或以上。');
-    }
-    // 为了兼容未配置 "component2": true 的情况
-    if (!this.data.id) {
-      this.setCanvasId();
     }
   },
   didUpdate() {
@@ -79,15 +72,11 @@ Component({
     canvas.destroy();
   },
   methods: {
-    setCanvasId() {
-      const pageId = (this.$page && this.$page.$id) || 0;
-      const id = `f-canvas-${pageId}-${this.$id}`;
-      this.setData({ id });
-    },
     onCanvasReady() {
       const { onCanvasReady } = this.props;
       onCanvasReady && onCanvasReady();
-      const { id } = this.data;
+
+      const id = `f-canvas-${this.$id}`;
       const query = my.createSelectorQuery();
       query
         .select(`#${id}`)
