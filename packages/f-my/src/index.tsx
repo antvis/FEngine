@@ -67,10 +67,13 @@ Component({
     if (!canvas) return;
     const { theme, px2hd } = props;
     const children = props.onRender(props);
-    canvas.update({
+    const updateProps = {
       theme,
       px2hd,
       children,
+    };
+    canvas.update(updateProps).catch((error) => {
+      this.catchError(error);
     });
   },
   didUnmount() {
