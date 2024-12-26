@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/antvis/FEngine/compare/v1.5.1...v1.6.0) (2024-12-26)
+
+
+### Features
+
+* 小程序update增加catch ([#309](https://github.com/antvis/FEngine/issues/309)) ([c700298](https://github.com/antvis/FEngine/commit/c70029807f3c3c31232153f18adcfeead215a878))
+
+
+
+
+
 ## [1.5.1](https://github.com/antvis/FEngine/compare/v1.5.0...v1.5.1) (2024-10-09)
 
 
