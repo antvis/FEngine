@@ -3,8 +3,6 @@ import { Canvas } from '@antv/f-engine';
 function convertTouches(touches) {
   if (!touches) return touches;
   touches.forEach((touch) => {
-    touch.pageX = 0;
-    touch.pageY = 0;
     touch.clientX = touch.x;
     touch.clientY = touch.y;
   });
