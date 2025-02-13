@@ -88,7 +88,6 @@ Component({
         .select(`#${id}`)
         .boundingClientRect()
         .exec((res) => {
-
           if (!res[0]) {
             return;
           }
@@ -105,29 +104,22 @@ Component({
               height: height * pixelRatio,
             },
             () => {
-              const {
-                element: canvas,
-                context
-              } = createCanvasAdapter(my.createCanvasContext(id));
-              try {
-                const fCanvas = this.createCanvas({
-                  width,
-                  height,
-                  pixelRatio,
-                  context,
-                  createImage: canvas.createImage.bind(canvas),
-                  requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
-                  cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
-                });
-                fCanvas.render().catch((error) => {debugger
-                  this.catchError(error);
-                });
-              } catch(ex) {
-                debugger
-              }
+              const { element: canvas, context } = createCanvasAdapter(my.createCanvasContext(id));
+              const fCanvas = this.createCanvas({
+                width,
+                height,
+                pixelRatio,
+                context,
+                createImage: canvas.createImage.bind(canvas),
+                requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
+                cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
+              });
+              fCanvas.render().catch((error) => {
+                this.catchError(error);
+              });
             },
           );
-      });
+        });
     },
 
     catchError(error) {

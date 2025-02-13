@@ -139,9 +139,7 @@ export function createCanvasAdapter(canvasContext: any) {
 function bindDrawRunnable(fn: any, canvasContext: IMiniProgramCanvasContext_v1, addCallIdAction: () => void) {
   return function (this: any, ...args: unknown[]) {
     try {
-      fn.apply(this, arguments);
-    } catch(ex) {debugger
-      throw ex;
+      fn.apply(this, args);
     } finally {
       canvasContext.draw(true);
       addCallIdAction();
@@ -317,11 +315,11 @@ class SimulatedCanvasContext {
   public addCallIdActions(): void {
     const { linearGradient, radialGradient } = this._callIdCache;
     this._enableCacheCallId = false;
-    for (let item of linearGradient ) {
+    for (const item of linearGradient ) {
       const gradient = this.ctx.createLinearGradient(0, 0, 0, 0);
       Object.assign(gradient, item);
     }
-    for (let item of radialGradient ) {
+    for (const item of radialGradient ) {
       const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 0);
       Object.assign(gradient, item);
     }
