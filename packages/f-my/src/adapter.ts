@@ -104,8 +104,10 @@ interface IMiniProgramCanvasContext_v1 {
 }
 
 export function createCanvasAdapter(canvasContext: any) {
-  const element = new CanvasElement(canvasContext);
   const context = new SimulatedCanvasContext(canvasContext);
+  const addCallIdAction = context.addCallIdActions.bind(context);
+
+  const element = new CanvasElement(canvasContext, addCallIdAction);
   context.canvas = element;
 
   return {
@@ -134,7 +136,7 @@ export function createCanvasAdapter(canvasContext: any) {
     // })
   }
 }
-function bindDrawRunnable(fn: any, canvasContext: IMiniProgramCanvasContext_v1) {
+function bindDrawRunnable(fn: any, canvasContext: IMiniProgramCanvasContext_v1, addCallIdAction: () => void) {
   return function (this: any, ...args: unknown[]) {
     try {
       fn.apply(this, arguments);
@@ -142,6 +144,7 @@ function bindDrawRunnable(fn: any, canvasContext: IMiniProgramCanvasContext_v1) 
       throw ex;
     } finally {
       canvasContext.draw(true);
+      addCallIdAction();
     }
   }
 }
@@ -160,7 +163,7 @@ class CanvasImageElement {
 
     return target;
   }
-  constructor(public url: string, private _context: IMiniProgramCanvasContext_v1) {
+  constructor(public url: string, private _context: IMiniProgramCanvasContext_v1, private _addCallIdAction: () => void) {
     preloadCanvasImage(url, (img) => {
       this._rawImgObj = img || {};
       this._complete(this._rawImgObj);
@@ -172,12 +175,12 @@ class CanvasImageElement {
     }
     if (img.url == this.url && img.id !== -1) {
       if (this._onload) {
-        bindDrawRunnable(this._onload, this._context)();
+        bindDrawRunnable(this._onload, this._context, this._addCallIdAction)();
         this._invoked = true;
       }
     } else {
       if (this._onerror) {
-        bindDrawRunnable(this._onerror, this._context)();
+        bindDrawRunnable(this._onerror, this._context, this._addCallIdAction)();
         this._invoked = true;
       }
     }
@@ -194,15 +197,16 @@ class CanvasImageElement {
 
 class CanvasElement {
   constructor(
-    private canvasContext: IMiniProgramCanvasContext_v1
+    private canvasContext: IMiniProgramCanvasContext_v1,
+    private _addCallIdAction: () => void
   ) {
 
   }
   createImage(url: string) {
-    return new CanvasImageElement(url, this.canvasContext);
+    return new CanvasImageElement(url, this.canvasContext, this._addCallIdAction);
   }
   requestAnimationFrame(fn: any) {
-    const frameFn = bindDrawRunnable(fn, this.canvasContext);
+    const frameFn = bindDrawRunnable(fn, this.canvasContext, this._addCallIdAction);
     return setTimeout(function () {
       frameFn(Date.now());
     }, 16);
@@ -213,11 +217,17 @@ class CanvasElement {
 }
 class SimulatedCanvasContext {
   public canvas: CanvasElement;
+  private _callIdCache: Record<string, Array<TCanvasGradient | TCanvasPattern>>;
+  private _enableCacheCallId: boolean;
 
   constructor(
     private ctx: IMiniProgramCanvasContext_v1
   ) {
-    
+    this._enableCacheCallId = true;
+    this._callIdCache = {
+      linearGradient: [],
+      radialGradient: []
+    };
   }
 
   private _fillStyle: string | TCanvasGradient | null | TCanvasPattern;
@@ -304,15 +314,36 @@ class SimulatedCanvasContext {
     return this.ctx.closePath();
   }
   // WontFIX: createImageData
+  public addCallIdActions(): void {
+    const { linearGradient, radialGradient } = this._callIdCache;
+    this._enableCacheCallId = false;
+    for (let item of linearGradient ) {
+      const gradient = this.ctx.createLinearGradient(0, 0, 0, 0);
+      Object.assign(gradient, item);
+    }
+    for (let item of radialGradient ) {
+      const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 0);
+      Object.assign(gradient, item);
+    }
+    this._enableCacheCallId = true;
+  }
   public createLinearGradient(x0: number, y0: number, x1: number, y1: number): TCanvasGradient {
-    return this.ctx.createLinearGradient(x0, y0, x1, y1);
+    const gradient = this.ctx.createLinearGradient(x0, y0, x1, y1);
+    if (this._enableCacheCallId) {
+      this._callIdCache.linearGradient.push(gradient);
+    }
+    return gradient;
   }
   public createPattern(image: TCanvasImageSource, repeat: TCanvasPatternRepeat): TCanvasPattern {
     const target = CanvasImageElement.toImageSource(image);
     return this.ctx.createPattern(target, repeat);
   }
   public createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): TCanvasGradient {
-    return this.ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+    const gradient = this.ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+    if (this._enableCacheCallId) {
+      this._callIdCache.radialGradient.push(gradient);
+    }
+    return gradient;
   }
   // WontFIX: createPath2D
   drawImage(
