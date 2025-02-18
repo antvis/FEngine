@@ -204,10 +204,13 @@ class CanvasElement {
     return new CanvasImageElement(url, this.canvasContext, this._addCallIdAction);
   }
   requestAnimationFrame(fn: any) {
-    const frameFn = bindDrawRunnable(fn, this.canvasContext, this._addCallIdAction);
-    return setTimeout(function () {
+    const frameFn = bindDrawRunnable(fn, this.canvasContext,this._addCallIdAction);
+    const offscreenCanvas = (my as any).createOffscreenCanvas
+      ? (my as any).createOffscreenCanvas()
+      : { requestAnimationFrame: () => {} };
+    return offscreenCanvas.requestAnimationFrame(() => {
       frameFn(Date.now());
-    }, 16);
+    });
   }
   cancelAnimationFrame(tid: any) {
     return clearTimeout(tid);
