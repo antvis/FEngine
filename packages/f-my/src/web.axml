@@ -1,0 +1,11 @@
+<canvas
+  a:if="{{id}}"
+  id="{{id}}"
+  class="f-canvas"
+  width="{{width}}"
+  height="{{height}}"
+  onTap="click"
+  onTouchStart="touchStart"
+  onTouchMove="touchMove"
+  onTouchEnd="touchEnd"
+/>
