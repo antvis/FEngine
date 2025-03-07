@@ -196,7 +196,10 @@ class CanvasImageElement {
 class CanvasElement {
   constructor(
     private canvasContext: IMiniProgramCanvasContext_v1,
-    private _addCallIdAction: () => void
+    private _addCallIdAction: () => void,
+    private offscreenCanvas = (my as any).createOffscreenCanvas
+    ? (my as any).createOffscreenCanvas()
+    : { requestAnimationFrame: () => {} }
   ) {
 
   }
@@ -205,10 +208,8 @@ class CanvasElement {
   }
   requestAnimationFrame(fn: any) {
     const frameFn = bindDrawRunnable(fn, this.canvasContext,this._addCallIdAction);
-    const offscreenCanvas = (my as any).createOffscreenCanvas
-      ? (my as any).createOffscreenCanvas()
-      : { requestAnimationFrame: () => {} };
-    return offscreenCanvas.requestAnimationFrame(() => {
+   
+    return this.offscreenCanvas.requestAnimationFrame(() => {
       frameFn(Date.now());
     });
   }
