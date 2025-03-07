@@ -1,6 +1,5 @@
 import { Component } from '@antv/f-engine';
-import { jsx as _jsx } from "@antv/f-engine/jsx-runtime";
-import { jsxs as _jsxs } from "@antv/f-engine/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs } from "@antv/f-engine/jsx-runtime";
 class Rect extends Component {
   render() {
     const {

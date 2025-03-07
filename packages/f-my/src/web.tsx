@@ -29,7 +29,7 @@ function dispatchEvent(el, event, type) {
 
 Component({
   didMount() {
-    this.onCanvasReady();
+    this.createChart();
   },
   didUpdate() {
     const { canvas, props } = this;
@@ -59,43 +59,31 @@ Component({
   },
   methods: {
     createChart() {
-      const query = my.createSelectorQuery();
+      const { width, height } = this.props;
       const id = `f-web-canvas-${this.$id}`;
-      query
-        .select(`#${id}`)
-        .boundingClientRect()
-        .exec((res) => {
-          if (!res[0]) {
-            return;
-          }
-          const { width, height } = res[0] as {
-            width: number;
-            height: number;
-          };
+      const { pixelRatio: drp = 2, windowWidth = 375 } = my?.getSystemInfoSync();
 
-          const { pixelRatio: drp = 2, windowWidth = 375 } = my?.getSystemInfoSync();
-          const rpx2px = windowWidth / 750;
-          const pixelRatio = Math.ceil(drp);
+      const pixelRatio = Math.ceil(drp);
+      const rpx2px = windowWidth / 750;
 
-          this.setData({
-            width: width * rpx2px * pixelRatio,
-            height: height * rpx2px * pixelRatio,
-          });
+      this.setData({
+        width: width * rpx2px * pixelRatio,
+        height: height * rpx2px * pixelRatio,
+      });
 
-          const { element: canvas, context } = createCanvasAdapter(my.createCanvasContext(id));
-          const fCanvas = this.createCanvas({
-            width: width * rpx2px,
-            height: height * rpx2px,
-            pixelRatio,
-            context,
-            createImage: canvas.createImage.bind(canvas),
-            requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
-            cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
-          });
-          fCanvas.render().catch((error) => {
-            this.catchError(error);
-          });
-        });
+      const { element: canvas, context } = createCanvasAdapter(my.createCanvasContext(id));
+      const fCanvas = this.createCanvas({
+        width: width * rpx2px,
+        height: height * rpx2px,
+        pixelRatio,
+        context,
+        createImage: canvas.createImage.bind(canvas),
+        requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
+        cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
+      });
+      fCanvas.render().catch((error) => {
+        this.catchError(error);
+      });
     },
 
     catchError(error) {
@@ -136,10 +124,11 @@ Component({
           const query = my.createSelectorQuery();
           query
             .select(`f-web-canvas-${this.$id}`)
+            //@ts-ignore
             .node()
             .exec((time) => {
               // api 执行结束后的下一个通信才会上屏
-              onCanvasRender(time);
+              onCanvasRender && onCanvasRender(time);
             });
         },
         // @ts-ignore
