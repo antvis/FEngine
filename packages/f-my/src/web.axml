@@ -1,7 +1,6 @@
 <canvas
-  a:if="{{id}}"
-  id="{{id}}"
-  class="f-canvas"
+  id="{{`f-web-canvas-${$id}`}}"
+  class="f-web-canvas"
   width="{{width}}"
   height="{{height}}"
   onTap="click"

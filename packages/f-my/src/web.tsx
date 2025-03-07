@@ -27,37 +27,21 @@ function dispatchEvent(el, event, type) {
   el.dispatchEvent(event);
 }
 
-const getPixelRatio = () => my.getSystemInfoSync().pixelRatio;
-
 Component({
-  props: {
-    onRender: (_props) => {},
-    // width height 会作为元素兜底的宽高使用
-    width: null,
-    height: null,
-    onError: () => {},
-    onCanvasReady: () => {},
-    onCanvasRender: () => {},
-  },
-  /**
-   * 组件创建时触发
-   * 注意：
-   *    使用该生命周期，项目配置需启用："component2": true
-   */
-  onInit() {
-    this.setCanvasId();
-  },
   didMount() {
-    // 为了兼容未配置 "component2": true 的情况
-    if (!this.data.id) {
-      this.setCanvasId();
-    }
     this.onCanvasReady();
   },
   didUpdate() {
     const { canvas, props } = this;
     if (!canvas) return;
-    const { theme, px2hd } = props;
+    const { theme, px2hd, reCreateOnUpdate } = props;
+    if (reCreateOnUpdate) {
+      canvas.destroy();
+      this.canvas = null;
+      this.createChart();
+      return;
+    }
+
     const children = props.onRender(props);
     const updateProps = {
       theme,
@@ -74,16 +58,9 @@ Component({
     canvas.destroy();
   },
   methods: {
-    setCanvasId() {
-      const pageId = (this.$page && this.$page.$id) || 0;
-      const id = `f-canvas-${pageId}-${this.$id}`;
-      this.setData({ id });
-    },
-    onCanvasReady() {
-      const { onCanvasReady } = this.props;
-      onCanvasReady && onCanvasReady();
-      const { id } = this.data;
+    createChart() {
       const query = my.createSelectorQuery();
+      const id = `f-web-canvas-${this.$id}`;
       query
         .select(`#${id}`)
         .boundingClientRect()
@@ -95,30 +72,29 @@ Component({
             width: number;
             height: number;
           };
-          const pixelRatio = Math.ceil(getPixelRatio());
 
-          // 高清解决方案
-          this.setData(
-            {
-              width: width * pixelRatio,
-              height: height * pixelRatio,
-            },
-            () => {
-              const { element: canvas, context } = createCanvasAdapter(my.createCanvasContext(id));
-              const fCanvas = this.createCanvas({
-                width,
-                height,
-                pixelRatio,
-                context,
-                createImage: canvas.createImage.bind(canvas),
-                requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
-                cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
-              });
-              fCanvas.render().catch((error) => {
-                this.catchError(error);
-              });
-            },
-          );
+          const { pixelRatio: drp = 2, windowWidth = 375 } = my?.getSystemInfoSync();
+          const rpx2px = windowWidth / 750;
+          const pixelRatio = Math.ceil(drp);
+
+          this.setData({
+            width: width * rpx2px * pixelRatio,
+            height: height * rpx2px * pixelRatio,
+          });
+
+          const { element: canvas, context } = createCanvasAdapter(my.createCanvasContext(id));
+          const fCanvas = this.createCanvas({
+            width: width * rpx2px,
+            height: height * rpx2px,
+            pixelRatio,
+            context,
+            createImage: canvas.createImage.bind(canvas),
+            requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
+            cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
+          });
+          fCanvas.render().catch((error) => {
+            this.catchError(error);
+          });
         });
     },
 
@@ -156,7 +132,16 @@ Component({
         createImage,
         requestAnimationFrame,
         cancelAnimationFrame,
-        onRender: onCanvasRender,
+        onRender: () => {
+          const query = my.createSelectorQuery();
+          query
+            .select(`f-web-canvas-${this.$id}`)
+            .node()
+            .exec((time) => {
+              // api 执行结束后的下一个通信才会上屏
+              onCanvasRender(time);
+            });
+        },
         // @ts-ignore
         offscreenCanvas: my.createOffscreenCanvas ? my.createOffscreenCanvas() : null,
         // useNativeClickEvent: false,
