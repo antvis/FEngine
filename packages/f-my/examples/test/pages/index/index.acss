@@ -3,3 +3,8 @@
   width: 100%;
   height: 600rpx;
 }
+
+.web-container {
+  width: 350rpx;
+  height: 480rpx;
+}
