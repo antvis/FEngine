@@ -29,12 +29,16 @@ function dispatchEvent(el, event, type) {
 
 Component({
   didMount() {
+    const { onUpdate, onClear } = this.props;
+    onUpdate && onUpdate(this.createChart.bind(this));
+    onClear && onClear(this.clear.bind(this));
     this.createChart();
   },
   didUpdate() {
     const { canvas, props } = this;
     if (!canvas) return;
     const { theme, px2hd, reCreateOnUpdate } = props;
+
     if (reCreateOnUpdate) {
       canvas.destroy();
       this.canvas = null;
@@ -53,9 +57,7 @@ Component({
     });
   },
   didUnmount() {
-    const { canvas } = this;
-    if (!canvas) return;
-    canvas.destroy();
+    this.clear();
   },
   methods: {
     createChart() {
@@ -84,6 +86,25 @@ Component({
       fCanvas.render().catch((error) => {
         this.catchError(error);
       });
+    },
+
+    clear() {
+      const canvas = this.canvas;
+      if (!canvas) return;
+      const { width, height } = this.props;
+      const { rpx2px, pixelRatio } = this.data;
+      try {
+        canvas.context.ctx.clearRect(
+          0,
+          0,
+          width * rpx2px * pixelRatio,
+          height * rpx2px * pixelRatio,
+        );
+        canvas.destroy();
+        this.canvas = null;
+      } catch (error) {
+        this.catchError(error);
+      }
     },
 
     catchError(error) {
@@ -126,9 +147,9 @@ Component({
             .select(`f-web-canvas-${this.$id}`)
             //@ts-ignore
             .node()
-            .exec((time) => {
+            .exec(() => {
               // api 执行结束后的下一个通信才会上屏
-              onCanvasRender && onCanvasRender(time);
+              onCanvasRender && onCanvasRender();
             });
         },
         // @ts-ignore
