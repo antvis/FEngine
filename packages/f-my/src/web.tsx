@@ -28,6 +28,12 @@ function dispatchEvent(el, event, type) {
 }
 
 Component({
+  data: {
+    width: 0,
+    height: 0,
+    rpx2px: 0.5,
+    pixelRatio: 2,
+  },
   didMount() {
     const { onUpdate, onClear } = this.props;
     onUpdate && onUpdate(this.createChart.bind(this));
@@ -37,7 +43,7 @@ Component({
   didUpdate() {
     const { canvas, props } = this;
     if (!canvas) return;
-    const { theme, px2hd, reCreateOnUpdate } = props;
+    const { theme, onPx2hd, reCreateOnUpdate } = props;
 
     if (reCreateOnUpdate) {
       canvas.destroy();
@@ -49,7 +55,7 @@ Component({
     const children = props.onRender(props);
     const updateProps = {
       theme,
-      px2hd,
+      px2hd: onPx2hd,
       children,
     };
     canvas.update(updateProps).catch((error) => {
@@ -128,14 +134,14 @@ Component({
       if (!width || !height) {
         return;
       }
-      const { theme, px2hd, onCanvasRender } = this.props;
+      const { theme, onPx2hd, onCanvasRender } = this.props;
       const children = this.props.onRender(this.props);
       const canvas = new Canvas({
         pixelRatio,
         width,
         height,
         theme,
-        px2hd,
+        px2hd: onPx2hd,
         context,
         children,
         createImage,
@@ -159,6 +165,8 @@ Component({
         isMouseEvent: (e) => e.type.startsWith('mouse'),
       });
       this.canvas = canvas;
+      // @ts-ignore g里面caf透传不了，暂时解决
+      canvas.canvas.context.config.cancelAnimationFrame = cancelAnimationFrame;
       this.canvasEl = canvas.getCanvasEl();
       return canvas;
     },

@@ -175,6 +175,8 @@ Component({
         isMouseEvent: (e) => e.type.startsWith('mouse'),
       });
       this.canvas = canvas;
+      // @ts-ignore g里面caf透传不了，暂时解决
+      canvas.canvas.context.config.cancelAnimationFrame = cancelAnimationFrame;
       this.canvasEl = canvas.getCanvasEl();
       return canvas;
     },
