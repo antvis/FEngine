@@ -35,37 +35,25 @@ Component({
     pixelRatio: 2,
   },
   didMount() {
-    const { onUpdate, onClear } = this.props;
-    onUpdate && onUpdate(this.createChart.bind(this));
-    onClear && onClear(this.clear.bind(this));
+    // 组件初始化时不主动绘制图表
+  },
+
+  didUpdate() {
+    const { canvas } = this;
+    canvas && canvas.destroy();
+    this.canvas = null;
     this.createChart();
   },
-  didUpdate() {
-    const { canvas, props } = this;
-    if (!canvas) return;
-    const { theme, onPx2hd, reCreateOnUpdate } = props;
 
-    if (reCreateOnUpdate) {
-      canvas.destroy();
-      this.canvas = null;
-      this.createChart();
-      return;
-    }
-
-    const children = props.onRender(props);
-    const updateProps = {
-      theme,
-      px2hd: onPx2hd,
-      children,
-    };
-    canvas.update(updateProps).catch((error) => {
-      this.catchError(error);
-    });
-  },
   didUnmount() {
     this.clear();
   },
+
   methods: {
+    // 提供给外部调用的绘制方法
+    drawChart() {
+      this.createChart();
+    },
     createChart() {
       const { width, height } = this.props;
       const id = `f-web-canvas-${this.$id}`;
@@ -97,15 +85,7 @@ Component({
     clear() {
       const canvas = this.canvas;
       if (!canvas) return;
-      const { width, height } = this.props;
-      const { rpx2px, pixelRatio } = this.data;
       try {
-        canvas.context.ctx.clearRect(
-          0,
-          0,
-          width * rpx2px * pixelRatio,
-          height * rpx2px * pixelRatio,
-        );
         canvas.destroy();
         this.canvas = null;
       } catch (error) {
