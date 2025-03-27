@@ -50,12 +50,9 @@ Component({
   },
 
   methods: {
-    // 提供给外部调用的绘制方法
-    drawChart() {
-      this.createChart();
-    },
     createChart() {
-      const { width, height } = this.props;
+      const { width, height, onCanvasReady } = this.props;
+      onCanvasReady && onCanvasReady();
       const id = `f-web-canvas-${this.$id}`;
       const { pixelRatio: drp = 2, windowWidth = 375 } = my?.getSystemInfoSync();
 
