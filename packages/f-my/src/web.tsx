@@ -35,14 +35,33 @@ Component({
     pixelRatio: 2,
   },
   didMount() {
+    const { isControlled, onHandleRef } = this.props;
+    onHandleRef &&
+      this.props.onHandleRef({
+        updateChart: this.updateChart.bind(this),
+      });
     // 组件初始化时不主动绘制图表
+    if (isControlled) return;
+    this.createChart();
   },
 
   didUpdate() {
-    const { canvas } = this;
-    canvas && canvas.destroy();
-    this.canvas = null;
-    this.createChart();
+    const { isControlled } = this.props;
+    // 组件更新不更新图表
+    if (isControlled) return;
+
+    const { canvas, props } = this;
+    if (!canvas) return;
+    const { theme, px2hd } = props;
+    const children = props.onRender(props);
+    const updateProps = {
+      theme,
+      px2hd,
+      children,
+    };
+    canvas.update(updateProps).catch((error) => {
+      this.catchError(error);
+    });
   },
 
   didUnmount() {
@@ -50,7 +69,7 @@ Component({
   },
 
   methods: {
-    createChart() {
+    createChart({ renderContent }) {
       const { width, height, onCanvasReady } = this.props;
       onCanvasReady && onCanvasReady();
       const id = `f-web-canvas-${this.$id}`;
@@ -70,6 +89,7 @@ Component({
         height: height * rpx2px,
         pixelRatio,
         context,
+        renderContent,
         createImage: canvas.createImage.bind(canvas),
         requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
         cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
@@ -90,6 +110,11 @@ Component({
       }
     },
 
+    updateChart() {
+      this.clear();
+      this.createChart();
+    },
+
     catchError(error) {
       console.error('图表渲染失败: ', error);
       const { onError } = this.props;
@@ -104,6 +129,7 @@ Component({
       height,
       pixelRatio,
       context,
+      renderContent,
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
@@ -112,7 +138,7 @@ Component({
         return;
       }
       const { theme, onPx2hd, onCanvasRender } = this.props;
-      const children = this.props.onRender(this.props);
+      const children = renderContent ? renderContent : this.props.onRender(this.props);
       const canvas = new Canvas({
         pixelRatio,
         width,
@@ -143,7 +169,9 @@ Component({
       });
       this.canvas = canvas;
       // @ts-ignore g里面caf透传不了，暂时解决
-      canvas.canvas.context.config.cancelAnimationFrame = cancelAnimationFrame;
+      if (canvas?.canvas?.context?.config) {
+        canvas.canvas.context.config.cancelAnimationFrame = cancelAnimationFrame;
+      }
       this.canvasEl = canvas.getCanvasEl();
       return canvas;
     },
