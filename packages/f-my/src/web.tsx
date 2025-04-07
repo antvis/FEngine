@@ -35,20 +35,19 @@ Component({
     pixelRatio: 2,
   },
   didMount() {
-    const { isControlled, onHandleRef } = this.props;
+    const { onHandleRef } = this.props;
     onHandleRef &&
       this.props.onHandleRef({
         updateChart: this.updateChart.bind(this),
       });
-    // 组件初始化时不主动绘制图表
-    if (isControlled) return;
-    this.createChart();
+
+    this.createChart({});
   },
 
   didUpdate() {
-    const { isControlled } = this.props;
+    const { skipUpdate } = this.props;
     // 组件更新不更新图表
-    if (isControlled) return;
+    if (skipUpdate) return;
 
     const { canvas, props } = this;
     if (!canvas) return;
@@ -112,7 +111,7 @@ Component({
 
     updateChart() {
       this.clear();
-      this.createChart();
+      this.createChart({});
     },
 
     catchError(error) {
@@ -168,8 +167,9 @@ Component({
         isMouseEvent: (e) => e.type.startsWith('mouse'),
       });
       this.canvas = canvas;
-      // @ts-ignore g里面caf透传不了，暂时解决
-      if (canvas?.canvas?.context?.config) {
+      // @ts-ignore
+      if (canvas.canvas?.context?.config) {
+        // @ts-ignore g里面caf透传不了，暂时解决
         canvas.canvas.context.config.cancelAnimationFrame = cancelAnimationFrame;
       }
       this.canvasEl = canvas.getCanvasEl();
