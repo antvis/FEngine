@@ -29,15 +29,17 @@ function dispatchEvent(el, event, type) {
 
 Component({
   data: {
-    width: 0,
-    height: 0,
+    width: null,
+    height: null,
     rpx2px: 0.5,
     pixelRatio: 2,
+    renderContent: null,
   },
   didMount() {
     const { onHandleRef } = this.props;
     onHandleRef &&
       this.props.onHandleRef({
+        setRenderContent: this.setRenderConetent.bind(this),
         updateChart: this.updateChart.bind(this),
       });
 
@@ -68,7 +70,7 @@ Component({
   },
 
   methods: {
-    createChart({ renderContent }) {
+    createChart() {
       const { width, height, onCanvasReady } = this.props;
       onCanvasReady && onCanvasReady();
       const id = `f-web-canvas-${this.$id}`;
@@ -88,7 +90,6 @@ Component({
         height: height * rpx2px,
         pixelRatio,
         context,
-        renderContent,
         createImage: canvas.createImage.bind(canvas),
         requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
         cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
@@ -111,7 +112,11 @@ Component({
 
     updateChart() {
       this.clear();
-      this.createChart({});
+      this.createChart();
+    },
+
+    setRenderConetent(renderContent) {
+      this.renderContent = renderContent;
     },
 
     catchError(error) {
@@ -128,7 +133,6 @@ Component({
       height,
       pixelRatio,
       context,
-      renderContent,
       createImage,
       requestAnimationFrame,
       cancelAnimationFrame,
@@ -136,8 +140,8 @@ Component({
       if (!width || !height) {
         return;
       }
-      const { theme, onPx2hd, onCanvasRender } = this.props;
-      const children = renderContent ? renderContent : this.props.onRender(this.props);
+      const { theme, onPx2hd, onCanvasRender, onRender } = this.props;
+      const children = onRender ? onRender(this.props) : this.renderContent;
       const canvas = new Canvas({
         pixelRatio,
         width,
