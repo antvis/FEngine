@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/antvis/FEngine/compare/v1.6.0...v1.7.0) (2025-04-09)
+
+
+### Bug Fixes
+
+* 增加判空 ([#329](https://github.com/antvis/FEngine/issues/329)) ([6c99298](https://github.com/antvis/FEngine/commit/6c9929886f32b7d152e3f5f65c06e6fccf6caf46))
+* 宽高设置&caf报错 ([#321](https://github.com/antvis/FEngine/issues/321)) ([2e30470](https://github.com/antvis/FEngine/commit/2e304704cd31d64be2ad3f3b8695289ae7c0b1b1))
+* 将offscreenCanvas创建挪至初始化 ([#318](https://github.com/antvis/FEngine/issues/318)) ([f4fcc19](https://github.com/antvis/FEngine/commit/f4fcc19887d5561d3319132ded5828d9248d0ca8))
+
+
+### Features
+
+* webCanvas增加设置renderContent函数&clear函数 ([#327](https://github.com/antvis/FEngine/issues/327)) ([15d8c14](https://github.com/antvis/FEngine/commit/15d8c142025ec38633397eafadc4c3b18fcba3c3))
+* 修改为受控组件，不主动绘制 ([#322](https://github.com/antvis/FEngine/issues/322)) ([1ff6d10](https://github.com/antvis/FEngine/commit/1ff6d10e6d5e6189d67ca372ca8e105d551aac8b))
+* 增加skipupdate&增加setRenderConetent函数 ([#326](https://github.com/antvis/FEngine/issues/326)) ([4b22e1b](https://github.com/antvis/FEngine/commit/4b22e1bb7a8d054ef9a6efb510dbf466e7fed1c5))
+* 增加webcanvas勾子函数 ([#320](https://github.com/antvis/FEngine/issues/320)) ([9a704cc](https://github.com/antvis/FEngine/commit/9a704cc5de03112cfe349d1fd093c1bc00daa1cb))
+* 增加不更新属性skipUpdate ([#325](https://github.com/antvis/FEngine/issues/325)) ([59b4172](https://github.com/antvis/FEngine/commit/59b4172e1ecd11905704d36d42ed4f357aa14961))
+
+
+
+
+
 # [1.6.0](https://github.com/antvis/FEngine/compare/v1.5.1...v1.6.0) (2024-12-26)
 
 
