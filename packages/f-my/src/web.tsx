@@ -113,7 +113,7 @@ Component({
 
     updateChart() {
       this.clear();
-      this.createChart({});
+      this.createChart();
     },
 
     setRenderConetent(renderContent) {
