@@ -44,7 +44,7 @@ Component({
         clear: this.clear.bind(this),
       });
 
-    this.createChart({});
+    this.createChart();
   },
 
   didUpdate() {
