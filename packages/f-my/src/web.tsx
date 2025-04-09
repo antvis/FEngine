@@ -41,6 +41,7 @@ Component({
       this.props.onHandleRef({
         setRenderContent: this.setRenderConetent.bind(this),
         updateChart: this.updateChart.bind(this),
+        clear: this.clear.bind(this),
       });
 
     this.createChart({});
