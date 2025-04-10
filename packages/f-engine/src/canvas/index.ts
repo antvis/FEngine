@@ -236,10 +236,19 @@ class Canvas<P extends CanvasProps = CanvasProps> {
 
   async render() {
     const { canvas, vNode, props } = this;
-    const { onRender } = props;
     await canvas.ready;
-    onRender && canvas.addEventListener('rerender', () => onRender(canvas), { once: true });
     render(vNode);
+
+    const renderFinished = await new Promise<boolean>((resolve) => {
+      const RENDER_TIMEOUT = 10 * 1000;
+      const timer = setTimeout(() => resolve(false), RENDER_TIMEOUT);
+      canvas.addEventListener('rerender', () => {
+        clearTimeout(timer);
+        resolve(true);
+      }, { once: true });
+    });
+    renderFinished && props.onRender?.(canvas);
+    return renderFinished;
   }
 
   emit(type: string, event) {
