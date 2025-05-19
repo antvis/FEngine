@@ -1,3 +1,9 @@
 <view class="container">
+  <view>native</view>
   <f-canvas onRender="onRenderChart" data="{{data}}"></f-canvas>
+  <view>web</view>
+  <view class="web-container">
+    <f-canvas-web onRender="onRenderChart" data="{{data}}" width="{{350}}" height="{{480}}">
+    </f-canvas-web>
+  </view>
 </view>

@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "f-canvas": "@antv/f-my"
+    "f-canvas": "@antv/f-my",
+    "f-canvas-web": "@antv/f-my/lib/web"
   }
 }
