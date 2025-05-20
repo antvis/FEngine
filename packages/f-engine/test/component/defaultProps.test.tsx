@@ -148,7 +148,7 @@ describe('defaultProps', () => {
     // 测试场景1：不传入任何属性
     const { props: props1 } = (
       <Canvas context={context} pixelRatio={1}>
-        {[<FunctionComponent />]}
+        <FunctionComponent />
       </Canvas>
     );
 
@@ -158,7 +158,7 @@ describe('defaultProps', () => {
     // 测试场景2：传入部分属性
     const { props: props2 } = (
       <Canvas context={context} pixelRatio={1}>
-        {[<FunctionComponent color="orange" />]}
+        <FunctionComponent color="orange" />
       </Canvas>
     );
 
@@ -168,7 +168,7 @@ describe('defaultProps', () => {
     // 测试场景3：传入全部属性
     const { props: props3 } = (
       <Canvas context={context} pixelRatio={1}>
-        {[<FunctionComponent color="yellow" size={120} />]}
+        <FunctionComponent color="yellow" size={120} />
       </Canvas>
     );
 
