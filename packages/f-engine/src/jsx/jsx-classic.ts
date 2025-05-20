@@ -22,6 +22,19 @@ export function jsx(type: ElementType, config, ...children): JSXNamespace.Elemen
   if (children.length) {
     props.children = children.length === 1 ? children[0] : children;
   }
+
+  // Resolve default props
+  // This is a simplified version of the React's defaultProps resolution.
+  // See https://github.com/facebook/react/blob/main/packages/react/src/jsx/ReactJSXElement.js
+  if (typeof type === 'function' && type['defaultProps']) {
+    const defaultProps = type['defaultProps'];
+    for (const propName in defaultProps) {
+      if (props[propName] === undefined) {
+        props[propName] = defaultProps[propName];
+      }
+    }
+  }
+
   return {
     key,
     ref,
