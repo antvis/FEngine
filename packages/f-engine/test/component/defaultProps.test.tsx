@@ -9,7 +9,7 @@ describe('defaultProps', () => {
     class ComponentWithDefaults extends Component {
       static defaultProps = {
         color: 'blue',
-        size: 50
+        size: 50,
       };
 
       render() {
@@ -58,7 +58,7 @@ describe('defaultProps', () => {
     class ChildComponent extends Component {
       static defaultProps = {
         color: 'blue',
-        size: 50
+        size: 50,
       };
 
       render() {
@@ -79,7 +79,7 @@ describe('defaultProps', () => {
     class ParentComponent extends Component {
       state = {
         childColor: undefined,
-        childSize: undefined
+        childSize: undefined,
       };
 
       didMount() {
@@ -87,19 +87,14 @@ describe('defaultProps', () => {
         setTimeout(() => {
           this.setState({
             childColor: 'red',
-            childSize: 100
+            childSize: 100,
           });
         }, 100);
       }
 
       render() {
         const { childColor, childSize } = this.state;
-        return (
-          <ChildComponent 
-            color={childColor}
-            size={childSize}
-          />
-        );
+        return <ChildComponent color={childColor} size={childSize} />;
       }
     }
 
@@ -142,7 +137,7 @@ describe('defaultProps', () => {
 
     FunctionComponent.defaultProps = {
       color: 'purple',
-      size: 80
+      size: 80,
     };
 
     // 测试场景1：不传入任何属性
@@ -201,15 +196,15 @@ describe('defaultProps', () => {
 
     FunctionComponent.defaultProps = {
       color: 'purple',
-      size: 80
+      size: 80,
     };
 
     const canvas = new Canvas({
       context,
       pixelRatio: 1,
-      children: [<FunctionComponent />]
+      children: [<FunctionComponent />],
     });
-    
+
     // 初始渲染：使用全部默认值
     await canvas.render();
     expect(mockCallback.mock.calls[0][0]).toEqual({ color: 'purple', size: 80 });
@@ -218,7 +213,7 @@ describe('defaultProps', () => {
     await canvas.update({
       context,
       pixelRatio: 1,
-      children: [<FunctionComponent color="pink" />]
+      children: [<FunctionComponent color="pink" />],
     });
     expect(mockCallback.mock.calls[1][0]).toEqual({ color: 'pink', size: 80 });
 
@@ -226,8 +221,53 @@ describe('defaultProps', () => {
     await canvas.update({
       context,
       pixelRatio: 1,
-      children: [<FunctionComponent color="brown" size={150} />]
+      children: [<FunctionComponent color="brown" size={150} />],
     });
     expect(mockCallback.mock.calls[2][0]).toEqual({ color: 'brown', size: 150 });
+  });
+
+  it('高阶组件', async () => {
+    const context = createContext('高阶组件');
+    const mockCallback = jest.fn();
+
+    function withTestComponent(WrappedComponent) {
+      return class extends Component {
+        render() {
+          return <WrappedComponent {...this.props} />;
+        }
+      };
+    }
+
+    const View = (props) => {
+      const { color, size } = props;
+      mockCallback({ color, size });
+      return (
+        <rect
+          attrs={{
+            fill: color,
+            height: `${size}px`,
+            width: `${size}px`,
+          }}
+        />
+      );
+    };
+
+    class EnhancedComponent extends withTestComponent(View) {
+      static defaultProps = {
+        color: 'green',
+        size: 60,
+      };
+    }
+
+    const { props: props1 } = (
+      <Canvas context={context}>
+        <EnhancedComponent />
+      </Canvas>
+    );
+
+    const canvas1 = new Canvas(props1);
+    await canvas1.render();
+
+    expect(mockCallback.mock.calls[0][0]).toEqual({ color: 'green', size: 60 }); // 使用全部默认值
   });
 });
