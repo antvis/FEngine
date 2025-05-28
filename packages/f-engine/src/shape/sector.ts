@@ -247,6 +247,12 @@ export class Sector extends Path {
           const b = mathSqrt(it[0] * it[0] + it[1] * it[1]);
           limitedOutBorderRadiusMax = mathMin(outBorderRadiusMax, (r - b) / (a + 1));
           limitedInnerBorderRadiusMax = mathMin(innerBorderRadiusMax, (r0 - b) / (a - 1));
+        } else {
+          // If `intersect` function returns undefined, it indicates that either the lines are parallel
+          // or they intersect at a very small angle (nearly parallel).
+          // In such cases, we set the corner radius to 0 for safety.
+          limitedOutBorderRadiusMax = 0;
+          limitedInnerBorderRadiusMax = 0;
         }
       }
     }

@@ -194,6 +194,69 @@ class View5 extends Component {
   }
 }
 
+class View6 extends Component {
+  render() {
+    return (
+      <group>
+        <sector
+          style={{
+            cx: 40,
+            cy: 40,
+            startAngle: 0,
+            endAngle: 0.001,
+            r: 26,
+            r0: 8,
+            fill: 'red',
+            stroke: 'black',
+            radius: [4, 4, 2, 2],
+          }}
+        />
+        <sector
+          style={{
+            cx: 100,
+            cy: 40,
+            startAngle: 0,
+            endAngle: 0.001,
+            r: 26,
+            r0: 8,
+            fill: 'red',
+            stroke: 'black',
+            radius: [4, 4, 2, 2],
+            anticlockwise: true,
+          }}
+        />
+        <sector
+          style={{
+            cx: 40,
+            cy: 100,
+            startAngle: 90.001,
+            endAngle: 90,
+            r: 26,
+            r0: 8,
+            fill: 'red',
+            stroke: 'black',
+            radius: [4, 4, 2, 2],
+          }}
+        />
+        <sector
+          style={{
+            cx: 100,
+            cy: 100,
+            startAngle: 90.001,
+            endAngle: 90,
+            r: 26,
+            r0: 8,
+            fill: 'red',
+            stroke: 'black',
+            radius: [4, 4, 2, 2],
+            anticlockwise: true,
+          }}
+        />
+      </group>
+    );
+  }
+}
+
 describe('Sector', () => {
   it('Sector', async () => {
     const { props } = (
@@ -397,6 +460,19 @@ describe('Sector', () => {
       </Canvas>
     );
     await canvas.update(update.props);
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+
+  it('极小角度扇形区域', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <View6 />
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
     await delay(500);
     expect(context).toMatchImageSnapshot();
   });
