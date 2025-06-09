@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/antvis/FEngine/compare/v1.7.0...v1.8.0) (2025-06-09)
+
+
+### Bug Fixes
+
+* very small angle (nearly parallel) render case in sector shape ([#333](https://github.com/antvis/FEngine/issues/333)) ([7cac015](https://github.com/antvis/FEngine/commit/7cac015af8512cb60fad8dc2f0906466ad295013))
+
+
+### Features
+
+* support defaultProps for class/function component ([#331](https://github.com/antvis/FEngine/issues/331)) ([f5a42fb](https://github.com/antvis/FEngine/commit/f5a42fb4c1204ca0fa378669dce658a20495c250))
+
+
+
+
+
 # [1.5.0](https://github.com/antvis/FEngine/compare/v1.4.1...v1.5.0) (2024-09-26)
 
 
