@@ -188,14 +188,16 @@ function createElement(parent: VNode, element: JSX.Element): VNode | VNode[] | n
 function destroyElement(vNode: VNode | VNode[] | null) {
   Children.map(vNode, (node: VNode | null) => {
     if (!node) return;
-    const { component, children } = node;
+    const { component, children, shape, tag } = node;
     if (component) {
       component.willUnmount();
       destroyElement(children);
       component.didUnmount();
       component.destroy();
-    } else {
+    } else if (children) {
       destroyElement(children);
+    } else if (tag === Shape && shape)  {
+      shape.destroy();
     }
   });
 }
