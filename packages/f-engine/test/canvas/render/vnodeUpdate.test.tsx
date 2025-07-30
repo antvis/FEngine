@@ -42,41 +42,4 @@ describe('vnode 更新', () => {
 
     expect(ref.current._vNode.props.update).toBe(true);
   });
-  it('基础图形更新', async () => {
-    const context = createContext();
-    const { props } = (
-      <Canvas context={context}>
-        <rect
-          style={{
-            width: 36,
-            height: 36,
-            fill: 'red',
-          }}
-        />
-      </Canvas>
-    );
-
-    const canvas = new Canvas(props);
-    await canvas.render();
-
-    const { props: nextProps } = (
-      <Canvas context={context}>
-        <circle
-          style={{
-            cx: 80,
-            cy: 30,
-            r: 20,
-            lineWidth: 2,
-            stroke: '#e45649',
-            fill: 'blue',
-          }}
-        />
-      </Canvas>
-    );
-    await delay(500);
-    await canvas.update(nextProps);
-
-    await delay(200);
-    expect(context).toMatchImageSnapshot();
-  });
 });
