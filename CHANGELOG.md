@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/antvis/FEngine/compare/v1.8.0...v1.8.1) (2025-08-05)
+
+
+### Bug Fixes
+
+* basic shapes update ([#336](https://github.com/antvis/FEngine/issues/336)) ([1e0211b](https://github.com/antvis/FEngine/commit/1e0211b893637e3311d791318bc3ad2937167e98))
+* measureText未考虑旋转 ([#340](https://github.com/antvis/FEngine/issues/340)) ([528de2b](https://github.com/antvis/FEngine/commit/528de2bef64171661587bd66d07656766ebdc68e))
+
+
+### Reverts
+
+* Revert "test(render): 添加 svg 和 webgl 事件的单测 (#240)" (#341) ([54906c0](https://github.com/antvis/FEngine/commit/54906c0d0070528852bd4472f601cb9fdc982a99)), closes [#240](https://github.com/antvis/FEngine/issues/240) [#341](https://github.com/antvis/FEngine/issues/341)
+* Revert "fix: basic shapes update (#336)" (#337) ([d85b1f3](https://github.com/antvis/FEngine/commit/d85b1f3ae4d5ee795861fa395ca0b4cf85d52500)), closes [#336](https://github.com/antvis/FEngine/issues/336) [#337](https://github.com/antvis/FEngine/issues/337)
+
+
+
+
+
 # [1.8.0](https://github.com/antvis/FEngine/compare/v1.7.0...v1.8.0) (2025-06-09)
 
 
