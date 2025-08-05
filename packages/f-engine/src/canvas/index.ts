@@ -53,6 +53,7 @@ function measureText(container: Group, px2hd, theme: ThemeType) {
       textAlign = theme.textAlign,
       textBaseline = theme.textBaseline,
       lineWidth = 1,
+      transform = '',
     } = font || {};
 
     const style = {
@@ -67,6 +68,7 @@ function measureText(container: Group, px2hd, theme: ThemeType) {
       textAlign,
       textBaseline,
       lineWidth,
+      transform,
       visibility: 'hidden',
     };
 
