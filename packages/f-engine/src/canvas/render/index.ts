@@ -185,17 +185,20 @@ function createElement(parent: VNode, element: JSX.Element): VNode | VNode[] | n
   });
 }
 
-function destroyElement(vNode: VNode | VNode[] | null) {
+function destroyElement(vNode: VNode | VNode[] | null, nextVNode?: VNode) {
   Children.map(vNode, (node: VNode | null) => {
     if (!node) return;
-    const { component, children } = node;
+    const { component, children, shape, tag } = node;
     if (component) {
       component.willUnmount();
       destroyElement(children);
       component.didUnmount();
       component.destroy();
-    } else {
+    } else if (children) {
       destroyElement(children);
+    } else if (tag === Shape && shape)  {
+      // 更新模式时销毁上个节点
+      nextVNode && shape.destroy();
     }
   });
 }
@@ -214,7 +217,7 @@ function updateElement(parent: VNode, nextElement: JSX.Element, lastElement: VNo
   }
 
   const nextVNode = createVNode(parent, nextElement as VNode);
-  destroyElement(lastElement);
+  destroyElement(lastElement, nextVNode);
   return nextVNode;
 }
 
