@@ -4,7 +4,7 @@ import Children from '../../children';
 import { isNumber, isArray } from '@antv/util';
 import getShapeAttrs from '../shape';
 import { VNode } from '../vnode';
-import { Shape, FunctionComponent, getWorkTag } from '../workTags';
+import { Shape, FunctionComponent, getWorkTag, ClassComponent } from '../workTags';
 import computeCSSLayout from './css-layout';
 
 export interface INode {
@@ -151,6 +151,20 @@ function renderJSXElement(element: JSX.Element, context, updater) {
     return renderJSXElement(newElement, context, updater);
   }
 
+  if (tag === ClassComponent) {
+    // 创建组件实例
+    const instance = new (type as any)(element.props, context, updater);
+
+    // 初始化组件
+    if (instance.componentWillMount) {
+      instance.componentWillMount();
+    }
+
+    const newElement = instance.render();
+
+    return renderJSXElement(newElement, context, updater);
+  }
+
   const { className, style: customStyle = {}, attrs, children: newChildren } = props;
 
   const style = px2hd({
@@ -270,4 +284,11 @@ function fillComponentLayout(vNode: VNode) {
   });
 }
 
-export { computeLayout, createNodeTree, computeCSSLayout, fillElementLayout, fillComponentLayout };
+export {
+  computeLayout,
+  renderJSXElement,
+  createNodeTree,
+  computeCSSLayout,
+  fillElementLayout,
+  fillComponentLayout,
+};
