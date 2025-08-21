@@ -1,5 +1,5 @@
 import { jsx, Canvas, Component } from '../../../src';
-import { computeComponent } from '../../../src/canvas/render/computeComponent';
+import { computeComponentBBox } from '../../../src/canvas/render';
 import { createContext, delay } from '@antv/f-test-utils';
 
 class View extends Component {
@@ -62,7 +62,6 @@ class ViewText extends Component {
           x: position[0],
           y: position[1],
           text: 'hello',
-          // textBaseline: 'middle',
         }}
       />
     );
@@ -80,7 +79,7 @@ class GuideGroup extends Component {
       const component = new child.type(child.props, context, updater);
       component.context = context;
 
-      const bbox = computeComponent(this, component.render());
+      const bbox = computeComponentBBox(this, component.render());
       this.bbox.push(bbox);
     });
   }

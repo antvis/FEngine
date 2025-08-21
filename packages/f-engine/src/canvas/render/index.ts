@@ -16,6 +16,7 @@ import {
   computeCSSLayout,
   fillElementLayout,
   fillComponentLayout,
+  computeComponentBBox,
 } from './computeLayout';
 import findClosestShapeNode from './findClosestShapeNode';
 
@@ -28,7 +29,7 @@ function pickElement(element: JSX.Element | JSX.Element[] | null) {
   });
 }
 
-export function getStyle(tagType: WorkTag, props, context) {
+function getStyle(tagType: WorkTag, props, context) {
   const { style: customStyle = {}, attrs, zIndex } = props;
 
   if (tagType === Shape) {
@@ -444,6 +445,7 @@ export {
   render,
   renderChildren,
   updateComponents,
+  computeComponentBBox,
   computeLayout,
   destroyElement,
   getUpdateAnimation,

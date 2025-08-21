@@ -1,5 +1,4 @@
-import { computeLayout } from './canvas/render';
-import { computeComponent } from './canvas/render/computeComponent';
+import { computeLayout, computeComponentBBox } from './canvas/render';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import { parseColor } from '@antv/g-lite';
 import * as Smooth from './shape/util/smooth';
@@ -15,7 +14,7 @@ export { default as createRef } from './createRef';
 export { default as createContext } from './createContext';
 export { default as Timeline, TimelineProps } from './timeline';
 export { default as Gesture } from './gesture';
-export { CanvasRenderer, computeLayout, computeComponent, Smooth, parseColor };
+export { CanvasRenderer, computeLayout, computeComponentBBox, Smooth, parseColor };
 export { default as isEqual } from './canvas/equal';
 
 export { default as Player, PlayerProps } from './player';

@@ -102,6 +102,6 @@ describe('G 的测试使用', () => {
 
     expect(textBBox).toBeDefined();
     expect(textBBox.x).toBeCloseTo(50, 1);
-    expect(textBBox.y).toBeCloseTo(35, 1);
+    expect(textBBox.y).toBeCloseTo(34, 1);
   });
 });

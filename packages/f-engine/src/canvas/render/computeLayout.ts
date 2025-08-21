@@ -157,9 +157,8 @@ function renderJSXElement(element: JSX.Element, context, updater) {
     // 创建组件实例
     const instance = new (type as any)(element.props, context, updater);
 
-    // 初始化组件
-    if (instance.componentWillMount) {
-      instance.componentWillMount();
+    if (instance.WillMount) {
+      instance.WillMount();
     }
 
     const newElement = instance.render();
@@ -188,7 +187,7 @@ function renderJSXElement(element: JSX.Element, context, updater) {
 
   const vNode = {
     key: undefined,
-    tag: ClassComponent,
+    tag,
     type,
     props,
     context,
@@ -215,7 +214,7 @@ function computeLayout(component: Component, newChildren: JSX.Element) {
   return new NodeTree(nodeTree);
 }
 
-export function createChildNodeTree(parent: VNode, vNodeChildren: VNode | VNode[]) {
+function createChildNodeTree(parent: VNode, vNodeChildren: VNode | VNode[]) {
   const { tag } = parent;
   const children = extendMap(vNodeChildren, (child: VNode) => {
     const { tag: childTag, style: childStyle, children: childChildren } = child;
@@ -320,7 +319,7 @@ function traverseNodeTreeAndCreateShapes(node, parentShape, context) {
   if (!node) return;
 
   const { type, children, style: originStyle, vNode } = node;
-  const { style: customStyle = {}, attrs } = vNode;
+  const { style: customStyle = {}, attrs = {} } = vNode;
 
   const style = context.px2hd({
     ...originStyle,
