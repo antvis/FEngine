@@ -16,6 +16,7 @@ import {
   computeCSSLayout,
   fillElementLayout,
   fillComponentLayout,
+  computeComponentBBox,
 } from './computeLayout';
 import findClosestShapeNode from './findClosestShapeNode';
 
@@ -76,6 +77,7 @@ function createVNode(parent: VNode, vNode: VNode) {
   const { canvas, context: parentContext, updater, animate: parentAnimate } = parent;
 
   const { ref, type, props: originProps } = vNode;
+
   const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
@@ -348,6 +350,7 @@ function renderChildren(
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
   computeCSSLayout(nodeTree);
+
   fillElementLayout(nodeTree);
   fillComponentLayout(parent);
 
@@ -442,6 +445,7 @@ export {
   render,
   renderChildren,
   updateComponents,
+  computeComponentBBox,
   computeLayout,
   destroyElement,
   getUpdateAnimation,

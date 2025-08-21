@@ -4,7 +4,9 @@ import Children from '../../children';
 import { isNumber, isArray } from '@antv/util';
 import getShapeAttrs from '../shape';
 import { VNode } from '../vnode';
-import { Shape, FunctionComponent, getWorkTag } from '../workTags';
+import { Group } from '@antv/g-lite';
+import { createShape } from './createShape';
+import { Shape, FunctionComponent, getWorkTag, ClassComponent } from '../workTags';
 import computeCSSLayout from './css-layout';
 
 export interface INode {
@@ -151,6 +153,19 @@ function renderJSXElement(element: JSX.Element, context, updater) {
     return renderJSXElement(newElement, context, updater);
   }
 
+  if (tag === ClassComponent) {
+    // 创建组件实例
+    const instance = new (type as any)(element.props, context, updater);
+
+    if (instance.WillMount) {
+      instance.WillMount();
+    }
+
+    const newElement = instance.render();
+
+    return renderJSXElement(newElement, context, updater);
+  }
+
   const { className, style: customStyle = {}, attrs, children: newChildren } = props;
 
   const style = px2hd({
@@ -170,8 +185,18 @@ function renderJSXElement(element: JSX.Element, context, updater) {
       })
     : [];
 
+  const vNode = {
+    key: undefined,
+    tag,
+    type,
+    props,
+    context,
+    updater,
+  };
+
   return {
     type,
+    vNode,
     className,
     children: nextChildren.filter(Boolean),
     style,
@@ -270,4 +295,55 @@ function fillComponentLayout(vNode: VNode) {
   });
 }
 
-export { computeLayout, createNodeTree, computeCSSLayout, fillElementLayout, fillComponentLayout };
+function computeComponentBBox(component: Component | VNode, newChildren?: JSX.Element) {
+  const { context, updater } = component;
+  const { canvas } = context;
+  const nodeTree = renderJSXElement(newChildren, context, updater);
+
+  if (nodeTree.style?.display === 'flex') {
+    computeCSSLayout(nodeTree);
+    fillElementLayout(nodeTree);
+  }
+
+  const rootShape = new Group();
+  traverseNodeTreeAndCreateShapes(nodeTree, rootShape, context);
+
+  canvas.getRoot().appendChild(rootShape);
+
+  const bbox = rootShape.getBBox();
+  rootShape.remove();
+  return bbox;
+}
+
+function traverseNodeTreeAndCreateShapes(node, parentShape, context) {
+  if (!node) return;
+
+  const { type, children, style: originStyle, vNode } = node;
+  const { style: customStyle = {}, attrs = {} } = vNode;
+
+  const style = context.px2hd({
+    ...originStyle,
+    ...customStyle,
+    ...attrs,
+  });
+
+  const shape = createShape(type, { style });
+
+  if (parentShape) {
+    parentShape.appendChild(shape);
+  }
+
+  Children.map(children, (child) => traverseNodeTreeAndCreateShapes(child, shape, context));
+
+  return shape;
+}
+
+export {
+  computeComponentBBox,
+  computeLayout,
+  renderJSXElement,
+  createNodeTree,
+  computeCSSLayout,
+  fillElementLayout,
+  fillComponentLayout,
+};

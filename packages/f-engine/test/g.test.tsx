@@ -1,4 +1,4 @@
-import { Canvas, CanvasEvent, Circle, convertToPath, Path, Rect } from '@antv/g-lite';
+import { Canvas, CanvasEvent, Circle, Text, convertToPath, Path, Rect, Group } from '@antv/g-lite';
 import { Renderer as CanvasRenderer } from '@antv/g-mobile-canvas';
 import '@antv/g-web-animations-api';
 import { createContext, delay } from './util';
@@ -69,5 +69,39 @@ describe('G 的测试使用', () => {
     });
 
     await delay(1000);
+  });
+
+  it('getBoxx', async () => {
+    const circle = new Circle({
+      style: {
+        cx: 50,
+        cy: 50,
+        r: 20,
+        fill: 'red',
+      },
+    });
+    const circleBBox = circle.getBBox();
+
+    const group = new Group();
+    const text = new Text({
+      style: {
+        x: 50,
+        y: 50,
+        text: 'test',
+      },
+    });
+    canvas.appendChild(group);
+    group.appendChild(text);
+    const textBBox = text.getBBox();
+
+    expect(circleBBox).toBeDefined();
+    expect(circleBBox.x).toBeCloseTo(30, 1);
+    expect(circleBBox.y).toBeCloseTo(30, 1);
+    expect(circleBBox.width).toBeCloseTo(40, 1);
+    expect(circleBBox.height).toBeCloseTo(40, 1);
+
+    expect(textBBox).toBeDefined();
+    expect(textBBox.x).toBeCloseTo(50, 1);
+    expect(textBBox.y).toBeCloseTo(34, 1);
   });
 });
