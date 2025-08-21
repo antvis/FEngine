@@ -253,6 +253,22 @@ function createNodeTree(vNode: VNode) {
   };
 }
 
+function hasFlexDisplay(node) {
+  if (!node) return false;
+
+  const { style, children, vNode } = node;
+
+  if (vNode?.tag === Shape && style?.display === 'flex') {
+    return true;
+  }
+
+  if (children && children.length) {
+    return children.some(hasFlexDisplay);
+  }
+
+  return false;
+}
+
 function fillElementLayout(node) {
   const { type, style, vNode, children, layout } = node;
   const attrs = getShapeAttrs(type, layout);
@@ -300,7 +316,7 @@ function computeComponentBBox(component: Component | VNode, newChildren?: JSX.El
   const { canvas } = context;
   const nodeTree = renderJSXElement(newChildren, context, updater);
 
-  if (nodeTree.style?.display === 'flex') {
+  if (hasFlexDisplay(nodeTree)) {
     computeCSSLayout(nodeTree);
     fillElementLayout(nodeTree);
   }
