@@ -1,6 +1,10 @@
 import { jsx, Canvas, Component } from '../../../src';
+import { getWorkTag } from '../../../src/canvas/workTags';
 import { computeComponentBBox } from '../../../src/canvas/render';
 import { createContext, delay } from '@antv/f-test-utils';
+
+const FunctionComponent = 0;
+const ClassComponent = 1;
 
 class View extends Component {
   willMount(): void {}
@@ -68,6 +72,9 @@ class ViewText extends Component {
   }
 }
 
+const ViewWithDisplay = (props) => {
+  return <ViewWithDisplayGroup {...props} />;
+};
 class GuideGroup extends Component {
   bbox = [];
 
@@ -76,10 +83,16 @@ class GuideGroup extends Component {
     const { updater, context } = this;
     const childArray = Array.isArray(children) ? children : [children];
     childArray.map((child) => {
-      const component = new child.type(child.props, context, updater);
-      component.context = context;
+      const tag = getWorkTag(child.type);
+      let element = child;
 
-      const bbox = computeComponentBBox(this, component.render());
+      if (tag === FunctionComponent) {
+        element = child.type(child.props, context, updater);
+      }
+      const component = new element.type({ ...element.props }, context, updater);
+      component.context = context;
+      const newElement = component.render();
+      const bbox = computeComponentBBox(this, newElement);
       this.bbox.push(bbox);
     });
   }
@@ -127,6 +140,7 @@ describe('computeComponent', () => {
       <Canvas context={context}>
         <GuideGroup ref={guideGroupRef}>
           <ViewWithDisplayGroup />
+          <ViewWithDisplay position={[20, 20]} />
         </GuideGroup>
       </Canvas>
     );
@@ -141,6 +155,9 @@ describe('computeComponent', () => {
     expect(bbox[0].y).toEqual(0);
     expect(bbox[0].width).toBeGreaterThan(20);
     expect(bbox[0].height).toBeGreaterThan(10);
+
+    expect(bbox[1].x).toEqual(20);
+    expect(bbox[1].y).toEqual(20);
   });
 
   it('View内的group带padding样式', async () => {
