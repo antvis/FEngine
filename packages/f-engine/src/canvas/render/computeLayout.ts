@@ -214,7 +214,7 @@ function computeLayout(component: Component, newChildren: JSX.Element) {
   return new NodeTree(nodeTree);
 }
 
-export function createChildNodeTree(parent: VNode, vNodeChildren: VNode | VNode[]) {
+function createChildNodeTree(parent: VNode, vNodeChildren: VNode | VNode[]) {
   const { tag } = parent;
   const children = extendMap(vNodeChildren, (child: VNode) => {
     const { tag: childTag, style: childStyle, children: childChildren } = child;

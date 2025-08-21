@@ -62,10 +62,6 @@ class ViewText extends Component {
           x: position[0],
           y: position[1],
           text: 'hello',
-<<<<<<< HEAD
-=======
-          // textBaseline: 'middle',
->>>>>>> 9217c83 (fix: 修复flex布局计算)
         }}
       />
     );
