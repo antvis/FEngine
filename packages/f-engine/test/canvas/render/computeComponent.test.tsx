@@ -1,6 +1,6 @@
-import { jsx, Canvas, Component, computeLayout } from '../../../src';
+import { jsx, Canvas, Component } from '../../../src';
 import { computeComponent } from '../../../src/canvas/render/computeComponent';
-import { createContext, delay } from '../../util';
+import { createContext, delay } from '@antv/f-test-utils';
 
 class View extends Component {
   willMount(): void {}
@@ -25,24 +25,46 @@ class View extends Component {
   }
 }
 
+class ViewWithDisplayGroup extends Component {
+  willMount(): void {}
+  render() {
+    const { style, position = [20, 0] } = this.props;
+    return (
+      <group
+        style={{
+          fill: 'blue',
+          display: 'flex',
+          x: position[0],
+          y: position[1],
+          ...style,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <text
+          style={{
+            text: 'hello',
+            textAlign: 'start',
+          }}
+        />
+      </group>
+    );
+  }
+}
+
 class ViewText extends Component {
   willMount(): void {}
   render() {
     const { position } = this.props;
     return (
-      <group
+      <text
         style={{
-          fill: 'red',
+          x: position[0],
+          y: position[1],
+          text: 'hello',
+          // textBaseline: 'middle',
         }}
-      >
-        <text
-          style={{
-            x: position[0],
-            y: position[1],
-            text: 'hello',
-          }}
-        />
-      </group>
+      />
     );
   }
 }
@@ -88,7 +110,6 @@ describe('computeComponent', () => {
     await delay(100);
 
     const bbox = guideGroupRef.current.bbox;
-
     expect(bbox[0].x).toEqual(40);
     expect(bbox[0].y).toEqual(28);
     expect(bbox[0].width).toBeGreaterThan(0);
@@ -98,5 +119,53 @@ describe('computeComponent', () => {
     expect(bbox[1].y).toEqual(50);
     expect(bbox[1].width).toEqual(40);
     expect(bbox[1].height).toEqual(40);
+  });
+
+  it('View内的group带display样式', async () => {
+    const context = createContext();
+    const guideGroupRef = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <GuideGroup ref={guideGroupRef}>
+          <ViewWithDisplayGroup />
+        </GuideGroup>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    await delay(100);
+
+    const bbox = guideGroupRef.current.bbox;
+    expect(bbox[0].x).toEqual(20);
+    expect(bbox[0].y).toEqual(0);
+    expect(bbox[0].width).toBeGreaterThan(20);
+    expect(bbox[0].height).toBeGreaterThan(10);
+  });
+
+  it('View内的group带padding样式', async () => {
+    const context = createContext();
+
+    const guideGroupRef = { current: null };
+    const { props } = (
+      <Canvas context={context}>
+        <GuideGroup ref={guideGroupRef}>
+          <ViewWithDisplayGroup position={[0, 0]} style={{ padding: [20, 20, 20, 20] }} />
+        </GuideGroup>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    await canvas.render();
+
+    await delay(100);
+
+    const bbox = guideGroupRef.current.bbox;
+
+    expect(bbox[0].x).toEqual(0);
+    expect(bbox[0].y).toEqual(0);
+    expect(bbox[0].width).toBeGreaterThan(40);
+    expect(bbox[0].height).toBeGreaterThan(40);
   });
 });

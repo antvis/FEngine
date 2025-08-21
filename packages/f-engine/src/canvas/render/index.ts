@@ -28,7 +28,7 @@ function pickElement(element: JSX.Element | JSX.Element[] | null) {
   });
 }
 
-function getStyle(tagType: WorkTag, props, context) {
+export function getStyle(tagType: WorkTag, props, context) {
   const { style: customStyle = {}, attrs, zIndex } = props;
 
   if (tagType === Shape) {
@@ -76,6 +76,7 @@ function createVNode(parent: VNode, vNode: VNode) {
   const { canvas, context: parentContext, updater, animate: parentAnimate } = parent;
 
   const { ref, type, props: originProps } = vNode;
+
   const { animate, transformFrom, ...props } = originProps;
 
   const tag = getWorkTag(type);
@@ -348,6 +349,7 @@ function renderChildren(
   // 计算 flex 布局
   const nodeTree = createNodeTree(parent);
   computeCSSLayout(nodeTree);
+
   fillElementLayout(nodeTree);
   fillComponentLayout(parent);
 

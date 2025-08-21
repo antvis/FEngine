@@ -96,6 +96,7 @@ function createShape(type: string, props) {
   const ShapeClass = getTag(type);
   if (!ShapeClass) return null;
   // const result = checkCSSRule(type, originStyle);
+
   const shape = new ShapeClass(props);
   // @ts-ignore
   shape.gesture = addEvent(shape, props);

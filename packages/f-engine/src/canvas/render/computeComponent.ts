@@ -1,6 +1,6 @@
 import { JSX } from '../../jsx/jsx-namespace';
 import Component from '../../component';
-import { renderJSXElement, computeCSSLayout } from './computeLayout';
+import { renderJSXElement, computeCSSLayout, fillElementLayout } from './computeLayout';
 import { createShape } from './createShape';
 import { VNode } from '../vnode';
 import { Group } from '@antv/g-lite';
@@ -11,31 +11,40 @@ function computeComponent(component: Component | VNode, newChildren?: JSX.Elemen
   const { canvas } = context;
   const nodeTree = renderJSXElement(newChildren, context, updater);
 
-  computeCSSLayout(nodeTree);
+  if (nodeTree.style?.display === 'flex') {
+    computeCSSLayout(nodeTree);
+    fillElementLayout(nodeTree);
+  }
 
   const rootShape = new Group();
-  traverseNodeTreeAndCreateShapes(nodeTree, rootShape);
+  traverseNodeTreeAndCreateShapes(nodeTree, rootShape, context);
 
   canvas.getRoot().appendChild(rootShape);
+
   const bbox = rootShape.getBBox();
   rootShape.remove();
   return bbox;
 }
 
-function traverseNodeTreeAndCreateShapes(node, parentShape) {
+function traverseNodeTreeAndCreateShapes(node, parentShape, context) {
   if (!node) return;
 
-  const { type, style, children } = node;
+  const { type, children, style: originStyle, vNode } = node;
+  const { style: customStyle = {}, attrs } = vNode;
 
-  // Create the shape for this node
-  const shape = createShape(type, { style });
+  const style = context.px2hd({
+    ...originStyle,
+    ...customStyle,
+    ...attrs,
+  });
 
-  // Add to parent
+  const shape = createShape(type, { style: { ...style, visibility: 'visible' } });
+
   if (parentShape) {
     parentShape.appendChild(shape);
   }
 
-  Children.map(children, (child) => traverseNodeTreeAndCreateShapes(child, shape));
+  Children.map(children, (child) => traverseNodeTreeAndCreateShapes(child, shape, context));
 
   return shape;
 }
