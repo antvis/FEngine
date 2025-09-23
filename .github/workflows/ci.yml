@@ -11,7 +11,7 @@ jobs:
   # This workflow contains a single job called "ci"
   ci:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: macos-14
 
     strategy:
       matrix:
