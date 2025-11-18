@@ -8,6 +8,8 @@ export interface SectorStyleProps extends BaseStyleProps {
   /** 起始角度 */
   startAngle?: string | number;
   endAngle?: string | number;
+  /** 扇形之间的间隙角度（以度为单位） */
+  padAngle?: string | number;
   r?: string | number;
   r0?: string | number;
   radius?:
@@ -126,24 +128,58 @@ export class Sector extends Path {
   }
   setAttribute(name, value, force?: boolean) {
     super.setAttribute(name, value, force);
-    if (['startAngle', 'endAngle', 'r', 'r0', 'radius', 'cx', 'cy'].indexOf(name) > -1) {
+    if (
+      ['startAngle', 'endAngle', 'r', 'r0', 'radius', 'cx', 'cy', 'padAngle'].indexOf(name) > -1
+    ) {
       this.updatePath();
     }
   }
 
   private updatePath() {
-    const { cx, cy, startAngle, endAngle, r, r0, radius, anticlockwise = false } = this.parsedStyle;
+    const {
+      cx,
+      cy,
+      startAngle,
+      endAngle,
+      r,
+      r0,
+      radius,
+      anticlockwise = false,
+      padAngle = 0,
+    } = this.parsedStyle;
 
     if (isNil(startAngle) || isNil(endAngle) || startAngle === endAngle || isNil(r) || r <= 0) {
       super.setAttribute('path', '');
       return;
     }
 
+    const startRad = deg2rad(startAngle);
+    const endRad = deg2rad(endAngle);
+    const padRad = deg2rad(padAngle);
+
+    let adjStart = startRad;
+    let adjEnd = endRad;
+    if (padRad > 0) {
+      const clockwise = !anticlockwise;
+
+      let rawAngle = clockwise ? endRad - startRad : startRad - endRad;
+      if (rawAngle < 0) rawAngle += PI2;
+
+      if (padRad >= rawAngle) {
+        super.setAttribute('path', '');
+        return;
+      }
+      const half = padRad / 2;
+
+      adjStart = clockwise ? startRad + half : startRad - half;
+      adjEnd = clockwise ? endRad - half : endRad + half;
+    }
+
     const path = this.createPath(
       cx,
       cy,
-      deg2rad(startAngle),
-      deg2rad(endAngle),
+      adjStart,
+      adjEnd,
       r,
       r0 ? r0 : 0,
       radius ? radius : [0, 0, 0, 0],
