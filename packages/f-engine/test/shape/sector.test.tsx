@@ -476,4 +476,100 @@ describe('Sector', () => {
     await delay(500);
     expect(context).toMatchImageSnapshot();
   });
+  it('padAngle 绘制', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <group>
+          <sector
+            style={{
+              cx: 100,
+              cy: 80,
+              startAngle: 0,
+              endAngle: 90,
+              r: 60,
+              r0: 10,
+              fill: 'red',
+              stroke: 'black',
+              radius: [0, 8, 8, 0],
+            }}
+          />
+          <sector
+            style={{
+              cx: 100,
+              cy: 80,
+              startAngle: 0,
+              endAngle: 90,
+              r: 60,
+              r0: 10,
+              fill: 'red',
+              stroke: 'black',
+              radius: [0, 8, 8, 0],
+              padAngle: 40,
+            }}
+          />
+          <sector
+            style={{
+              cx: 260,
+              cy: 80,
+              startAngle: 0,
+              endAngle: 20,
+              r: 60,
+              r0: 10,
+              fill: 'blue',
+              stroke: 'black',
+              radius: [0, 8, 8, 0],
+              padAngle: 40,
+            }}
+          />
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
+  it('padAngle 绘制 anticlockwise', async () => {
+    const { props } = (
+      <Canvas context={context}>
+        <group>
+          <sector
+            style={{
+              cx: 100,
+              cy: 100,
+              startAngle: 0,
+              endAngle: 90,
+              r: 60,
+              r0: 10,
+              fill: 'green',
+              stroke: 'black',
+              radius: [0, 8, 8, 0],
+              anticlockwise: true,
+            }}
+          />
+          <sector
+            style={{
+              cx: 100,
+              cy: 100,
+              startAngle: 0,
+              endAngle: 90,
+              r: 60,
+              r0: 10,
+              fill: 'green',
+              stroke: 'black',
+              radius: [0, 8, 8, 0],
+              padAngle: 30,
+              anticlockwise: true,
+            }}
+          />
+        </group>
+      </Canvas>
+    );
+
+    const canvas = new Canvas(props);
+    canvas.render();
+    await delay(500);
+    expect(context).toMatchImageSnapshot();
+  });
 });
