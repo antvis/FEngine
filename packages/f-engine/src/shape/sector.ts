@@ -8,7 +8,6 @@ export interface SectorStyleProps extends BaseStyleProps {
   /** 起始角度 */
   startAngle?: string | number;
   endAngle?: string | number;
-  /** 扇形之间的间隙角度（以度为单位） */
   padAngle?: string | number;
   r?: string | number;
   r0?: string | number;
