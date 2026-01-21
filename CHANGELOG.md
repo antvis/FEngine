@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/antvis/FEngine/compare/v1.8.2...v1.10.0) (2026-01-21)
+
+
+### Features
+
+* sector支持空隙设置 ([#348](https://github.com/antvis/FEngine/issues/348)) ([51dbc64](https://github.com/antvis/FEngine/commit/51dbc64b51c3e2c0aeb8eab1363f9720570df77e))
+
+
+
+
+
 # [1.9.0](https://github.com/antvis/FEngine/compare/v1.8.2...v1.9.0) (2026-01-21)
 
 
