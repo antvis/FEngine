@@ -81,6 +81,7 @@ Component({
       this.nativeCanvas?.cancelAnimationFrame(this.renderFrameId);
       this.renderFrameId = null;
     }
+    this.nativeCanvas = null;
     const { canvas } = this;
     if (!canvas) return;
     canvas.destroy();
