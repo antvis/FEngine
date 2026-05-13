@@ -112,6 +112,7 @@ Component({
           }
 
           const { width, height } = canvas;
+          if (this.destroyed) return;
           this.nativeCanvas = canvas;
 
           const pixelRatio = Math.ceil(getPixelRatio());
