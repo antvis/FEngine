@@ -7,20 +7,23 @@ export type { JSX } from './jsx/jsx-namespace';
 // export createElement 别名
 export { jsx as createElement, Fragment, jsx } from './jsx';
 export { registerTag } from './jsx/tag';
-export { default as Canvas, CanvasProps } from './canvas';
+export { default as Canvas } from './canvas';
+export type { CanvasProps } from './canvas';
 export { default as Component } from './component';
 export { default as Children } from './children';
 export { default as createRef } from './createRef';
 export { default as createContext } from './createContext';
-export { default as Timeline, TimelineProps } from './timeline';
+export { default as Timeline } from './timeline';
+export type { TimelineProps } from './timeline';
 export { default as Gesture } from './gesture';
 export { CanvasRenderer, computeLayout, computeComponentBBox, Smooth, parseColor };
 export { default as isEqual } from './canvas/equal';
 
-export { default as Player, PlayerProps } from './player';
+export { default as Player } from './player';
+export type { PlayerProps } from './player';
 
 // 导出 ts 类型
-export {
+export type {
   IProps,
   IState,
   IContext,
