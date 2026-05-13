@@ -52,6 +52,7 @@ Component({
     this.setCanvasId();
   },
   didMount() {
+    this.destroyed = false;
     if (!isAppX2CanvasEnv()) {
       console.error('当前基础库版本过低，请升级基础库版本到 2.7.0 或以上。');
     }
@@ -75,6 +76,11 @@ Component({
     });
   },
   didUnmount() {
+    this.destroyed = true;
+    if (this.renderFrameId != null) {
+      this.nativeCanvas?.cancelAnimationFrame(this.renderFrameId);
+      this.renderFrameId = null;
+    }
     const { canvas } = this;
     if (!canvas) return;
     canvas.destroy();
@@ -105,6 +111,7 @@ Component({
           }
 
           const { width, height } = canvas;
+          this.nativeCanvas = canvas;
 
           const pixelRatio = Math.ceil(getPixelRatio());
 
@@ -115,6 +122,9 @@ Component({
               height: height * pixelRatio,
             },
             () => {
+              if (this.destroyed) {
+                return;
+              }
               const context = canvas.getContext('2d');
               const fCanvas = this.createCanvas({
                 width,
@@ -125,8 +135,14 @@ Component({
                 requestAnimationFrame: canvas.requestAnimationFrame.bind(canvas),
                 cancelAnimationFrame: canvas.cancelAnimationFrame.bind(canvas),
               });
-              fCanvas.render().catch((error) => {
-                this.catchError(error);
+              this.renderFrameId = canvas.requestAnimationFrame(() => {
+                this.renderFrameId = null;
+                if (this.destroyed) {
+                  return;
+                }
+                fCanvas.render().catch((error) => {
+                  this.catchError(error);
+                });
               });
             },
           );
