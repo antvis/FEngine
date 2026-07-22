@@ -64,6 +64,7 @@
     "react-monaco-editor": "0.34.0",
     "monaco-editor": "0.20.0",
     "monaco-editor-webpack-plugin": "1.9.1",
-    "cheerio": "1.0.0-rc.12"
+    "cheerio": "1.0.0-rc.12",
+    "typescript": "^5.2.0"
   }
 }
