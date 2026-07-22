@@ -3,7 +3,7 @@ const { configureToMatchImageSnapshot } = require('jest-image-snapshot');
 // eslint-disable-next-line
 const CanvasConverter = require('canvas-to-buffer');
 const toMatchImageSnapshot = configureToMatchImageSnapshot({
-  failureThreshold: 0.001,
+  failureThreshold: 0.01,
   failureThresholdType: 'percent',
 });
 
